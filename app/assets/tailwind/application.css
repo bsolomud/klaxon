@@ -1,1 +1,52 @@
 @import "tailwindcss";
+
+@theme {
+    --color-brand-black: #000000;
+}
+
+@layer base {
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="tel"],
+    input[type="url"],
+    input[type="date"],
+    select,
+    textarea {
+        @apply block w-full rounded-lg border border-gray-300 px-3 py-2
+        text-gray-900 placeholder-gray-400 shadow-sm
+        focus:border-black focus:ring-1 focus:ring-black focus:outline-none
+        sm:text-sm transition-all duration-200;
+    }
+
+    input[type="checkbox"],
+    input[type="radio"] {
+        @apply h-4 w-4 border-gray-300 text-black focus:ring-black cursor-pointer;
+        accent-color: #000000;
+    }
+
+    input[type="checkbox"] { @apply rounded; }
+    input[type="radio"] { @apply rounded-full; }
+    input[type="file"] {
+        @apply block w-full text-sm text-gray-500
+        file:mr-4 file:py-2 file:px-4
+        file:rounded-full file:border-0
+        file:text-sm file:font-semibold
+        file:bg-black file:text-white
+        hover:file:bg-gray-800 cursor-pointer;
+    }
+}
+
+@layer components {
+    .btn-primary {
+        @apply flex w-full justify-center rounded-lg bg-black py-2.5 px-4
+        text-sm font-medium text-white shadow-sm hover:bg-gray-800
+        focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2
+        transition-all active:scale-95 cursor-pointer;
+    }
+
+    .label-input {
+        @apply block text-xs font-medium text-gray-700 uppercase tracking-wider mb-1;
+    }
+}

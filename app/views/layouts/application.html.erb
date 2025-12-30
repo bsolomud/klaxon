@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="h-full bg-gray-50">
   <head>
     <title><%= content_for(:title) || "Klaxon" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -18,14 +18,42 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <main class="container mx-auto mt-28 px-5 flex">
-      <%= yield %>
-    </main>
+  <body class="h-full antialiased font-sans">
+    <% if devise_controller? %>
+      <%# Для логіну: чистий екран без обмежень контейнера %>
+      <main class="h-full">
+        <%= yield %>
+      </main>
+    <% else %>
+      <%# Для внутрішніх сторінок: стандартна сітка %>
+      <header class="bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between">
+          <div class="font-bold tracking-tighter text-xl">AULABS</div>
+          <nav>
+            <%= button_to "Вихід", destroy_user_session_path, method: :delete, class: "text-sm text-gray-500" if user_signed_in? %>
+          </nav>
+        </div>
+      </header>
+
+      <main class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+        <%= yield %>
+      </main>
+    <% end %>
+
+    <%# Flash Messages %>
+    <% flash.each do |type, message| %>
+      <div class="fixed bottom-5 right-5 z-50 transform transition-all duration-500 ease-out animate-in slide-in-from-right-10 fade-in">
+        <div class="flex items-center gap-3 bg-black text-white px-5 py-3 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-gray-800">
+          <div class="h-2 w-2 rounded-full <%= type == 'alert' ? 'bg-red-500' : 'bg-green-500' %>"></div>
+          <span class="text-sm font-medium tracking-wide"><%= message %></span>
+        </div>
+      </div>
+    <% end %>
   </body>
 </html>

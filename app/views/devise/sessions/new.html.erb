@@ -1,26 +1,82 @@
-<h2>Log in</h2>
-
-<%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
-  <div class="field">
-    <%= f.label :email %><br />
-    <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
-  </div>
-
-  <div class="field">
-    <%= f.label :password %><br />
-    <%= f.password_field :password, autocomplete: "current-password" %>
-  </div>
-
-  <% if devise_mapping.rememberable? %>
-    <div class="field">
-      <%= f.check_box :remember_me %>
-      <%= f.label :remember_me %>
+<div class="min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+  <div class="sm:mx-auto sm:w-full sm:max-w-md">
+    <div class="flex justify-center">
+      <div class="h-12 w-12 bg-black flex items-center justify-center rounded-xl shadow-lg">
+        <span class="text-white font-bold text-xl tracking-tighter italic">Au</span>
+      </div>
     </div>
-  <% end %>
-
-  <div class="actions">
-    <%= f.submit "Log in" %>
+    <h2 class="mt-6 text-center text-2xl font-semibold tracking-tight text-gray-900">
+      Вхід до системи Aulabs
+    </h2>
+    <p class="mt-2 text-center text-sm text-gray-500 font-light italic">
+      Engineering the future of mobility
+    </p>
   </div>
-<% end %>
 
-<%= render "devise/shared/links" %>
+  <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+    <div class="bg-white py-8 px-4 shadow-sm border border-gray-100 sm:rounded-2xl sm:px-10">
+      <%= form_with(builder: AuFormBuilder, model: resource, scope: resource_name, url: session_path(resource_name), local: true, class: "space-y-6") do |f| %>
+        <div>
+          <%= f.label :email, "Корпоративна пошта", class: "label-input" %>
+          <%= f.email_field :email, autofocus: true, autocomplete: "email", placeholder: "name@aulabs.io" %>
+        </div>
+
+        <div>
+          <%= f.label :password, "Пароль", class: "label-input" %>
+          <%= f.password_field :password, autocomplete: "current-password" %>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <%# Чекбокс: ми передаємо label_text, щоб білдер сам збудував структуру зліва %>
+          <%= f.check_box :remember_me, label_text: "Запам'ятати мене" %>
+
+          <% if devise_mapping.recoverable? %>
+            <div class="text-sm">
+              <%= link_to "Забули пароль?", new_password_path(resource_name), class: "font-medium text-gray-500 hover:text-black transition-colors" %>
+            </div>
+          <% end %>
+        </div>
+
+        <div>
+          <%= f.submit "Увійти в систему", class: "btn-primary" %>
+        </div>
+      <% end %>
+
+      <div class="mt-6 border-t border-gray-100 pt-6 text-center text-sm text-gray-500">
+        Немає аккаунту?
+        <%= link_to "Створити профіль", new_registration_path(resource_name), class: "font-medium text-black hover:underline" %>
+      </div>
+    </div>
+
+    <div class="mt-8 text-center text-[10px] text-gray-400 uppercase tracking-[0.2em]">
+      Aulabs © <%= Time.current.year %>
+    </div>
+  </div>
+</div>
+
+<!--<h2>Log in</h2>-->
+
+<%#= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+<!--  <div class="field">-->
+<!--    <%#= f.label :email %><br />-->
+    <%#= f.email_field :email, autofocus: true, autocomplete: "email" %>
+<!--  </div>-->
+
+<!--  <div class="field">-->
+<!--    <%#= f.label :password %><br />-->
+    <%#= f.password_field :password, autocomplete: "current-password" %>
+<!--  </div>-->
+
+  <%# if devise_mapping.rememberable? %>
+<!--    <div class="field">-->
+      <%#= f.check_box :remember_me %>
+      <%#= f.label :remember_me %>
+<!--    </div>-->
+  <%# end %>
+
+<!--  <div class="actions">-->
+    <%#= f.submit "Log in" %>
+<!--  </div>-->
+<%# end %>
+
+<%#= render "devise/shared/links" %>
