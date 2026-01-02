@@ -1,17 +1,5 @@
 <div class="min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-  <div class="sm:mx-auto sm:w-full sm:max-w-md">
-    <div class="flex justify-center">
-      <div class="h-12 w-12 bg-black flex items-center justify-center rounded-xl shadow-lg">
-        <span class="text-white font-bold text-xl tracking-tighter italic">Au</span>
-      </div>
-    </div>
-    <h2 class="mt-6 text-center text-2xl font-semibold tracking-tight text-gray-900">
-      Вхід до системи Aulabs
-    </h2>
-    <p class="mt-2 text-center text-sm text-gray-500 font-light italic">
-      Engineering the future of mobility
-    </p>
-  </div>
+  <%= render "devise/shared/header" %>
 
   <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
     <div class="bg-white py-8 px-4 shadow-sm border border-gray-100 sm:rounded-2xl sm:px-10">
@@ -27,7 +15,6 @@
         </div>
 
         <div class="flex items-center justify-between">
-          <%# Чекбокс: ми передаємо label_text, щоб білдер сам збудував структуру зліва %>
           <%= f.check_box :remember_me, label_text: "Запам'ятати мене" %>
 
           <% if devise_mapping.recoverable? %>
