@@ -1,43 +1,81 @@
-<h2>Edit <%= resource_name.to_s.humanize %></h2>
+<div class="min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+  <%= render "devise/shared/header" %>
 
-<%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
+  <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+    <div class="bg-white py-8 px-4 shadow-sm border border-gray-100 sm:rounded-2xl sm:px-10">
+      <%= render "devise/shared/error_messages", resource: resource %>
 
-  <div class="field">
-    <%= f.label :email %><br />
-    <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
+      <%= form_with(builder: AuFormBuilder, model: resource, scope: resource_name, url: registration_path(resource_name), method: :put) do |f| %>
+        <div>
+          <%= f.label :first_name, t(".first_name"), class: "label-input" %>
+          <%= f.text_field :first_name, autocomplete: "given-name" %>
+        </div>
+
+        <div>
+          <%= f.label :last_name, t(".last_name"), class: "label-input" %>
+          <%= f.text_field :last_name, autocomplete: "family-name" %>
+        </div>
+
+        <div>
+          <%= f.label :middle_name, t(".middle_name"), class: "label-input" %>
+          <%= f.text_field :middle_name, autocomplete: "additional-name" %>
+        </div>
+
+        <div>
+          <%= f.label :phone_number, t(".phone_number"), class: "label-input" %>
+          <%= f.telephone_field :phone_number, autocomplete: "tel", placeholder: "+380501234567" %>
+        </div>
+
+        <div class="border-t border-gray-100 pt-6 mt-6">
+          <%= f.label :email, t(".corporate_email"), class: "label-input" %>
+          <%= f.email_field :email, autocomplete: "email" %>
+
+          <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
+            <p class="mt-1 text-xs text-amber-600">
+              <%= t(".pending_confirmation", email: resource.unconfirmed_email) %>
+            </p>
+          <% end %>
+        </div>
+
+        <div>
+          <%= f.label :password, class: "label-input inline-flex items-center gap-1" do %>
+            <%= t(".new_password") %>
+            <span class="text-[11px] lowercase font-normal text-gray-500 tracking-normal">(<%= t(".leave_blank") %>)</span>
+          <% end %>
+          <%= f.password_field :password, autocomplete: "new-password" %>
+          <% if @minimum_password_length %>
+            <p class="mt-1 text-xs text-gray-500"><%= t(".min_chars", count: @minimum_password_length) %></p>
+          <% end %>
+        </div>
+
+        <div>
+          <%= f.label :password_confirmation, t(".confirm_password"), class: "label-input" %>
+          <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
+        </div>
+
+        <div class="border-t border-gray-100 pt-6 mt-6">
+          <%= f.label :current_password, t(".current_password"), class: "label-input" %>
+          <%= f.password_field :current_password, autocomplete: "current-password" %>
+          <p class="mt-1 text-xs text-gray-500"><%= t(".required_to_confirm") %></p>
+        </div>
+
+        <div>
+          <%= f.submit t(".save_changes"), class: "btn-primary" %>
+        </div>
+      <% end %>
+
+      <div class="mt-6 border-t border-gray-100 pt-6">
+        <h3 class="text-sm font-semibold text-red-700 mb-2"><%= t(".delete_account_title") %></h3>
+        <p class="text-xs text-gray-500 mb-3"><%= t(".delete_account_warning") %></p>
+        <%= button_to t(".delete_account"), registration_path(resource_name),
+            method: :delete,
+            data: { turbo_confirm: t(".delete_confirm") },
+            class: "text-sm font-medium text-red-600 hover:text-red-800 transition-colors" %>
+      </div>
+    </div>
+
+    <div class="mt-8 text-center text-[10px] text-gray-400 uppercase tracking-[0.2em]">
+      Aulabs © <%= Time.current.year %>
+    </div>
   </div>
-
-  <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
-    <div>Currently waiting confirmation for: <%= resource.unconfirmed_email %></div>
-  <% end %>
-
-  <div class="field">
-    <%= f.label :password %> <i>(leave blank if you don't want to change it)</i><br />
-    <%= f.password_field :password, autocomplete: "new-password" %>
-    <% if @minimum_password_length %>
-      <br />
-      <em><%= @minimum_password_length %> characters minimum</em>
-    <% end %>
-  </div>
-
-  <div class="field">
-    <%= f.label :password_confirmation %><br />
-    <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
-  </div>
-
-  <div class="field">
-    <%= f.label :current_password %> <i>(we need your current password to confirm your changes)</i><br />
-    <%= f.password_field :current_password, autocomplete: "current-password" %>
-  </div>
-
-  <div class="actions">
-    <%= f.submit "Update" %>
-  </div>
-<% end %>
-
-<h3>Cancel my account</h3>
-
-<div>Unhappy? <%= button_to "Cancel my account", registration_path(resource_name), data: { confirm: "Are you sure?", turbo_confirm: "Are you sure?" }, method: :delete %></div>
-
-<%= link_to "Back", :back %>
+</div>

@@ -1,0 +1,129 @@
+uk:
+  activerecord:
+    errors:
+      messages:
+        blank: "не може бути порожнім"
+        invalid: "має невірний формат"
+        taken: "вже зайнято"
+        too_short: "занадто коротке (мінімум %{count} символів)"
+        too_long: "занадто довге (максимум %{count} символів)"
+        confirmation: "не збігається з підтвердженням"
+    models:
+      user: "Користувач"
+    attributes:
+      user:
+        email: "Електронна пошта"
+        password: "Пароль"
+        password_confirmation: "Підтвердження пароля"
+        current_password: "Поточний пароль"
+        first_name: "Ім'я"
+        last_name: "Прізвище"
+        middle_name: "По батькові"
+        phone_number: "Номер телефону"
+  errors:
+    messages:
+      not_saved:
+        one: "1 помилка завадила збереженню %{resource}:"
+        other: "%{count} помилок завадили збереженню %{resource}:"
+  layouts:
+    application:
+      sign_out: "Вихід"
+  devise:
+    shared:
+      header:
+        sessions: "Вхід до системи"
+        registrations_new: "Реєстрація у системі"
+        registrations_edit: "Редагування профілю"
+        passwords: "Відновлення паролю"
+        confirmations: "Підтвердження пошти"
+        unlocks: "Розблокування акаунту"
+      links:
+        sign_in: "Увійти"
+        sign_up: "Створити профіль"
+        forgot_password: "Забули пароль?"
+        no_confirmation: "Не отримали лист підтвердження?"
+        no_unlock: "Не отримали інструкції розблокування?"
+        sign_in_with: "Увійти через %{provider}"
+    sessions:
+      new:
+        corporate_email: "Корпоративна пошта"
+        password: "Пароль"
+        remember_me: "Запам'ятати мене"
+        forgot_password: "Забули пароль?"
+        sign_in: "Увійти в систему"
+        no_account: "Немає аккаунту?"
+        create_account: "Створити профіль"
+    registrations:
+      new:
+        corporate_email: "Корпоративна пошта"
+        password: "Пароль"
+        min_chars: "від %{count} символів"
+        sign_up: "Увійти в систему"
+        have_account: "Уже є аккаунту?"
+        sign_in: "Увійти в систему"
+      edit:
+        first_name: "Ім'я"
+        last_name: "Прізвище"
+        middle_name: "По батькові"
+        phone_number: "Номер телефону"
+        corporate_email: "Корпоративна пошта"
+        pending_confirmation: "Очікується підтвердження для: %{email}"
+        new_password: "Новий пароль"
+        leave_blank: "залиште порожнім, якщо не хочете змінювати"
+        min_chars: "Мінімум %{count} символів"
+        confirm_password: "Підтвердити пароль"
+        current_password: "Поточний пароль"
+        required_to_confirm: "Необхідний для підтвердження змін"
+        save_changes: "Зберегти зміни"
+        delete_account_title: "Видалення акаунту"
+        delete_account_warning: "Цю дію неможливо скасувати. Усі ваші дані буде видалено."
+        delete_account: "Видалити акаунт"
+        delete_confirm: "Ви впевнені? Цю дію неможливо скасувати."
+    passwords:
+      new:
+        corporate_email: "Корпоративна пошта"
+        send_instructions: "Надіслати інструкції"
+        remember_password: "Згадали пароль?"
+        sign_in: "Увійти в систему"
+      edit:
+        new_password: "Новий пароль"
+        min_chars: "від %{count} символів"
+        confirm_password: "Підтвердити пароль"
+        change_password: "Змінити пароль"
+        remember_password: "Згадали пароль?"
+        sign_in: "Увійти в систему"
+    confirmations:
+      new:
+        corporate_email: "Корпоративна пошта"
+        resend: "Надіслати повторно"
+        already_confirmed: "Уже підтверджено?"
+        sign_in: "Увійти в систему"
+    unlocks:
+      new:
+        corporate_email: "Корпоративна пошта"
+        send_instructions: "Надіслати інструкції розблокування"
+        already_unlocked: "Уже розблоковано?"
+        sign_in: "Увійти в систему"
+    mailer:
+      confirmation_instructions:
+        greeting: "Вітаємо %{email}!"
+        instruction: "Ви можете підтвердити свою електронну пошту за посиланням нижче:"
+        action: "Підтвердити акаунт"
+      reset_password_instructions:
+        greeting: "Вітаємо %{email}!"
+        instruction: "Хтось запросив посилання для зміни вашого пароля. Ви можете зробити це за посиланням нижче."
+        action: "Змінити пароль"
+        instruction_2: "Якщо ви не робили цього запиту, проігноруйте цей лист."
+        instruction_3: "Ваш пароль не зміниться, поки ви не перейдете за посиланням вище та не створите новий."
+      unlock_instructions:
+        greeting: "Вітаємо %{email}!"
+        instruction: "Ваш акаунт було заблоковано через надмірну кількість невдалих спроб входу."
+        instruction_2: "Натисніть на посилання нижче, щоб розблокувати акаунт:"
+        action: "Розблокувати акаунт"
+      email_changed:
+        greeting: "Вітаємо %{email}!"
+        changing: "Повідомляємо, що вашу електронну пошту змінюють на %{email}."
+        changed: "Повідомляємо, що вашу електронну пошту було змінено на %{email}."
+      password_change:
+        greeting: "Вітаємо %{email}!"
+        message: "Повідомляємо, що ваш пароль було змінено."

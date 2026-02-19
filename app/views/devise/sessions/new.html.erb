@@ -5,33 +5,33 @@
     <div class="bg-white py-8 px-4 shadow-sm border border-gray-100 sm:rounded-2xl sm:px-10">
       <%= form_with(builder: AuFormBuilder, model: resource, scope: resource_name, url: session_path(resource_name), local: true, class: "space-y-6") do |f| %>
         <div>
-          <%= f.label :email, "Корпоративна пошта", class: "label-input" %>
+          <%= f.label :email, t(".corporate_email"), class: "label-input" %>
           <%= f.email_field :email, autofocus: true, autocomplete: "email", placeholder: "name@aulabs.io" %>
         </div>
 
         <div>
-          <%= f.label :password, "Пароль", class: "label-input" %>
+          <%= f.label :password, t(".password"), class: "label-input" %>
           <%= f.password_field :password, autocomplete: "current-password" %>
         </div>
 
         <div class="flex items-center justify-between">
-          <%= f.check_box :remember_me, label_text: "Запам'ятати мене" %>
+          <%= f.check_box :remember_me, label_text: t(".remember_me") %>
 
           <% if devise_mapping.recoverable? %>
             <div class="text-sm">
-              <%= link_to "Забули пароль?", new_password_path(resource_name), class: "font-medium text-gray-500 hover:text-black transition-colors" %>
+              <%= link_to t(".forgot_password"), new_password_path(resource_name), class: "font-medium text-gray-500 hover:text-black transition-colors" %>
             </div>
           <% end %>
         </div>
 
         <div>
-          <%= f.submit "Увійти в систему", class: "btn-primary" %>
+          <%= f.submit t(".sign_in"), class: "btn-primary" %>
         </div>
       <% end %>
 
       <div class="mt-6 border-t border-gray-100 pt-6 text-center text-sm text-gray-500">
-        Немає аккаунту?
-        <%= link_to "Створити профіль", new_registration_path(resource_name), class: "font-medium text-black hover:underline" %>
+        <%= t(".no_account") %>
+        <%= link_to t(".create_account"), new_registration_path(resource_name), class: "font-medium text-black hover:underline" %>
       </div>
     </div>
 
@@ -40,30 +40,3 @@
     </div>
   </div>
 </div>
-
-<!--<h2>Log in</h2>-->
-
-<%#= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
-<!--  <div class="field">-->
-<!--    <%#= f.label :email %><br />-->
-    <%#= f.email_field :email, autofocus: true, autocomplete: "email" %>
-<!--  </div>-->
-
-<!--  <div class="field">-->
-<!--    <%#= f.label :password %><br />-->
-    <%#= f.password_field :password, autocomplete: "current-password" %>
-<!--  </div>-->
-
-  <%# if devise_mapping.rememberable? %>
-<!--    <div class="field">-->
-      <%#= f.check_box :remember_me %>
-      <%#= f.label :remember_me %>
-<!--    </div>-->
-  <%# end %>
-
-<!--  <div class="actions">-->
-    <%#= f.submit "Log in" %>
-<!--  </div>-->
-<%# end %>
-
-<%#= render "devise/shared/links" %>

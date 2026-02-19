@@ -1,9 +1,17 @@
 <%
   kind = case controller_name
-         when 'sessions'
-           'Вхід до системи'
-         when 'registrations'
-           'Реєстрація у системі'
+         when "sessions"
+           t("devise.shared.header.sessions")
+         when "registrations"
+           action_name == "new" ? t("devise.shared.header.registrations_new") : t("devise.shared.header.registrations_edit")
+         when "passwords"
+           t("devise.shared.header.passwords")
+         when "confirmations"
+           t("devise.shared.header.confirmations")
+         when "unlocks"
+           t("devise.shared.header.unlocks")
+         else
+           "Aulabs"
          end
 %>
 

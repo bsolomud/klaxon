@@ -36,7 +36,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between">
           <div class="font-bold tracking-tighter text-xl">AULABS</div>
           <nav>
-            <%= button_to "Вихід", destroy_user_session_path, method: :delete, class: "text-sm text-gray-500" if user_signed_in? %>
+            <%= button_to t("layouts.application.sign_out"), destroy_user_session_path, method: :delete, class: "text-sm text-gray-500" if user_signed_in? %>
           </nav>
         </div>
       </header>
