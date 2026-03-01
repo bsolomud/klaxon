@@ -37,46 +37,52 @@ RSpec.describe "Flash Messages", type: :system do
 
   describe "close button" do
     it "renders a close button with the x-mark icon" do
-      visit new_user_session_path
+      using_session(:close_button_test) do
+        visit new_user_session_path
 
-      fill_in "Corporate email", with: user.email
-      fill_in "Password", with: "password123"
-      click_button "Sign in"
+        fill_in "Corporate email", with: user.email
+        fill_in "Password", with: "password123"
+        click_button "Sign in"
 
-      within("[data-controller='flash']") do
-        close_button = find("button[aria-label='Close']")
-        expect(close_button).to be_present
-        expect(close_button).to have_css("svg")
+        within("[data-controller='flash']") do
+          close_button = find("button[aria-label='Close']")
+          expect(close_button).to be_present
+          expect(close_button).to have_css("svg")
+        end
       end
     end
 
     it "dismisses flash when close button is clicked" do
-      visit new_user_session_path
+      using_session(:dismiss_button_test) do
+        visit new_user_session_path
 
-      fill_in "Corporate email", with: user.email
-      fill_in "Password", with: "password123"
-      click_button "Sign in"
+        fill_in "Corporate email", with: user.email
+        fill_in "Password", with: "password123"
+        click_button "Sign in"
 
-      expect(page).to have_css("[data-controller='flash']")
+        expect(page).to have_css("[data-controller='flash']")
 
-      find("button[aria-label='Close']").click
+        find("button[aria-label='Close']").click
 
-      expect(page).to have_no_css("[data-controller='flash']", wait: 2)
+        expect(page).to have_no_css("[data-controller='flash']", wait: 2)
+      end
     end
   end
 
   describe "auto-dismiss" do
     it "automatically disappears after the duration" do
-      visit new_user_session_path
+      using_session(:auto_dismiss_test) do
+        visit new_user_session_path
 
-      fill_in "Corporate email", with: user.email
-      fill_in "Password", with: "password123"
-      click_button "Sign in"
+        fill_in "Corporate email", with: user.email
+        fill_in "Password", with: "password123"
+        click_button "Sign in"
 
-      expect(page).to have_css("[data-controller='flash']")
+        expect(page).to have_css("[data-controller='flash']")
 
-      # Default duration is 5000ms + 300ms transition
-      expect(page).to have_no_css("[data-controller='flash']", wait: 7)
+        # Default duration is 5000ms + 300ms transition
+        expect(page).to have_no_css("[data-controller='flash']", wait: 7)
+      end
     end
   end
 end

@@ -8,8 +8,13 @@ en:
         too_short: "is too short (minimum is %{count} characters)"
         too_long: "is too long (maximum is %{count} characters)"
         confirmation: "doesn't match confirmation"
+        restrict_dependent_destroy:
+          has_many: "Cannot delete record because dependent workshops exist"
     models:
       user: "User"
+      service_category: "Service category"
+      workshop: "Workshop"
+      working_hour: "Working hour"
     attributes:
       user:
         email: "Email"
@@ -20,6 +25,29 @@ en:
         last_name: "Last name"
         middle_name: "Middle name"
         phone_number: "Phone number"
+      service_category:
+        name: "Name"
+        slug: "Slug"
+      workshop:
+        name: "Name"
+        description: "Description"
+        phone: "Phone"
+        email: "Email"
+        address: "Address"
+        city: "City"
+        country: "Country"
+        latitude: "Latitude"
+        longitude: "Longitude"
+        service_category: "Service category"
+        service_category_id: "Service category"
+        active: "Active"
+        logo: "Logo"
+        photos: "Photos"
+      working_hour:
+        day_of_week: "Day of week"
+        opens_at: "Opens at"
+        closes_at: "Closes at"
+        closed: "Closed"
   errors:
     messages:
       not_saved:
@@ -28,6 +56,110 @@ en:
   layouts:
     application:
       sign_out: "Sign out"
+  service_categories:
+    index:
+      title: "Service Categories"
+      subtitle: "Browse all available car service types"
+      new_category: "New category"
+      workshops_count:
+        zero: "No workshops"
+        one: "1 workshop"
+        other: "%{count} workshops"
+      empty: "No service categories yet."
+    show:
+      edit: "Edit"
+      delete: "Delete"
+      delete_confirm: "Are you sure? This will delete the category."
+      workshops_title: "Workshops in this category"
+      open_now: "Open now"
+      closed_now: "Closed"
+      no_workshops: "No workshops in this category yet."
+      back: "Back to categories"
+    new:
+      title: "New Service Category"
+      back: "Back to categories"
+    edit:
+      title: "Edit Service Category"
+      back: "Back to category"
+    form:
+      name: "Name"
+      slug: "Slug"
+    create:
+      success: "Service category was successfully created."
+    update:
+      success: "Service category was successfully updated."
+    destroy:
+      success: "Service category was successfully deleted."
+      has_workshops: "Cannot delete category that has workshops."
+  workshops:
+    index:
+      title: "Workshops"
+      subtitle: "Find car services near you"
+      new_workshop: "New workshop"
+      filters: "Active filters"
+      open_now_filter: "Open now"
+      open_now: "Open now"
+      closed_now: "Closed"
+      empty: "No workshops found."
+    show:
+      open_now: "Open now"
+      closed_now: "Closed"
+      edit: "Edit"
+      delete: "Delete"
+      delete_confirm: "Are you sure? This will permanently delete this workshop."
+      description: "Description"
+      working_hours: "Working Hours"
+      day_closed: "Closed"
+      contact: "Contact"
+      phone: "Phone"
+      email: "Email"
+      location: "Location"
+      address_label: "Address"
+      city_label: "City"
+      country_label: "Country"
+      coordinates: "Coordinates"
+      back: "Back to workshops"
+    new:
+      title: "New Workshop"
+      back: "Back to workshops"
+    edit:
+      title: "Edit Workshop"
+      back: "Back to workshop"
+    form:
+      basic_info: "Basic Information"
+      name: "Workshop name"
+      category: "Service category"
+      select_category: "Select a category..."
+      description: "Description"
+      active: "Active (visible in directory)"
+      contact_info: "Contact Information"
+      phone: "Phone number"
+      email: "Email"
+      location_info: "Location"
+      address: "Street address"
+      city: "City"
+      country: "Country"
+      latitude: "Latitude"
+      longitude: "Longitude"
+      working_hours: "Working Hours"
+      day_closed: "Closed"
+      media: "Logo & Photos"
+      logo: "Logo"
+      photos: "Photos"
+    days:
+      sunday: "Sunday"
+      monday: "Monday"
+      tuesday: "Tuesday"
+      wednesday: "Wednesday"
+      thursday: "Thursday"
+      friday: "Friday"
+      saturday: "Saturday"
+    create:
+      success: "Workshop was successfully created."
+    update:
+      success: "Workshop was successfully updated."
+    destroy:
+      success: "Workshop was successfully deleted."
   devise:
     shared:
       header:

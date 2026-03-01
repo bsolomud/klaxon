@@ -1,0 +1,135 @@
+<div class="mb-8">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold tracking-tight text-gray-900"><%= @workshop.name %></h1>
+      <div class="mt-1 flex items-center gap-3">
+        <%= link_to @workshop.service_category.name,
+                    service_category_path(@workshop.service_category),
+                    class: "inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700 hover:bg-gray-200 transition-colors" %>
+        <div class="flex items-center gap-1.5">
+          <div class="h-2 w-2 rounded-full shrink-0 <%= @workshop.open_now? ? 'bg-green-500' : 'bg-red-500' %>"></div>
+          <span class="text-xs text-gray-500"><%= @workshop.open_now? ? t(".open_now") : t(".closed_now") %></span>
+        </div>
+      </div>
+    </div>
+
+    <% if user_signed_in? %>
+      <div class="flex items-center gap-2">
+        <%= link_to t(".edit"), edit_workshop_path(@workshop), class: "text-sm font-medium text-gray-500 hover:text-black transition-colors" %>
+        <%= button_to t(".delete"), workshop_path(@workshop), method: :delete,
+              class: "text-sm font-medium text-red-500 hover:text-red-700 transition-colors cursor-pointer",
+              data: { turbo_confirm: t(".delete_confirm") } %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+  <%# Main content %>
+  <div class="lg:col-span-2 space-y-6">
+    <%# Logo & Photos %>
+    <% if @workshop.logo.attached? || @workshop.photos.attached? %>
+      <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+        <% if @workshop.logo.attached? %>
+          <div class="mb-4">
+            <%= image_tag @workshop.logo, class: "h-20 w-auto object-contain" %>
+          </div>
+        <% end %>
+
+        <% if @workshop.photos.attached? %>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <% @workshop.photos.each do |photo| %>
+              <%= image_tag photo, class: "w-full h-32 object-cover rounded-lg" %>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <%# Description %>
+    <% if @workshop.description.present? %>
+      <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+        <h2 class="text-sm font-medium text-gray-900 uppercase tracking-wider mb-3"><%= t(".description") %></h2>
+        <p class="text-sm text-gray-600 leading-relaxed"><%= simple_format(@workshop.description) %></p>
+      </div>
+    <% end %>
+
+    <%# Working Hours %>
+    <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+      <h2 class="text-sm font-medium text-gray-900 uppercase tracking-wider mb-4"><%= t(".working_hours") %></h2>
+
+      <div class="space-y-2">
+        <% (0..6).each do |day| %>
+          <% wh = @working_hours.find { |h| h.day_of_week == day } %>
+          <div class="flex items-center justify-between py-1.5 <%= day == Time.current.wday ? 'font-semibold' : '' %>">
+            <span class="text-sm text-gray-700"><%= day_name(day) %></span>
+            <% if wh.nil? || wh.closed? %>
+              <span class="text-sm text-red-500"><%= t(".day_closed") %></span>
+            <% else %>
+              <span class="text-sm text-gray-600"><%= wh.opens_at.strftime("%H:%M") %> &ndash; <%= wh.closes_at.strftime("%H:%M") %></span>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <%# Sidebar — Contact info %>
+  <div class="space-y-6">
+    <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+      <h2 class="text-sm font-medium text-gray-900 uppercase tracking-wider mb-4"><%= t(".contact") %></h2>
+
+      <dl class="space-y-3">
+        <div>
+          <dt class="text-xs text-gray-400 uppercase tracking-wider"><%= t(".phone") %></dt>
+          <dd class="mt-0.5 text-sm text-gray-900">
+            <%= link_to @workshop.phone, "tel:#{@workshop.phone}", class: "hover:text-black" %>
+          </dd>
+        </div>
+
+        <% if @workshop.email.present? %>
+          <div>
+            <dt class="text-xs text-gray-400 uppercase tracking-wider"><%= t(".email") %></dt>
+            <dd class="mt-0.5 text-sm text-gray-900">
+              <%= mail_to @workshop.email, class: "hover:text-black" %>
+            </dd>
+          </div>
+        <% end %>
+      </dl>
+    </div>
+
+    <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+      <h2 class="text-sm font-medium text-gray-900 uppercase tracking-wider mb-4"><%= t(".location") %></h2>
+
+      <dl class="space-y-3">
+        <div>
+          <dt class="text-xs text-gray-400 uppercase tracking-wider"><%= t(".address_label") %></dt>
+          <dd class="mt-0.5 text-sm text-gray-900"><%= @workshop.address %></dd>
+        </div>
+
+        <div>
+          <dt class="text-xs text-gray-400 uppercase tracking-wider"><%= t(".city_label") %></dt>
+          <dd class="mt-0.5 text-sm text-gray-900">
+            <%= link_to @workshop.city, workshops_path(city: @workshop.city), class: "hover:text-black hover:underline" %>
+          </dd>
+        </div>
+
+        <div>
+          <dt class="text-xs text-gray-400 uppercase tracking-wider"><%= t(".country_label") %></dt>
+          <dd class="mt-0.5 text-sm text-gray-900"><%= @workshop.country %></dd>
+        </div>
+
+        <% if @workshop.latitude.present? && @workshop.longitude.present? %>
+          <div>
+            <dt class="text-xs text-gray-400 uppercase tracking-wider"><%= t(".coordinates") %></dt>
+            <dd class="mt-0.5 text-xs font-mono text-gray-500"><%= @workshop.latitude %>, <%= @workshop.longitude %></dd>
+          </div>
+        <% end %>
+      </dl>
+    </div>
+  </div>
+</div>
+
+<div class="mt-8">
+  <%= link_to t(".back"), workshops_path, class: "text-sm font-medium text-gray-500 hover:text-black transition-colors" %>
+</div>

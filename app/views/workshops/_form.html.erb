@@ -1,0 +1,146 @@
+<%= form_with(builder: AuFormBuilder, model: workshop, class: "space-y-8") do |f| %>
+  <%= render "devise/shared/error_messages", resource: workshop %>
+
+  <%# Basic Info %>
+  <fieldset>
+    <legend class="text-sm font-medium text-gray-900 uppercase tracking-wider mb-4"><%= t("workshops.form.basic_info") %></legend>
+
+    <div class="space-y-4">
+      <div>
+        <%= f.label :name, t("workshops.form.name"), class: "label-input" %>
+        <%= f.text_field :name, autofocus: true %>
+      </div>
+
+      <div>
+        <%= f.label :service_category_id, t("workshops.form.category"), class: "label-input" %>
+        <%= f.collection_select :service_category_id, ServiceCategory.order(:name), :id, :name,
+              { prompt: t("workshops.form.select_category") }, {} %>
+      </div>
+
+      <div>
+        <%= f.label :description, t("workshops.form.description"), class: "label-input" %>
+        <%= f.text_area :description, rows: 4 %>
+      </div>
+
+      <div>
+        <%= f.check_box :active, label_text: t("workshops.form.active") %>
+      </div>
+    </div>
+  </fieldset>
+
+  <%# Contact %>
+  <fieldset>
+    <legend class="text-sm font-medium text-gray-900 uppercase tracking-wider mb-4"><%= t("workshops.form.contact_info") %></legend>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <%= f.label :phone, t("workshops.form.phone"), class: "label-input" %>
+        <%= f.telephone_field :phone %>
+      </div>
+
+      <div>
+        <%= f.label :email, t("workshops.form.email"), class: "label-input" %>
+        <%= f.email_field :email %>
+      </div>
+    </div>
+  </fieldset>
+
+  <%# Location %>
+  <fieldset>
+    <legend class="text-sm font-medium text-gray-900 uppercase tracking-wider mb-4"><%= t("workshops.form.location_info") %></legend>
+
+    <div class="space-y-4">
+      <div>
+        <%= f.label :address, t("workshops.form.address"), class: "label-input" %>
+        <%= f.text_field :address %>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <%= f.label :city, t("workshops.form.city"), class: "label-input" %>
+          <%= f.text_field :city %>
+        </div>
+
+        <div>
+          <%= f.label :country, t("workshops.form.country"), class: "label-input" %>
+          <%= f.text_field :country %>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <%= f.label :latitude, t("workshops.form.latitude"), class: "label-input" %>
+          <%= f.number_field :latitude, step: "0.0000001" %>
+        </div>
+
+        <div>
+          <%= f.label :longitude, t("workshops.form.longitude"), class: "label-input" %>
+          <%= f.number_field :longitude, step: "0.0000001" %>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+
+  <%# Working Hours %>
+  <fieldset>
+    <legend class="text-sm font-medium text-gray-900 uppercase tracking-wider mb-4"><%= t("workshops.form.working_hours") %></legend>
+
+    <div class="space-y-3">
+      <%= f.fields_for :working_hours do |wh| %>
+        <div class="flex items-center gap-4 py-2 border-b border-gray-50 last:border-0">
+          <%= wh.hidden_field :day_of_week %>
+          <%= wh.hidden_field :id if wh.object.persisted? %>
+
+          <span class="w-28 text-sm font-medium text-gray-700 shrink-0"><%= day_name(wh.object.day_of_week) %></span>
+
+          <div class="flex items-center gap-3 flex-1">
+            <div class="w-28">
+              <%= wh.time_field :opens_at, class: "#{wh.object.closed? ? 'opacity-40' : ''}" %>
+            </div>
+            <span class="text-gray-400 text-sm">&ndash;</span>
+            <div class="w-28">
+              <%= wh.time_field :closes_at, class: "#{wh.object.closed? ? 'opacity-40' : ''}" %>
+            </div>
+          </div>
+
+          <div class="shrink-0">
+            <%= wh.check_box :closed, label_text: t("workshops.form.day_closed") %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </fieldset>
+
+  <%# Files %>
+  <fieldset>
+    <legend class="text-sm font-medium text-gray-900 uppercase tracking-wider mb-4"><%= t("workshops.form.media") %></legend>
+
+    <div class="space-y-4">
+      <div>
+        <%= f.label :logo, t("workshops.form.logo"), class: "label-input" %>
+        <% if workshop.logo.attached? %>
+          <div class="mb-2">
+            <%= image_tag workshop.logo, class: "h-16 w-auto object-contain rounded" %>
+          </div>
+        <% end %>
+        <%= f.file_field :logo, accept: "image/*" %>
+      </div>
+
+      <div>
+        <%= f.label :photos, t("workshops.form.photos"), class: "label-input" %>
+        <% if workshop.photos.attached? %>
+          <div class="mb-2 flex gap-2 flex-wrap">
+            <% workshop.photos.each do |photo| %>
+              <%= image_tag photo, class: "h-16 w-16 object-cover rounded" %>
+            <% end %>
+          </div>
+        <% end %>
+        <%= f.file_field :photos, multiple: true, accept: "image/*" %>
+      </div>
+    </div>
+  </fieldset>
+
+  <div>
+    <%= f.submit class: "btn-primary" %>
+  </div>
+<% end %>

@@ -50,7 +50,7 @@
     <% flash.each do |type, message| %>
       <div data-controller="flash" data-flash-duration-value="5000"
            class="fixed bottom-5 right-5 z-50 transition-all duration-300 ease-out animate-in slide-in-from-right-10 fade-in">
-        <div class="flex items-center gap-3 bg-black text-white px-5 py-3 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-gray-800">
+        <div class="flex items-center gap-2 bg-black text-white px-5 py-3 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-gray-800">
           <div class="h-2 w-2 rounded-full shrink-0 <%= type == 'alert' ? 'bg-red-500' : 'bg-green-500' %>"></div>
           <span class="text-sm font-medium tracking-wide"><%= message %></span>
           <button type="button" data-action="flash#close"

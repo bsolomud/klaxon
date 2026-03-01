@@ -1,0 +1,31 @@
+<div class="mb-8 flex items-center justify-between">
+  <div>
+    <h1 class="text-2xl font-bold tracking-tight text-gray-900"><%= t(".title") %></h1>
+    <p class="mt-1 text-sm text-gray-500"><%= t(".subtitle") %></p>
+  </div>
+
+  <% if user_signed_in? %>
+    <%= link_to t(".new_category"), new_service_category_path, class: "btn-primary !w-auto" %>
+  <% end %>
+</div>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+  <% @service_categories.each do |category| %>
+    <%= link_to service_category_path(category),
+                class: "group block bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md hover:border-gray-200 transition-all" do %>
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-gray-900 group-hover:text-black"><%= category.name %></h2>
+        <span class="text-xs font-mono text-gray-400"><%= category.slug %></span>
+      </div>
+      <p class="mt-2 text-sm text-gray-500">
+        <%= t(".workshops_count", count: category.workshops.size) %>
+      </p>
+    <% end %>
+  <% end %>
+</div>
+
+<% if @service_categories.empty? %>
+  <div class="text-center py-12">
+    <p class="text-sm text-gray-500"><%= t(".empty") %></p>
+  </div>
+<% end %>

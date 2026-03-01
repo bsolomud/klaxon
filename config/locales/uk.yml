@@ -8,8 +8,13 @@ uk:
         too_short: "занадто коротке (мінімум %{count} символів)"
         too_long: "занадто довге (максимум %{count} символів)"
         confirmation: "не збігається з підтвердженням"
+        restrict_dependent_destroy:
+          has_many: "Неможливо видалити запис, оскільки існують залежні майстерні"
     models:
       user: "Користувач"
+      service_category: "Категорія послуг"
+      workshop: "Майстерня"
+      working_hour: "Години роботи"
     attributes:
       user:
         email: "Електронна пошта"
@@ -20,6 +25,29 @@ uk:
         last_name: "Прізвище"
         middle_name: "По батькові"
         phone_number: "Номер телефону"
+      service_category:
+        name: "Назва"
+        slug: "Slug"
+      workshop:
+        name: "Назва"
+        description: "Опис"
+        phone: "Телефон"
+        email: "Електронна пошта"
+        address: "Адреса"
+        city: "Місто"
+        country: "Країна"
+        latitude: "Широта"
+        longitude: "Довгота"
+        service_category: "Категорія послуг"
+        service_category_id: "Категорія послуг"
+        active: "Активна"
+        logo: "Логотип"
+        photos: "Фото"
+      working_hour:
+        day_of_week: "День тижня"
+        opens_at: "Відкривається"
+        closes_at: "Закривається"
+        closed: "Зачинено"
   errors:
     messages:
       not_saved:
@@ -28,6 +56,112 @@ uk:
   layouts:
     application:
       sign_out: "Вихід"
+  service_categories:
+    index:
+      title: "Категорії послуг"
+      subtitle: "Переглянути всі доступні типи автосервісів"
+      new_category: "Нова категорія"
+      workshops_count:
+        zero: "Немає майстерень"
+        one: "1 майстерня"
+        few: "%{count} майстерні"
+        many: "%{count} майстерень"
+        other: "%{count} майстерень"
+      empty: "Категорій послуг ще немає."
+    show:
+      edit: "Редагувати"
+      delete: "Видалити"
+      delete_confirm: "Ви впевнені? Це видалить категорію."
+      workshops_title: "Майстерні в цій категорії"
+      open_now: "Зараз відчинено"
+      closed_now: "Зачинено"
+      no_workshops: "У цій категорії ще немає майстерень."
+      back: "Назад до категорій"
+    new:
+      title: "Нова категорія послуг"
+      back: "Назад до категорій"
+    edit:
+      title: "Редагування категорії послуг"
+      back: "Назад до категорії"
+    form:
+      name: "Назва"
+      slug: "Slug"
+    create:
+      success: "Категорію послуг успішно створено."
+    update:
+      success: "Категорію послуг успішно оновлено."
+    destroy:
+      success: "Категорію послуг успішно видалено."
+      has_workshops: "Неможливо видалити категорію, яка має майстерні."
+  workshops:
+    index:
+      title: "Майстерні"
+      subtitle: "Знайдіть автосервіси поблизу"
+      new_workshop: "Нова майстерня"
+      filters: "Активні фільтри"
+      open_now_filter: "Зараз відчинено"
+      open_now: "Зараз відчинено"
+      closed_now: "Зачинено"
+      empty: "Майстерень не знайдено."
+    show:
+      open_now: "Зараз відчинено"
+      closed_now: "Зачинено"
+      edit: "Редагувати"
+      delete: "Видалити"
+      delete_confirm: "Ви впевнені? Це остаточно видалить цю майстерню."
+      description: "Опис"
+      working_hours: "Години роботи"
+      day_closed: "Зачинено"
+      contact: "Контакти"
+      phone: "Телефон"
+      email: "Електронна пошта"
+      location: "Розташування"
+      address_label: "Адреса"
+      city_label: "Місто"
+      country_label: "Країна"
+      coordinates: "Координати"
+      back: "Назад до майстерень"
+    new:
+      title: "Нова майстерня"
+      back: "Назад до майстерень"
+    edit:
+      title: "Редагування майстерні"
+      back: "Назад до майстерні"
+    form:
+      basic_info: "Основна інформація"
+      name: "Назва майстерні"
+      category: "Категорія послуг"
+      select_category: "Оберіть категорію..."
+      description: "Опис"
+      active: "Активна (видима в каталозі)"
+      contact_info: "Контактна інформація"
+      phone: "Номер телефону"
+      email: "Електронна пошта"
+      location_info: "Розташування"
+      address: "Адреса"
+      city: "Місто"
+      country: "Країна"
+      latitude: "Широта"
+      longitude: "Довгота"
+      working_hours: "Години роботи"
+      day_closed: "Зачинено"
+      media: "Логотип та фото"
+      logo: "Логотип"
+      photos: "Фото"
+    days:
+      sunday: "Неділя"
+      monday: "Понеділок"
+      tuesday: "Вівторок"
+      wednesday: "Середа"
+      thursday: "Четвер"
+      friday: "П'ятниця"
+      saturday: "Субота"
+    create:
+      success: "Майстерню успішно створено."
+    update:
+      success: "Майстерню успішно оновлено."
+    destroy:
+      success: "Майстерню успішно видалено."
   devise:
     shared:
       header:
