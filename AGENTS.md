@@ -1,6 +1,82 @@
-# AGENTS.md - Klaxon Development Guide
+# AGENTS.md - AULABS Development Guide
 
-Klaxon is a Ruby on Rails 8 application for AULABS. It uses PostgreSQL, TailwindCSS 4, Hotwire (Turbo/Stimulus) via import maps, Devise for authentication, and OmniAuth for OAuth. UI text is in Ukrainian.
+## Product Vision
+
+**AULABS** is a FAANG-quality platform for automotive services. Think of it as the intersection of Google Maps, Booking.com, and a real-time queue management system — purpose-built for the car service industry, built for global scale.
+
+> Note: `klaxon` is the name of this repository. The product is **AULABS**.
+
+### What We're Building
+
+Drivers waste enormous time at car services: waiting in unknown queues at tire shops during seasonal rushes, circling parking lots, sitting in line at car washes, not knowing if an evacuator is nearby. AULABS eliminates this friction.
+
+**For drivers**, AULABS is a single app to:
+- Find nearby car service workshops by type and see live availability
+- Join a queue remotely — arrive when it's your turn, not an hour before
+- Book a time slot for planned services
+- Track estimated wait time in real time
+- Get notified when to head over
+
+**For service businesses** (workshops, parking lots, car washes, detailing studios), AULABS is an operations platform to:
+- Manage queues and appointments digitally
+- Reduce walk-away customers who leave when they see a long wait
+- Show real-time capacity to drivers in the area
+- Build a verified reputation with reviews and ratings
+
+### Car Service History
+
+Every car in the system has a full, persistent service history — a logbook of everything that has ever been done to it across any workshop on the platform.
+
+**For drivers**: one place to see everything done to their car — oil changes, tire swaps, diagnostics, detailing — regardless of which workshop performed the service. No more lost paper receipts or forgotten maintenance intervals.
+
+**For workshops** (with driver permission): access to a car's history before starting work. A mechanic can see that the car had diagnostics 2 months ago, tires changed last winter, and that the previous STO flagged a brake issue. This enables better, safer service.
+
+Key principles:
+- A **Car** belongs to a User (driver); a driver may have multiple cars
+- Service history entries (**ServiceRecord**) are created by workshops when a job is completed
+- Drivers control visibility — a driver can grant or revoke a workshop's access to their car's history
+- History is append-only — records are never deleted, only the car owner can see the full log
+- This data is a core product differentiator: over time, AULABS becomes the trusted digital passport for every car
+
+### Service Categories
+
+The platform covers the full lifecycle of car ownership needs:
+
+| Category | Ukrainian | Key Feature |
+|---|---|---|
+| Auto repair (STO) | СТО | appointment booking + queue |
+| Tire service | Шиномонтаж | seasonal surge queue management |
+| Car wash | Автомийка | live slot availability |
+| Detailing | Детейлінг | multi-hour appointment scheduling |
+| Evacuator / Towing | Евакуатор | on-demand dispatch, live tracking |
+| Diagnostics | Діагностика | appointment + result history |
+| Parking | Паркінг | real-time space availability |
+
+### Product Quality Bar
+
+We build at FAANG standards:
+- **Reliability**: queues and slot state must be consistent — no double-bookings, no lost updates
+- **Real-time UX**: drivers see live queue position and wait estimates via Hotwire/Turbo Streams
+- **Speed**: every page interaction must feel instant; background jobs via SolidQueue handle async work
+- **Trust**: reviews, ratings, verified business profiles — every feature must reinforce driver confidence
+- **Simplicity**: a driver finding a tire shop at 8am during a snowstorm must complete the flow in under 60 seconds
+
+### Domain Vocabulary
+
+Always use these terms consistently in code, UI, and discussions:
+
+- **User** — the single user model for all people in the system; roles determine what they can do
+- **Driver** — a User role; a car owner who finds workshops and joins queues
+- **Operator** — a User role; a business owner/staff who manages a workshop
+- **Workshop** — a service business (STO, car wash, etc.)
+- **ServiceCategory** — the type of service a workshop provides
+- **Queue / Черга** — a live, real-time line a driver joins remotely
+- **Slot / Слот** — a booked time window for a planned appointment
+- **WorkingHour** — when a workshop is open each day of the week
+
+> There is **one `User` model**. Driver and Operator are roles, not separate models. Always think in terms of `user.role` or similar, never separate tables.
+
+---
 
 ## Tech Stack
 
