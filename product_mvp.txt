@@ -1,0 +1,698 @@
+AULABS — MVP Plan
+=================
+
+PRODUCT OVERVIEW
+----------------
+AULABS is an automotive services platform. Drivers find workshops, request services
+for their cars, and workshop owners/staff manage those requests. The end goal is a
+full service history per car — a "digital passport."
+
+MVP core loop:
+  user registration (no role selection — any user can do anything based on context)
+  when user registered → submit workshop → pending approval → admin approves
+  when user registered → car registration → workshop discovery → service request → workshop response → service record
+  when user registered → browse workshops → filter by category/city/around current location/open now → view details
+
+WHAT ALREADY EXISTS
+-------------------
+- User (Devise auth, no roles yet)
+- ServiceCategory (9 seeded: STO, Tire Service, Car Wash, Detailing, Evacuator, Diagnostics, Oil Change, Electric Repair, Body Repair)
+- Workshop (CRUD, working hours, Active Storage for logo/photos, filtering by city/country/category/open_now)
+- Public workshop index/show; auth globally enforced
+
+KEY ARCHITECTURAL DECISIONS
+----------------------------
+1. There is NO operator role. Every person in the system is a User (driver by default).
+   Workshop access is determined entirely by the workshop_operators join table.
+   A user who submits a workshop becomes its "owner" via that join table.
+
+2. Admin is a SEPARATE Devise model (admins table), not a User. Admins manage the
+   platform (approve/decline workshops, manage users) but never appear in the users table.
+
+3. User↔Workshop is many-to-many via workshop_operators join table.
+   The join table has a role column: owner(0), staff(1).
+   "Is this user a workshop manager?" = user.workshop_operators.exists?
+
+4. Workshop has many service categories via workshop_service_categories join table
+   (removing the current single service_category_id on workshops).
+   Pricing and estimated service duration are declared per workshop per category on this join model.
+
+5. Two layouts:
+   - application layout: driver-facing (browse, my cars, my requests)
+   - workshop layout: workshop management (incoming requests, settings)
+
+6. Workshop self-registration: any user submits workshop details → status: pending →
+   admin approves/declines → on approval the submitting user is the owner.
+
+7. Car ownership transfers are user-to-user with a full audit trail across three tables:
+   car_transfers, car_transfer_events, car_ownership_records.
+
+8. ServiceRequest references workshop_service_category_id (not service_category_id directly).
+   Price is snapshotted at request time so history is accurate even if workshop changes pricing.
+   Service category is accessed via: service_request.workshop_service_category.service_category.
+
+9. ServiceRecord is the car's "digital passport" entry. It captures the full picture of a
+   completed service: summary, parts used, costs, mileage at service, next service recommendation.
+
+10. Queue management is a first-class feature. Each workshop has a live Queue per day
+    (optionally per service category). Drivers join it remotely via QueueEntry.
+
+DATA MODEL CHANGES
+------------------
+REMOVE:
+  - service_category_id from workshops table
+
+ADD:
+  - role column on users (integer enum: driver=0)
+    Note: only driver for now; kept for future extensibility.
+  - admins table (separate Devise model — platform administrators)
+  - workshop_operators table (user_id, workshop_id, role: owner=0/staff=1)
+  - status column on workshops (pending=0, active=1, declined=2, suspended=3)
+  - decline_reason column on workshops (text, nullable — populated by admin on decline)
+  - latitude, longitude columns on workshops (decimal, nullable — for proximity search)
+  - workshop_service_categories table (workshop_id, service_category_id, pricing fields,
+    estimated_duration_minutes)
+  - cars table (includes fuel_type, odometer, engine_volume, transmission)
+  - car_transfers table
+  - car_transfer_events table (append-only audit log)
+  - car_ownership_records table (append-only ownership timeline)
+  - service_requests table (references workshop_service_category_id, price_snapshot jsonb,
+    lock_version for optimistic locking)
+  - service_records table (full service passport: parts_used, costs, odometer_at_service,
+    next service recommendation)
+  - queues table (workshop_id, service_category_id, date, status)
+  - queue_entries table (queue_id, user_id, car_id, position, status, estimated_wait_minutes)
+
+
+IMPLEMENTATION STEPS
+====================
+
+STEP 1 — User Roles + Separate Admin Model
+-------------------------------------------
+Migrations:
+  - add_role_to_users: add integer role column (default 0 = driver)
+    enum :role, { driver: 0 }  — only driver for now; kept for future extensibility
+  - create_admins: email, encrypted_password + standard Devise columns
+
+Admin model:
+  class Admin < ApplicationRecord
+    devise :database_authenticatable, :rememberable, :validatable
+  end
+
+Admin::BaseController:
+  class Admin::BaseController < ApplicationController
+    layout "admin"
+    before_action :authenticate_admin!
+    skip_before_action :authenticate_user!
+  end
+
+All admin controllers inherit Admin::BaseController.
+Admin routes are under /admin/auth (Devise) and /admin namespace.
+
+Migrations:
+  - create_workshop_operators: user_id (fk), workshop_id (fk), role (int, default 0)
+    unique index on [user_id, workshop_id]
+  - add_status_to_workshops: integer status column (default 0 = pending)
+
+New model: WorkshopOperator
+  belongs_to :workshop
+  belongs_to :user
+  enum :role, { owner: 0, staff: 1 }
+
+User model additions:
+  has_many :workshop_operators
+  has_many :workshops, through: :workshop_operators
+  has_many :cars
+  def workshop_owner? = workshop_operators.owner.exists?
+  def manages_workshop?(workshop) = workshop_operators.exists?(workshop: workshop)
+  def full_name
+
+Workshop model additions:
+  has_many :workshop_operators
+  has_many :members, through: :workshop_operators, source: :user
+  has_many :service_requests
+  enum :status, { pending: 0, active: 1, declined: 2, suspended: 3 }
+  scope :active, -> { where(status: :active) }
+
+ApplicationController additions:
+  require_workshop_access!(workshop) — redirects unless current_user.manages_workshop?(workshop)
+
+Note: There is no require_operator! because there is no operator role.
+      Access to workshop management is checked per-workshop via the join table.
+
+Tests: test/models/user_test.rb, test/models/admin_test.rb,
+       test/fixtures/users.yml, test/fixtures/admins.yml, test/fixtures/workshop_operators.yml
+
+
+STEP 2 — Workshop Has Many Service Categories + Pricing
+--------------------------------------------------------
+Migrations:
+  - create_workshop_service_categories:
+      workshop_id (fk), service_category_id (fk)
+      price_min                decimal(10,2), nullable
+      price_max                decimal(10,2), nullable
+      price_unit               string, nullable      # e.g. "per service", "per hour", "from"
+      currency                 string, default "UAH"
+      estimated_duration_minutes  integer, nullable  # how long this service takes at this workshop
+      unique index on [workshop_id, service_category_id]
+  - remove_service_category_id_from_workshops
+
+New model: WorkshopServiceCategory
+  belongs_to :workshop
+  belongs_to :service_category
+  def price_display  # returns "500–1500 UAH / per service" or "price on request"
+  def duration_display  # returns "~45 хв" or nil
+
+Workshop model: replace belongs_to :service_category with
+  has_many :workshop_service_categories
+  has_many :service_categories, through: :workshop_service_categories
+
+ServiceCategory model: replace has_many :workshops with
+  has_many :workshop_service_categories
+  has_many :workshops, through: :workshop_service_categories
+
+WorkshopsController + form:
+  - Multi-select service_category_ids[]
+  - Per-category pricing + duration fields rendered dynamically (Stimulus controller)
+  - Nested attributes or separate WorkshopServiceCategoriesController for pricing
+
+Pricing flow:
+  Workshop owner edits workshop settings → for each selected service category,
+  optionally enters price_min, price_max, price_unit, estimated_duration_minutes.
+  Displayed on workshop show page as a service categories table with price and duration columns.
+  "Price on request" shown when no price is set (not required).
+  Estimated duration informs queue wait time estimates.
+
+Update by_category_slug scope to use joins(:service_categories)
+Update seeds to populate workshop_service_categories join table
+
+Tests: test/fixtures/workshop_service_categories.yml
+
+
+STEP 3 — Admin Namespace + Workshop Approval
+---------------------------------------------
+Migration:
+  - add_decline_reason_to_workshops: add decline_reason (text, nullable)
+    Populated by admin when declining. Visible to workshop owner in My Workshops.
+
+Admin::WorkshopsController (admin layout via Admin::BaseController):
+  - index: all workshops filterable by status
+  - show: workshop detail + owner info
+  - approve (PATCH member): workshop.active!
+  - decline (PATCH member): workshop.update!(status: :declined, decline_reason: params[:reason])
+  - suspend (PATCH member): workshop.suspended!
+
+Routes:
+  devise_for :admins, path: "admin/auth"
+  namespace :admin do
+    resources :workshops, only: [:index, :show] do
+      member { patch :approve; patch :decline; patch :suspend }
+    end
+    resources :users, only: [:index, :show]
+    root to: "workshops#index"
+  end
+
+Views: app/views/admin/workshops/ (index: pending queue + status filter; show: detail + action buttons)
+       decline action renders a modal/form with an optional reason text field.
+Seeds: db/seeds.rb creates one Admin record for development (email/password from ENV or hardcoded)
+
+Tests: test/controllers/admin/workshops_controller_test.rb
+
+
+STEP 4 — Workshop Self-Registration Flow
+-----------------------------------------
+Migration:
+  - add_geocoordinates_to_workshops: add latitude (decimal, precision: 10, scale: 6),
+    longitude (decimal, precision: 10, scale: 6), both nullable.
+  Populated from address on save. For MVP: use geocoder gem (geocoder.search(address).first).
+  Workshop model: after_validation :geocode, if: :address_changed? (or equivalent address field)
+  Proximity filter (/workshops?near=lat,lng) uses ORDER BY distance expression or a simple bounding
+  box for MVP.
+
+Any logged-in user can submit a workshop:
+  GET  /workshops/new     — workshop submission form (same as existing but accessible to all)
+  POST /workshops         — creates workshop with status: pending
+                            creates WorkshopOperator(user: current_user, role: :owner)
+
+WorkshopsController#create:
+  Workshop.create!(status: :pending, ...)
+  current_user.workshop_operators.create!(workshop: @workshop, role: :owner)
+  redirect with notice: "Your workshop has been submitted for review"
+
+Workshop index/show: only active workshops shown to drivers (scope :active)
+Workshop owner can see their pending/declined workshops in a "My Workshops" section.
+If workshop was declined, decline_reason is shown to the owner alongside the status badge.
+
+My Workshops section (application layout nav item for users with any workshop_operators):
+  - Lists all workshops the user is owner/staff of with status badges
+  - Links to workshop management (workshop layout) if active
+  - Shows "Pending Review" badge if pending
+  - Shows decline_reason if declined
+
+Tests: test/controllers/workshops_controller_test.rb (create sets pending + creates owner)
+
+
+STEP 5 — Two Separate Layouts
+-------------------------------
+app/views/layouts/application.html.erb (update):
+  - Nav: Browse Workshops, My Cars, My Requests, My Workshops (if manages any), Sign out
+  - No workshop-management-specific links
+
+app/views/layouts/workshop.html.erb (new, replaces "operator"):
+  - Sidebar: workshop name + status, incoming requests (pending count), settings
+  - Workshop switcher if user manages multiple workshops — switcher navigates to the selected
+    workshop's URL directly (e.g. /workshop_management/workshops/:id/service_requests).
+    No session storage; workshop context is always resolved from params[:workshop_id] in the URL.
+  - No driver-facing content
+
+app/controllers/workshop_management/base_controller.rb (new):
+  class WorkshopManagement::BaseController < ApplicationController
+    layout "workshop"
+    before_action :set_current_workshop
+    before_action :require_workshop_access!
+
+    private
+
+    def set_current_workshop
+      @workshop = current_user.workshops.active.find(params[:workshop_id])
+    end
+
+    def require_workshop_access!
+      redirect_to root_path unless current_user.manages_workshop?(@workshop)
+    end
+  end
+
+Workshop context is always authoritative from params[:workshop_id] in the URL.
+This ensures deep links work correctly and multi-tab use does not cause conflicts.
+
+All workshop management controllers inherit WorkshopManagement::BaseController.
+All driver controllers inherit ApplicationController.
+
+
+STEP 6 — Car Model + Ownership Transfer
+-----------------------------------------
+Migration create_cars:
+  user_id (fk), make (string), model (string), year (int), license_plate (unique),
+  vin (unique, nullable, 17 chars)
+  fuel_type    integer, not null, default 0  # enum: gasoline=0, diesel=1, electric=2, hybrid=3
+  odometer     integer, nullable             # current mileage in km; updated each service
+  engine_volume  decimal(3,1), nullable      # e.g. 1.8, 2.0, 3.5 — not applicable for EV
+  transmission integer, nullable            # enum: manual=0, automatic=1
+
+Migration create_car_transfers:
+  car_id (fk), from_user_id (fk), to_user_id (fk)
+  status (int enum: requested=0, approved=1, rejected=2, cancelled=3, expired=4)
+  token (string, unique)   — secure token for the approval link sent to from_user
+  expires_at (datetime)    — 14 days from created_at
+  Unique partial index: (car_id) WHERE status = 0  — only one active transfer per car
+
+Migration create_car_transfer_events:  [APPEND-ONLY — no updated_at]
+  car_transfer_id (fk)
+  actor_id (fk → users)
+  event_type (int enum):
+    transfer_requested=0    — to_user submitted the request
+    notification_sent=1     — system sent approval link to from_user
+    approved=2              — from_user clicked approve
+    rejected=3              — from_user clicked reject
+    cancelled=4             — to_user withdrew the request
+    expired=5               — cron job marked it expired
+    ownership_transferred=6 — car.user_id was updated (system action)
+  metadata (jsonb, nullable)  — ip, user_agent, reason, from_user_id, to_user_id snapshot
+  created_at only (no updated_at — signals immutability)
+
+Migration create_car_ownership_records:  [APPEND-ONLY]
+  car_id (fk), user_id (fk)
+  started_at (datetime, not null)    — when this user became owner
+  ended_at (datetime, nullable)      — null = current owner
+  car_transfer_id (fk, nullable)     — null = original registration; fk otherwise
+  created_at
+
+Car model:
+  belongs_to :user
+  has_many :service_requests
+  has_many :service_records, through: :service_requests
+  has_many :car_transfers
+  has_many :car_ownership_records
+  enum :fuel_type, { gasoline: 0, diesel: 1, electric: 2, hybrid: 3 }
+  enum :transmission, { manual: 0, automatic: 1 }, allow_nil: true
+  validates presence: make, model, year, license_plate, fuel_type
+  validates year > 1885
+  validates license_plate uniqueness (case insensitive)
+  validates vin length 17 (when present), uniqueness
+  validates engine_volume: nil when fuel_type == :electric
+  def display_name = "#{year} #{make} #{model}"
+
+Note: fuel_type is required. engine_volume is optional (not applicable to EVs).
+      odometer is updated by the workshop when creating a ServiceRecord.
+      transmission is optional — not all service categories need it.
+
+VIN claim flow (on create, if VIN already exists):
+  1. User enters VIN → system detects existing car
+  2. Block creation; show: "This vehicle is already registered. If you are the new owner — request a transfer."
+  3. User initiates transfer → CarTransfer.create(status: :requested, token: SecureRandom.urlsafe_base64)
+  4. car_transfer_events: transfer_requested (actor: to_user)
+  5. from_user receives email with approval link (token-based)
+  6. car_transfer_events: notification_sent
+  7a. from_user approves →
+      car.update!(user_id: to_user_id)
+      car_ownership_records: previous record gets ended_at = now
+      car_ownership_records: new record (to_user, started_at: now, car_transfer_id: this)
+      car_transfer_events: approved (actor: from_user)
+      car_transfer_events: ownership_transferred (metadata: { from_user_id:, to_user_id: })
+  7b. from_user rejects →
+      car_transfer.rejected!
+      car_transfer_events: rejected (actor: from_user, metadata: { reason: optional })
+  7c. to_user cancels →
+      car_transfer.cancelled!
+      car_transfer_events: cancelled (actor: to_user)
+  7d. expires_at passed (cron/SolidQueue) →
+      car_transfer.expired!
+      car_transfer_events: expired (actor: system)
+
+Key audit queries:
+  car.car_ownership_records.order(:started_at)           — full ownership timeline
+  car.car_transfers.includes(:car_transfer_events)        — all transfer attempts
+  CarTransferEvent.where(event_type: :ownership_transferred) — all completed transfers in system
+  CarTransfer.where(from_user: user).or(...)              — all transfers a user was involved in
+
+CarsController (full CRUD, application layout):
+  - index: current_user's cars
+  - show: car details + full service history table
+  - new/create/edit/update/destroy: standard with ownership guard
+  - transfer flow handled by CarTransfersController
+
+Routes:
+  resources :cars do
+    resources :transfers, controller: "car_transfers", only: [:new, :create]
+  end
+  resources :car_transfers, only: [:show] do
+    member { patch :approve; patch :reject; patch :cancel }
+  end
+
+Tests: test/fixtures/cars.yml, test/models/car_test.rb,
+       test/models/car_transfer_test.rb, test/controllers/cars_controller_test.rb
+
+
+STEP 7 — Service Requests (Driver Side)
+-----------------------------------------
+Migration create_service_requests:
+  car_id (fk), workshop_id (fk)
+  workshop_service_category_id (fk)  — NOT service_category_id directly; links to the join model
+                                       so we know exactly what was offered by this workshop
+  price_snapshot  jsonb, nullable    — {min:, max:, unit:, currency:} captured at request time;
+                                       preserved even if workshop later changes their pricing
+  status (int, default 0), description (text), preferred_time (datetime)
+  lock_version (int, default 0)      — optimistic locking; prevents concurrent status transitions
+  Indexes: [workshop_id, status], [car_id, status]
+
+Status enum: pending=0, accepted=1, rejected=2, in_progress=3, completed=4
+
+ServiceRequest model:
+  belongs_to :car
+  belongs_to :workshop
+  belongs_to :workshop_service_category
+  has_one :service_category, through: :workshop_service_category
+  has_one :service_record
+  enum :status, { pending: 0, accepted: 1, rejected: 2, in_progress: 3, completed: 4 }
+  validates presence: description, preferred_time
+  validate :preferred_time_within_working_hours   — checks WorkingHour for that weekday
+  validate :car_belongs_to_current_user           — scoped in controller, validated in model
+  validate :service_offered_by_workshop           — confirms workshop_service_category.workshop_id
+                                                    matches workshop_id; prevents impossible requests
+  before_create :snapshot_price                   — copies current pricing into price_snapshot
+  scope :recent, -> { order(created_at: :desc) }
+  def driver = car.user
+
+  private
+
+  def snapshot_price
+    wsc = workshop_service_category
+    return unless wsc
+    self.price_snapshot = {
+      min: wsc.price_min,
+      max: wsc.price_max,
+      unit: wsc.price_unit,
+      currency: wsc.currency
+    }.compact
+  end
+
+ServiceRequestsController (application layout, only: index, new, create, show):
+  - new: requires ?workshop_id= param; loads current_user.cars + workshop.workshop_service_categories
+         pre-selects car if current_user.cars.count == 1
+         pre-selects category if referred from a category filter
+  - create: validates car belongs to current_user; snapshots price automatically
+  - index: all requests across current_user's cars
+  - show: own requests only; shows service record if completed; shows price_snapshot
+
+app/views/workshops/show.html.erb: add "Request Service" button
+Routes: resources :service_requests, only: [:index, :new, :create, :show]
+Tests: test/fixtures/service_requests.yml, test/models/service_request_test.rb
+
+
+STEP 8 — Workshop Management Namespace + Request Handling
+----------------------------------------------------------
+WorkshopManagement::ServiceRequestsController (workshop layout via BaseController):
+  - index: @workshop.service_requests, filterable by ?status=
+  - show: scoped to this workshop; displays car info, price_snapshot, driver description
+  - accept  (PATCH member): request.accepted! — uses optimistic locking (lock_version)
+  - reject  (PATCH member): request.rejected! — uses optimistic locking
+  - start   (PATCH member): request.in_progress! — uses optimistic locking
+
+Optimistic locking: all status transition forms include a hidden lock_version field.
+If two operators click simultaneously, the second gets a stale object error — rescued and
+shown as "This request was already updated by another action."
+
+Routes:
+  namespace :workshop_management do
+    resources :workshops, only: [] do
+      resources :service_requests, only: [:index, :show] do
+        member { patch :accept; patch :reject; patch :start }
+        resource :service_record, only: [:new, :create]
+      end
+    end
+  end
+
+Views: app/views/workshop_management/service_requests/ (index: request table; show: detail + actions)
+Tests: test/controllers/workshop_management/service_requests_controller_test.rb
+
+
+STEP 9 — Service Records (Completion + Car History)
+-----------------------------------------------------
+Migration create_service_records:
+  service_request_id (fk, unique)
+  summary                text, not null            — what was done
+  recommendations        text, nullable            — mechanic notes for driver
+  performed_by           string, nullable          — mechanic/staff name
+  odometer_at_service    integer, nullable         — mileage when service was performed (km)
+  parts_used             jsonb, nullable           — [{name:, part_number:, quantity:, warranty_months:}]
+  labor_cost             decimal(10,2), nullable   — labor charge
+  parts_cost             decimal(10,2), nullable   — parts charge
+  currency               string, default "UAH"
+  next_service_at_km     integer, nullable         — mechanic's forward recommendation (mileage)
+  next_service_at_date   date, nullable            — mechanic's forward recommendation (date)
+  completed_at           datetime, not null
+  Unique index on service_request_id (one record per request — enforced at DB level)
+
+ServiceRecord model:
+  belongs_to :service_request
+  has_one :car, through: :service_request
+  has_one :workshop, through: :service_request
+  validates presence: summary, completed_at
+  before_validation: set completed_at to Time.current on create (if nil)
+  after_create :update_car_odometer   — if odometer_at_service present, updates car.odometer
+
+  def total_cost
+    (labor_cost || 0) + (parts_cost || 0)
+  end
+
+WorkshopManagement::ServiceRecordsController (workshop layout):
+  - new: loads @service_request (must be in_progress + belong to this workshop)
+         pre-fills odometer from car.odometer if available
+  - create: saves record (including parts_used, costs, odometer_at_service),
+            calls service_request.completed!, updates car.odometer if odometer_at_service present,
+            redirects to workshop show
+
+View updates:
+  - app/views/workshop_management/service_records/new.html.erb:
+      context panel (car info, current odometer, driver description) +
+      summary form + parts table (add/remove rows via Stimulus) + cost fields
+  - app/views/service_requests/show.html.erb: show service_record section when completed,
+      including total cost and next service recommendation
+  - app/views/cars/show.html.erb: history table
+      (date, workshop, category, odometer, summary, parts, cost, next service recommendation)
+
+Tests: test/fixtures/service_records.yml, test/models/service_record_test.rb,
+       test/controllers/workshop_management/service_records_controller_test.rb
+
+
+STEP 10 — Queue Management
+----------------------------
+A Queue is a live, date-scoped line at a workshop for walk-in or on-demand service.
+Distinct from a ServiceRequest (which is a pre-booked appointment with preferred_time).
+A driver joins a queue remotely and arrives when called.
+
+Migration create_queues:
+  workshop_id (fk)
+  service_category_id (fk, nullable)  — nil = general queue; set = category-specific queue
+  date (date, not null)               — which day this queue is for
+  status (int, default 0)             — enum: open=0, paused=1, closed=2
+  Unique index on [workshop_id, service_category_id, date] — one queue per workshop/category/day
+
+Migration create_queue_entries:
+  queue_id (fk)
+  user_id (fk)
+  car_id (fk, nullable)               — driver selects which car; optional for MVP
+  position (int, not null)            — assigned on join; sequential within queue
+  status (int, default 0)             — enum: waiting=0, called=1, in_service=2, completed=3, no_show=4
+  estimated_wait_minutes (int, nullable) — recomputed when entries ahead are served
+  joined_at (datetime, not null)
+  called_at (datetime, nullable)      — when workshop called this driver
+  Unique index on [queue_id, position]
+  Unique partial index on [queue_id, user_id] WHERE status IN (0,1,2) — no duplicate active entries
+
+Queue model:
+  belongs_to :workshop
+  belongs_to :service_category, optional: true
+  has_many :queue_entries
+  enum :status, { open: 0, paused: 1, closed: 2 }
+  scope :today, -> { where(date: Date.current) }
+  def active_entries = queue_entries.where(status: [:waiting, :called, :in_service])
+  def next_position = (queue_entries.maximum(:position) || 0) + 1
+
+QueueEntry model:
+  belongs_to :queue
+  belongs_to :user
+  belongs_to :car, optional: true
+  enum :status, { waiting: 0, called: 1, in_service: 2, completed: 3, no_show: 4 }
+  after_create :recompute_wait_estimates   — recalculates estimated_wait_minutes for all waiting entries
+  def recompute_wait_estimates             — uses queue.service_category.estimated_duration_minutes
+                                             multiplied by position ahead
+
+Driver flow:
+  Workshop show page → "Join Queue" button (if queue open today for this category)
+  POST /queues/:queue_id/entries — creates QueueEntry, returns position + estimated wait
+  Driver can view position at /queue_entries/:id/show
+  Workshop calls next: PATCH /workshop_management/queues/:id/entries/:entry_id/call
+  On call: entry.called!, estimated_wait_minutes zeroed for this entry, recalculate others
+
+Workshop management flow:
+  WorkshopManagement::QueuesController:
+    - index: today's queues for this workshop; shows open/paused/closed status
+    - show: live entry list (position, status, car, wait estimate)
+    - open  (PATCH member): queue.open!  — or create today's queue if not exists
+    - pause (PATCH member): queue.paused!
+    - close (PATCH member): queue.closed!
+
+  WorkshopManagement::QueueEntriesController:
+    - call    (PATCH): entry.called! + recalculate
+    - serve   (PATCH): entry.in_service!
+    - complete (PATCH): entry.completed!
+    - no_show (PATCH): entry.no_show! + recalculate
+    - all transitions use optimistic locking (lock_version on queue_entries)
+
+Routes:
+  resources :queues, only: [:show] do
+    resources :queue_entries, only: [:create, :show]
+  end
+  namespace :workshop_management do
+    resources :workshops, only: [] do
+      resources :queues, only: [:index, :show] do
+        member { patch :open; patch :pause; patch :close }
+        resources :queue_entries, only: [:index] do
+          member { patch :call; patch :serve; patch :complete; patch :no_show }
+        end
+      end
+    end
+  end
+
+Wait estimate calculation:
+  estimated_wait_minutes for entry at position N =
+    sum of estimated_duration_minutes for all entries ahead (status: waiting/called/in_service)
+    Falls back to a default (30 min) if estimated_duration_minutes not set on service category.
+
+Real-time updates (Turbo Streams):
+  Queue show page (driver-facing) subscribes to Turbo Stream broadcasts.
+  QueueEntry status changes and position updates are broadcast via:
+    Turbo::StreamsChannel.broadcast_replace_to("queue_#{queue.id}", ...)
+  This is the primary real-time UX — driver sees their position update live without reload.
+
+Seeds: create sample open queue for each seeded workshop.
+
+Tests: test/fixtures/queues.yml, test/fixtures/queue_entries.yml,
+       test/models/queue_test.rb, test/models/queue_entry_test.rb,
+       test/controllers/workshop_management/queues_controller_test.rb
+
+
+STEP 11 — Dashboard + My Workshops
+------------------------------------
+Dashboard (DashboardController#index, application layout):
+  - If user manages any workshop: show "My Workshops" card with links to workshop management
+  - Always show: my cars, recent service requests, "Find a Workshop" CTA
+  - No redirect based on role — a user can be both a car owner and a workshop manager
+
+My Workshops section (also in nav if user.workshop_owner?):
+  - Lists workshops the user owns or is staff on
+  - Status badge: pending (spinner), active (green), declined (red), suspended (yellow)
+  - Pending workshops: note that admin reviews manually
+  - Declined workshops: show decline_reason so owner knows why
+
+Registration:
+  - Standard Devise sign-up, no role selection
+  - After sign-up: driver dashboard with CTA to either browse workshops or submit a new one
+
+
+CRITICAL FILES
+==============
+app/models/user.rb                                    role enum (driver only), workshops, cars
+app/models/admin.rb                                   new separate Devise model
+app/models/workshop.rb                                status enum, decline_reason, lat/lng, service_categories (many), members (many)
+app/models/workshop_operator.rb                       join model with role: owner/staff
+app/models/workshop_service_category.rb               join model with pricing + estimated_duration_minutes
+app/models/car.rb                                     fuel_type, odometer, engine_volume, transmission, VIN uniqueness
+app/models/car_transfer.rb                            status enum, token, expires_at
+app/models/car_transfer_event.rb                      append-only audit log
+app/models/car_ownership_record.rb                    append-only ownership timeline
+app/models/service_request.rb                         workshop_service_category_id, price_snapshot, lock_version
+app/models/service_record.rb                          full passport: parts_used, costs, odometer_at_service, next service rec
+app/models/queue.rb                                   open/paused/closed, today scope
+app/models/queue_entry.rb                             position, wait estimate, Turbo broadcasts
+app/views/layouts/workshop.html.erb                   new workshop management layout
+app/views/layouts/admin.html.erb                      new admin layout
+app/views/layouts/application.html.erb                driver nav + My Workshops link
+app/controllers/admin/base_controller.rb              authenticate_admin!, skip authenticate_user!
+app/controllers/workshop_management/base_controller.rb  layout + workshop always from params[:workshop_id]
+app/controllers/application_controller.rb             require_workshop_access! helper
+config/routes.rb                                      admin, workshop_management, cars, transfers, queues
+config/locales/en.yml + uk.yml                        all new UI strings (Ukrainian UI preserved)
+app/views/workshops/show.html.erb                     "Request Service" + "Join Queue" CTAs
+db/seeds.rb                                           one Admin record + workshop_service_categories + sample queues
+
+
+VERIFICATION
+============
+1. bin/rails db:migrate      — all migrations apply cleanly
+2. bin/rails db:seed         — admin record created, workshop_service_categories populated,
+                               sample queues created
+3. bin/rubocop               — zero offenses
+4. bin/rails test            — all model + controller tests pass
+5. Manual end-to-end:
+   a. Sign up as user → submit workshop → see "Pending Review" status in My Workshops
+   b. Sign in as admin (/admin/auth/sign_in) → approve workshop; or decline with reason
+      → sign back in as user → decline_reason visible in My Workshops
+   c. Sign back in as user → workshop now active → manage requests via workshop layout
+   d. Sign up as second user → add car (with fuel_type, odometer) → browse workshops
+      → "Request Service" → submit (service_category offered by workshop validated;
+      price_snapshot stored; pre-selects car if only one)
+   e. Sign in as workshop owner → workshop layout → see request → accept → start
+      → fill service record (parts, costs, odometer_at_service, next service rec) → complete
+      → car.odometer updated automatically
+   f. Sign back in as driver → view car → full service history entry visible including
+      parts used, cost, next service recommendation
+   g. Second user registers same VIN → sees claim prompt → requests transfer →
+      original owner approves → car_ownership_records updated → audit trail complete
+   h. Workshop owner opens queue for today → driver joins queue remotely →
+      driver sees live position via Turbo Streams → workshop calls driver →
+      driver arrives → service starts → queue entry completed
+   i. Two operators try to accept the same request simultaneously →
+      second gets stale object error → handled gracefully
+6. bin/brakeman --no-pager   — no new warnings

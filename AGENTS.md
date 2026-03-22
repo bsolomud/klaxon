@@ -67,14 +67,14 @@ Always use these terms consistently in code, UI, and discussions:
 
 - **User** — the single user model for all people in the system; roles determine what they can do
 - **Driver** — a User role; a car owner who finds workshops and joins queues
-- **Operator** — a User role; a business owner/staff who manages a workshop
+- **Operator** — a business owner/staff who manages a workshop
 - **Workshop** — a service business (STO, car wash, etc.)
 - **ServiceCategory** — the type of service a workshop provides
 - **Queue / Черга** — a live, real-time line a driver joins remotely
 - **Slot / Слот** — a booked time window for a planned appointment
 - **WorkingHour** — when a workshop is open each day of the week
 
-> There is **one `User` model**. Driver and Operator are roles, not separate models. Always think in terms of `user.role` or similar, never separate tables.
+> There is **one `User` model**. Driver is role, not separate models. Always think in terms of `user.role` or similar, never separate tables.
 
 ---
 
