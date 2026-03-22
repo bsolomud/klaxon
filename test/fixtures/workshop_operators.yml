@@ -1,0 +1,9 @@
+owner_one:
+  user: one
+  workshop: one
+  role: 0
+
+staff_two:
+  user: two
+  workshop: one
+  role: 1

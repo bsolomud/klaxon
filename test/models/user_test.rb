@@ -39,13 +39,13 @@ class UserTest < ActiveSupport::TestCase
     assert_not user_two.manages_workshop?(other_workshop)
   end
 
-  test "workshop_owner? returns true when user has owner role" do
-    assert @user.workshop_owner?
+  test "owns_any_workshop? returns true when user has owner role" do
+    assert @user.owns_any_workshop?
   end
 
-  test "workshop_owner? returns false when user is only staff" do
+  test "owns_any_workshop? returns false when user is only staff" do
     user_two = users(:two)
-    assert_not user_two.workshop_owner?
+    assert_not user_two.owns_any_workshop?
   end
 
   test "full_name returns first and last name" do

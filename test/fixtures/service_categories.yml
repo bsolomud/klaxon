@@ -1,0 +1,7 @@
+tire_service:
+  name: "Шиномонтаж"
+  slug: "tire-service"
+
+car_wash:
+  name: "Автомийка"
+  slug: "car-wash"

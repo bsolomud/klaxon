@@ -1,0 +1,26 @@
+one:
+  name: "Шиномонтаж Експрес"
+  phone: "+380501234567"
+  address: "вул. Хрещатик, 1"
+  city: "Київ"
+  country: "UA"
+  service_category: tire_service
+  status: active
+
+two:
+  name: "Автомийка Блиск"
+  phone: "+380507654321"
+  address: "вул. Сагайдачного, 10"
+  city: "Київ"
+  country: "UA"
+  service_category: car_wash
+  status: active
+
+pending_workshop:
+  name: "СТО Новий"
+  phone: "+380509999999"
+  address: "вул. Грушевського, 5"
+  city: "Київ"
+  country: "UA"
+  service_category: tire_service
+  status: pending

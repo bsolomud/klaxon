@@ -50,6 +50,6 @@ class ServiceCategoriesController < ApplicationController
   end
 
   def service_category_params
-    params.expect(service_category: [:name, :slug])
+    params.require(:service_category).permit(:name, :slug)
   end
 end

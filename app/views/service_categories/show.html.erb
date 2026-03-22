@@ -22,17 +22,7 @@
 
 <% if @workshops.any? %>
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-    <% @workshops.each do |workshop| %>
-      <%= link_to workshop_path(workshop),
-                  class: "group block bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md hover:border-gray-200 transition-all" do %>
-        <h3 class="text-base font-semibold text-gray-900 group-hover:text-black"><%= workshop.name %></h3>
-        <p class="mt-1 text-sm text-gray-500"><%= workshop.city %>, <%= workshop.country %></p>
-        <div class="mt-3 flex items-center gap-2">
-          <div class="h-2 w-2 rounded-full shrink-0 <%= workshop.open_now? ? 'bg-green-500' : 'bg-red-500' %>"></div>
-          <span class="text-xs text-gray-500"><%= workshop.open_now? ? t(".open_now") : t(".closed_now") %></span>
-        </div>
-      <% end %>
-    <% end %>
+    <%= render partial: "workshops/workshop_card", collection: @workshops, as: :workshop %>
   </div>
 <% else %>
   <div class="text-center py-12">

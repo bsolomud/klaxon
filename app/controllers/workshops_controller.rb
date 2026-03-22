@@ -17,7 +17,7 @@ class WorkshopsController < ApplicationController
 
   def new
     @workshop = Workshop.new
-    build_working_hours
+    build_missing_working_hours
   end
 
   def create
@@ -66,14 +66,6 @@ class WorkshopsController < ApplicationController
     )
   end
 
-  # Build all 7 days for new form
-  def build_working_hours
-    (0..6).each do |day|
-      @workshop.working_hours.build(day_of_week: day)
-    end
-  end
-
-  # Fill in missing days on edit/validation failure
   def build_missing_working_hours
     existing_days = @workshop.working_hours.map(&:day_of_week)
     (0..6).each do |day|

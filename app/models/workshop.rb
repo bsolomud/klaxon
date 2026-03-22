@@ -2,7 +2,7 @@ class Workshop < ApplicationRecord
   belongs_to :service_category
 
   has_many :workshop_operators, dependent: :destroy
-  has_many :members, through: :workshop_operators, source: :user
+  has_many :operators, through: :workshop_operators, source: :user
 
   has_many :working_hours, dependent: :destroy
   accepts_nested_attributes_for :working_hours, allow_destroy: true
@@ -44,21 +44,25 @@ class Workshop < ApplicationRecord
   }
 
   def open_now?
-    today = working_hours.find_by(day_of_week: Time.current.wday)
-    return false if today.nil? || today.closed?
+    wh = today_working_hours
+    return false if wh.nil? || wh.closed?
 
-    time = Time.current.strftime("%H:%M:%S")
-    opens = today.opens_at.strftime("%H:%M:%S")
-    closes = today.closes_at.strftime("%H:%M:%S")
+    self.class.time_within_range?(
+      Time.current.strftime("%H:%M:%S"),
+      wh.opens_at.strftime("%H:%M:%S"),
+      wh.closes_at.strftime("%H:%M:%S")
+    )
+  end
 
+  def today_working_hours
+    working_hours.find_by(day_of_week: Time.current.wday)
+  end
+
+  def self.time_within_range?(time, opens, closes)
     if opens <= closes
       time >= opens && time <= closes
     else
       time >= opens || time <= closes
     end
-  end
-
-  def today_working_hours
-    working_hours.find_by(day_of_week: Time.current.wday)
   end
 end

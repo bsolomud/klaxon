@@ -13,7 +13,7 @@ class User < ApplicationRecord
     workshop_operators.exists?(workshop: workshop)
   end
 
-  def workshop_owner?
+  def owns_any_workshop?
     workshop_operators.owner.exists?
   end
 
