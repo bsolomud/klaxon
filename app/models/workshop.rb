@@ -1,11 +1,16 @@
 class Workshop < ApplicationRecord
   belongs_to :service_category
 
+  has_many :workshop_operators, dependent: :destroy
+  has_many :members, through: :workshop_operators, source: :user
+
   has_many :working_hours, dependent: :destroy
   accepts_nested_attributes_for :working_hours, allow_destroy: true
 
   has_one_attached :logo
   has_many_attached :photos
+
+  enum :status, { pending: 0, active: 1, declined: 2, suspended: 3 }
 
   validates :name, presence: true
   validates :phone, presence: true
@@ -14,7 +19,6 @@ class Workshop < ApplicationRecord
   validates :country, presence: true
   validates :service_category, presence: true
 
-  scope :active, -> { where(active: true) }
   scope :by_city, ->(city) { where(city: city) }
   scope :by_country, ->(country) { where(country: country) }
 

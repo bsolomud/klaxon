@@ -43,7 +43,7 @@ workshop = Workshop.find_or_create_by!(name: "AutoPro Service Center") do |w|
   w.country = "Ukraine"
   w.latitude = 50.4501
   w.longitude = 30.5234
-  w.active = true
+  w.status = :active
 end
 
 # Working hours: Mon-Fri 08:00-20:00, Sat 09:00-17:00, Sun closed

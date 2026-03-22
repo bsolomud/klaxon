@@ -40,7 +40,7 @@ uk:
         longitude: "Довгота"
         service_category: "Категорія послуг"
         service_category_id: "Категорія послуг"
-        active: "Активна"
+        status: "Статус"
         logo: "Логотип"
         photos: "Фото"
       working_hour:
@@ -53,6 +53,8 @@ uk:
       not_saved:
         one: "1 помилка завадила збереженню %{resource}:"
         other: "%{count} помилок завадили збереженню %{resource}:"
+  authorization:
+    access_denied: "Доступ заборонено"
   layouts:
     application:
       sign_out: "Вихід"
@@ -142,7 +144,6 @@ uk:
       category: "Категорія послуг"
       select_category: "Оберіть категорію..."
       description: "Опис"
-      active: "Активна (видима в каталозі)"
       contact_info: "Контактна інформація"
       phone: "Номер телефону"
       email: "Електронна пошта"

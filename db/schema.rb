@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_22_154735) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_22_165328) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -104,12 +104,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_22_154735) do
     t.index ["workshop_id"], name: "index_working_hours_on_workshop_id"
   end
 
+  create_table "workshop_operators", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "role", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.bigint "workshop_id", null: false
+    t.index ["user_id", "workshop_id"], name: "index_workshop_operators_on_user_id_and_workshop_id", unique: true
+    t.index ["user_id"], name: "index_workshop_operators_on_user_id"
+    t.index ["workshop_id"], name: "index_workshop_operators_on_workshop_id"
+  end
+
   create_table "workshops", force: :cascade do |t|
-    t.boolean "active", default: true, null: false
     t.string "address", null: false
     t.string "city", null: false
     t.string "country", null: false
     t.datetime "created_at", null: false
+    t.text "decline_reason"
     t.text "description"
     t.string "email"
     t.decimal "latitude", precision: 10, scale: 7
@@ -117,15 +128,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_22_154735) do
     t.string "name", null: false
     t.string "phone", null: false
     t.bigint "service_category_id", null: false
+    t.integer "status", default: 0, null: false
     t.datetime "updated_at", null: false
-    t.index ["active"], name: "index_workshops_on_active"
     t.index ["city"], name: "index_workshops_on_city"
     t.index ["country"], name: "index_workshops_on_country"
     t.index ["service_category_id"], name: "index_workshops_on_service_category_id"
+    t.index ["status"], name: "index_workshops_on_status"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "working_hours", "workshops"
+  add_foreign_key "workshop_operators", "users"
+  add_foreign_key "workshop_operators", "workshops"
   add_foreign_key "workshops", "service_categories"
 end

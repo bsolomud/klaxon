@@ -40,7 +40,7 @@ en:
         longitude: "Longitude"
         service_category: "Service category"
         service_category_id: "Service category"
-        active: "Active"
+        status: "Status"
         logo: "Logo"
         photos: "Photos"
       working_hour:
@@ -53,6 +53,8 @@ en:
       not_saved:
         one: "1 error prevented this %{resource} from being saved:"
         other: "%{count} errors prevented this %{resource} from being saved:"
+  authorization:
+    access_denied: "Access denied"
   layouts:
     application:
       sign_out: "Sign out"
@@ -140,7 +142,6 @@ en:
       category: "Service category"
       select_category: "Select a category..."
       description: "Description"
-      active: "Active (visible in directory)"
       contact_info: "Contact Information"
       phone: "Phone number"
       email: "Email"

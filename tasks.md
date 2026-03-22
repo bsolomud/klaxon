@@ -4,7 +4,7 @@
 
 ---
 
-## Phase 1 — User Roles + Admin Model
+## Phase 1 — User Roles + Admin Model [DONE]
 
 ### Task 1: Add role enum to User model
 - **Description**: Add integer `role` column to users (default 0 = driver). Add `enum :role, { driver: 0 }` to User model.

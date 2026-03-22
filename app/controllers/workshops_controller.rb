@@ -60,7 +60,7 @@ class WorkshopsController < ApplicationController
       :name, :description, :phone, :email,
       :address, :city, :country,
       :latitude, :longitude,
-      :service_category_id, :active,
+      :service_category_id,
       :logo, photos: [],
       working_hours_attributes: [:id, :day_of_week, :opens_at, :closes_at, :closed, :_destroy]
     )
