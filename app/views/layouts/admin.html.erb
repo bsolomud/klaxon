@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html class="h-full bg-gray-50">
+  <head>
+    <title><%= content_for(:title) || "AULABS Admin" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="h-full antialiased font-sans">
+    <header class="bg-black text-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex h-14 items-center justify-between">
+        <div class="flex items-center gap-6">
+          <div class="font-bold tracking-tighter text-lg">AULABS <span class="text-gray-400 font-normal text-sm">admin</span></div>
+          <nav class="flex items-center gap-4">
+            <%= link_to t("layouts.admin.nav.workshops"), admin_root_path, class: "text-sm text-gray-400 hover:text-white transition-colors" %>
+            <%= link_to t("layouts.admin.nav.users"), admin_root_path, class: "text-sm text-gray-400 hover:text-white transition-colors" %>
+          </nav>
+        </div>
+        <nav class="flex items-center gap-4">
+          <span class="text-sm text-gray-500"><%= current_admin.email if admin_signed_in? %></span>
+          <%= button_to t("layouts.admin.sign_out"), destroy_admin_session_path, method: :delete, class: "text-sm text-gray-400 hover:text-white transition-colors" if admin_signed_in? %>
+        </nav>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+      <%= yield %>
+    </main>
+
+    <% flash.each do |type, message| %>
+      <div data-controller="flash" data-flash-duration-value="5000"
+           class="fixed bottom-5 right-5 z-50 transition-all duration-300 ease-out">
+        <div class="flex items-center gap-2 bg-black text-white px-5 py-3 rounded-xl shadow-lg border border-gray-800">
+          <div class="h-2 w-2 rounded-full shrink-0 <%= type == 'alert' ? 'bg-red-500' : 'bg-green-500' %>"></div>
+          <span class="text-sm font-medium tracking-wide"><%= message %></span>
+        </div>
+      </div>
+    <% end %>
+  </body>
+</html>

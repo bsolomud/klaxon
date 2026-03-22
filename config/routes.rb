@@ -2,6 +2,12 @@ Rails.application.routes.draw do
   devise_for :users, controllers: {
     registrations: "users/registrations"
   }
+  devise_for :admins, path: "admin/auth"
+
+  namespace :admin do
+    root "dashboard#index"
+  end
+
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

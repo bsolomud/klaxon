@@ -56,6 +56,15 @@ en:
   layouts:
     application:
       sign_out: "Sign out"
+    admin:
+      sign_out: "Sign out"
+      nav:
+        workshops: "Workshops"
+        users: "Users"
+  admin:
+    dashboard:
+      index:
+        title: "Dashboard"
   service_categories:
     index:
       title: "Service Categories"
@@ -160,6 +169,14 @@ en:
       success: "Workshop was successfully updated."
     destroy:
       success: "Workshop was successfully deleted."
+  admins:
+    sessions:
+      new:
+        title: "Admin Panel Aulabs"
+        email: "Email"
+        password: "Password"
+        remember_me: "Remember me"
+        sign_in: "Sign in"
   devise:
     shared:
       header:

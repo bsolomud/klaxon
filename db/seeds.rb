@@ -62,3 +62,15 @@ if workshop.working_hours.empty?
 end
 
 puts "Seeded example workshop: #{workshop.name}"
+
+# ============================================================
+# Admin Account
+# ============================================================
+
+admin_password = ENV.fetch("ADMIN_PASSWORD", "password")
+
+Admin.find_or_create_by!(email: "admin@aulabs.dev") do |admin|
+  admin.password = admin_password
+end
+
+puts "Seeded admin: admin@aulabs.dev"

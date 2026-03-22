@@ -78,6 +78,7 @@ Before considering the task done, verify:
 - Use `before_action` for shared setup
 - Rescue specific errors, not generic ones
 - Use transactions for multi-record atomic operations
+- **Always use `t()` locale helpers in views** — never hardcode user-facing strings. Add keys to both `config/locales/en.yml` and `config/locales/uk.yml`.
 
 ### Don't
 - Create service objects, form objects, or interactors
@@ -89,6 +90,7 @@ Before considering the task done, verify:
 - Check `user.role` for workshop access — use `WorkshopOperator`
 - Store `current_user` in models
 - Use `params.permit!` or skip strong parameters
+- Hardcode user-facing strings in views — always use `t()` with locale keys in both `en.yml` and `uk.yml`
 
 ---
 

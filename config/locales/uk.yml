@@ -56,6 +56,15 @@ uk:
   layouts:
     application:
       sign_out: "Вихід"
+    admin:
+      sign_out: "Вихід"
+      nav:
+        workshops: "Майстерні"
+        users: "Користувачі"
+  admin:
+    dashboard:
+      index:
+        title: "Панель керування"
   service_categories:
     index:
       title: "Категорії послуг"
@@ -162,6 +171,14 @@ uk:
       success: "Майстерню успішно оновлено."
     destroy:
       success: "Майстерню успішно видалено."
+  admins:
+    sessions:
+      new:
+        title: "Адмін-панель Aulabs"
+        email: "Email"
+        password: "Пароль"
+        remember_me: "Запам'ятати мене"
+        sign_in: "Увійти"
   devise:
     shared:
       header:

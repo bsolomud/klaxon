@@ -1,9 +1,9 @@
 one:
   email: "user-one@example.com"
-  encrypted_password: "$2a$04$fakehashfakehashfakehashfakehashfakehashfakehashfake"
+  encrypted_password: "<%= BCrypt::Password.create('password', cost: 4) %>"
   role: 0
 
 two:
   email: "user-two@example.com"
-  encrypted_password: "$2a$04$fakehashfakehashfakehashfakehashfakehashfakehashfake"
+  encrypted_password: "<%= BCrypt::Password.create('password', cost: 4) %>"
   role: 0
