@@ -12,16 +12,52 @@
       </div>
 
       <div>
-        <%= f.label :service_category_id, t("workshops.form.category"), class: "label-input" %>
-        <%= f.collection_select :service_category_id, ServiceCategory.order(:name), :id, :name,
-              { prompt: t("workshops.form.select_category") }, {} %>
-      </div>
-
-      <div>
         <%= f.label :description, t("workshops.form.description"), class: "label-input" %>
         <%= f.text_area :description, rows: 4 %>
       </div>
 
+    </div>
+  </fieldset>
+
+  <%# Service Categories with Pricing %>
+  <fieldset>
+    <legend class="text-sm font-medium text-gray-900 uppercase tracking-wider mb-4"><%= t("workshops.form.categories") %></legend>
+
+    <div class="space-y-3">
+      <% sorted_wscs = workshop.workshop_service_categories.sort_by { |wsc| wsc.service_category&.name.to_s } %>
+      <%= f.fields_for :workshop_service_categories, sorted_wscs do |wsc| %>
+        <div data-controller="pricing-fields" class="border border-gray-100 rounded-lg p-3">
+          <%= wsc.hidden_field :service_category_id %>
+          <%= wsc.hidden_field :id if wsc.object.persisted? %>
+
+          <%= wsc.check_box :_destroy, {
+                checked: !wsc.object.marked_for_destruction?,
+                label_text: wsc.object.service_category&.name,
+                class: "rounded border-gray-300 text-black focus:ring-black",
+                data: { pricing_fields_target: "checkbox", action: "change->pricing-fields#toggle" }
+              }, "0", "1" %>
+
+          <div data-pricing-fields-target="fields"
+               class="<%= 'hidden' if wsc.object.marked_for_destruction? %> mt-3 ml-6 grid grid-cols-1 sm:grid-cols-2 gap-x-4">
+            <div>
+              <%= wsc.label :price_min, t("workshops.form.price_min"), class: "label-input" %>
+              <%= wsc.number_field :price_min, step: "0.01", min: "0" %>
+            </div>
+            <div>
+              <%= wsc.label :price_max, t("workshops.form.price_max"), class: "label-input" %>
+              <%= wsc.number_field :price_max, step: "0.01", min: "0" %>
+            </div>
+            <div>
+              <%= wsc.label :price_unit, t("workshops.form.price_unit"), class: "label-input" %>
+              <%= wsc.text_field :price_unit %>
+            </div>
+            <div>
+              <%= wsc.label :estimated_duration_minutes, t("workshops.form.estimated_duration"), class: "label-input" %>
+              <%= wsc.number_field :estimated_duration_minutes, min: "1", step: "1" %>
+            </div>
+          </div>
+        </div>
+      <% end %>
     </div>
   </fieldset>
 

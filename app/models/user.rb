@@ -1,6 +1,4 @@
 class User < ApplicationRecord
-  # Include default devise modules. Others available are:
-  # :timeoutable
   devise :database_authenticatable, :registerable, :confirmable, :lockable,
          :trackable, :recoverable, :rememberable, :validatable, :omniauthable
 
@@ -13,7 +11,7 @@ class User < ApplicationRecord
     workshop_operators.exists?(workshop: workshop)
   end
 
-  def owns_any_workshop?
+  def workshop_owner?
     workshop_operators.owner.exists?
   end
 

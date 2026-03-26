@@ -13,16 +13,17 @@
   <div class="p-5">
     <div class="flex items-start justify-between gap-2">
       <h2 class="text-base font-semibold text-gray-900 group-hover:text-black"><%= workshop.name %></h2>
-      <span class="shrink-0 inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-600">
-        <%= workshop.service_category.name %>
-      </span>
+      <% workshop.service_categories.each do |category| %>
+        <span class="shrink-0 inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-600">
+          <%= category.name %>
+        </span>
+      <% end %>
     </div>
 
     <p class="mt-1 text-sm text-gray-500"><%= workshop.city %>, <%= workshop.country %></p>
 
-    <div class="mt-3 flex items-center gap-2">
-      <div class="h-2 w-2 rounded-full shrink-0 <%= workshop.open_now? ? 'bg-green-500' : 'bg-red-500' %>"></div>
-      <span class="text-xs text-gray-500"><%= workshop.open_now? ? t("workshops.index.open_now") : t("workshops.index.closed_now") %></span>
+    <div class="mt-3">
+      <%= workshop_status_indicator(workshop) %>
     </div>
   </div>
 <% end %>

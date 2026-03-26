@@ -1,8 +1,14 @@
 class Workshop < ApplicationRecord
-  belongs_to :service_category
+  TIME_FORMAT = "%H:%M:%S"
 
   has_many :workshop_operators, dependent: :destroy
   has_many :operators, through: :workshop_operators, source: :user
+
+  has_many :workshop_service_categories, dependent: :destroy
+  has_many :service_categories, through: :workshop_service_categories
+  accepts_nested_attributes_for :workshop_service_categories,
+    allow_destroy: true,
+    reject_if: proc { |attrs| attrs["_destroy"] == "1" && attrs["id"].blank? }
 
   has_many :working_hours, dependent: :destroy
   accepts_nested_attributes_for :working_hours, allow_destroy: true
@@ -17,18 +23,17 @@ class Workshop < ApplicationRecord
   validates :address, presence: true
   validates :city, presence: true
   validates :country, presence: true
-  validates :service_category, presence: true
 
   scope :by_city, ->(city) { where(city: city) }
   scope :by_country, ->(country) { where(country: country) }
 
   scope :by_category_slug, ->(slug) {
-    joins(:service_category).where(service_categories: { slug: slug })
+    joins(:service_categories).where(service_categories: { slug: slug })
   }
 
   scope :open_now, -> {
     now = Time.current
-    time = now.strftime("%H:%M:%S")
+    time = now.strftime(TIME_FORMAT)
     wday = now.wday
 
     joins(:working_hours)
@@ -44,13 +49,13 @@ class Workshop < ApplicationRecord
   }
 
   def open_now?
-    wh = today_working_hours
-    return false if wh.nil? || wh.closed?
+    today_hours = today_working_hours
+    return false if today_hours.nil? || today_hours.closed?
 
     self.class.time_within_range?(
-      Time.current.strftime("%H:%M:%S"),
-      wh.opens_at.strftime("%H:%M:%S"),
-      wh.closes_at.strftime("%H:%M:%S")
+      Time.current.strftime(TIME_FORMAT),
+      today_hours.opens_at.strftime(TIME_FORMAT),
+      today_hours.closes_at.strftime(TIME_FORMAT)
     )
   end
 
@@ -65,4 +70,5 @@ class Workshop < ApplicationRecord
       time >= opens || time <= closes
     end
   end
+  private_class_method :time_within_range?
 end

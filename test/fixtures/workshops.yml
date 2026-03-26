@@ -4,7 +4,6 @@ one:
   address: "вул. Хрещатик, 1"
   city: "Київ"
   country: "UA"
-  service_category: tire_service
   status: active
 
 two:
@@ -13,7 +12,6 @@ two:
   address: "вул. Сагайдачного, 10"
   city: "Київ"
   country: "UA"
-  service_category: car_wash
   status: active
 
 pending_workshop:
@@ -22,5 +20,4 @@ pending_workshop:
   address: "вул. Грушевського, 5"
   city: "Київ"
   country: "UA"
-  service_category: tire_service
   status: pending

@@ -5,11 +5,10 @@ FactoryBot.define do
     address { "123 Main Street" }
     city { "Kyiv" }
     country { "Ukraine" }
-    active { true }
-    service_category
+    status { :active }
 
     trait :inactive do
-      active { false }
+      status { :suspended }
     end
 
     trait :with_working_hours do

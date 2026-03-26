@@ -60,4 +60,38 @@ class WorkshopTest < ActiveSupport::TestCase
   test "decline_reason is nullable" do
     assert_nil @workshop.decline_reason
   end
+
+  # Task 14 — many-to-many service categories
+
+  test "has service_categories through workshop_service_categories" do
+    assert_includes @workshop.service_categories, service_categories(:tire_service)
+  end
+
+  test "service_categories returns only linked categories" do
+    assert_not_includes @workshop.service_categories, service_categories(:car_wash)
+  end
+
+  test "destroying workshop destroys workshop_service_categories" do
+    assert_difference "WorkshopServiceCategory.count", -1 do
+      @workshop.destroy
+    end
+  end
+
+  # Task 19 — by_category_slug uses join table
+
+  test "by_category_slug returns workshops with matching service category" do
+    results = Workshop.by_category_slug("tire-service")
+    assert_includes results, workshops(:one)
+    assert_not_includes results, workshops(:two)
+  end
+
+  test "by_category_slug returns empty when no match" do
+    assert_empty Workshop.by_category_slug("nonexistent-slug")
+  end
+
+  test "by_category_slug works with chained scopes" do
+    results = Workshop.active.by_category_slug("tire-service")
+    assert_includes results, workshops(:one)
+    assert_not_includes results, workshops(:pending_workshop)
+  end
 end

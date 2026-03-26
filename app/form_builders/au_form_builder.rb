@@ -13,19 +13,6 @@ class AuFormBuilder < ActionView::Helpers::FormBuilder
     end
   end
 
-  # Кастомний метод для Чекбоксів (Input зліва, Label справа)
-  # def check_box(name, options = {}, checked_value = "1", unchecked_value = "0")
-  #   error_class = object.errors[name].any? ? "ring-2 ring-red-500 ring-offset-2" : ""
-  #   options[:class] = Array(options[:class]).join(" ") + " #{error_class}"
-  #
-  #   @template.content_tag(:div, class: "mb-2") do
-  #     @template.content_tag(:div, class: "flex items-center") do
-  #       super(name, options, checked_value, unchecked_value) +
-  #         label(name, options[:label_text], class: "ml-2 text-sm text-gray-700")
-  #     end + error_message_for(name)
-  #   end
-  # end
-
   def check_box(name, options = {}, checked_value = "1", unchecked_value = "0")
     # Витягуємо текст лейбла, щоб він не потрапив у атрибути самого інпуту
     label_text = options.delete(:label_text)

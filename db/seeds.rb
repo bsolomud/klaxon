@@ -33,7 +33,6 @@ puts "Seeded #{ServiceCategory.count} service categories"
 sto = ServiceCategory.find_by!(slug: "sto")
 
 workshop = Workshop.find_or_create_by!(name: "AutoPro Service Center") do |w|
-  w.service_category = sto
   w.description = "Full-service automotive repair and maintenance center. " \
                   "Certified technicians, modern diagnostic equipment, genuine parts."
   w.phone = "+380441234567"
@@ -44,6 +43,22 @@ workshop = Workshop.find_or_create_by!(name: "AutoPro Service Center") do |w|
   w.latitude = 50.4501
   w.longitude = 30.5234
   w.status = :active
+end
+
+tire = ServiceCategory.find_by!(slug: "tire_service")
+car_wash = ServiceCategory.find_by!(slug: "car_wash")
+diagnostics = ServiceCategory.find_by!(slug: "diagnostics")
+
+[
+  { service_category: sto, price_min: 500, price_max: 5000, price_unit: "послуга", currency: "UAH", estimated_duration_minutes: 120 },
+  { service_category: tire, price_min: 300, price_max: 1200, price_unit: "колесо", currency: "UAH", estimated_duration_minutes: 45 },
+  { service_category: car_wash, price_min: 200, price_max: 800, price_unit: "послуга", currency: "UAH", estimated_duration_minutes: 30 },
+  { service_category: diagnostics, price_min: 400, price_max: 1500, price_unit: "послуга", currency: "UAH", estimated_duration_minutes: 60 }
+].each do |attrs|
+  category = attrs.delete(:service_category)
+  wsc = WorkshopServiceCategory.find_or_initialize_by(workshop: workshop, service_category: category)
+  wsc.assign_attributes(attrs)
+  wsc.save!
 end
 
 # Working hours: Mon-Fri 08:00-20:00, Sat 09:00-17:00, Sun closed

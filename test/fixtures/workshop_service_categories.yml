@@ -1,0 +1,26 @@
+tire_express:
+  workshop: one
+  service_category: tire_service
+  price_min: 500
+  price_max: 1500
+  price_unit: "послуга"
+  currency: "UAH"
+  estimated_duration_minutes: 45
+
+car_wash_basic:
+  workshop: two
+  service_category: car_wash
+  price_min: 200
+  price_max: 200
+  price_unit: "послуга"
+  currency: "UAH"
+  estimated_duration_minutes: 30
+
+no_price:
+  workshop: pending_workshop
+  service_category: tire_service
+  price_min:
+  price_max:
+  price_unit:
+  currency: "UAH"
+  estimated_duration_minutes:

@@ -52,7 +52,7 @@
 
 ---
 
-## Phase 2 — Workshop Operators + Status
+## Phase 2 — Workshop Operators + Status [DONE]
 
 ### Task 7: Create WorkshopOperator model + migration
 - **Description**: Create `workshop_operators` table: `user_id` (fk), `workshop_id` (fk), `role` (integer, default 0). Unique index on `[user_id, workshop_id]`. Model with `enum :role, { owner: 0, staff: 1 }`.

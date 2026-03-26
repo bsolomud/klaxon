@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_22_165328) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_25_161809) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -115,6 +115,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_22_165328) do
     t.index ["workshop_id"], name: "index_workshop_operators_on_workshop_id"
   end
 
+  create_table "workshop_service_categories", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "currency", default: "UAH"
+    t.integer "estimated_duration_minutes"
+    t.decimal "price_max", precision: 10, scale: 2
+    t.decimal "price_min", precision: 10, scale: 2
+    t.string "price_unit"
+    t.bigint "service_category_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "workshop_id", null: false
+    t.index ["service_category_id"], name: "index_workshop_service_categories_on_service_category_id"
+    t.index ["workshop_id", "service_category_id"], name: "index_wsc_on_workshop_id_and_service_category_id", unique: true
+    t.index ["workshop_id"], name: "index_workshop_service_categories_on_workshop_id"
+  end
+
   create_table "workshops", force: :cascade do |t|
     t.string "address", null: false
     t.string "city", null: false
@@ -127,12 +142,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_22_165328) do
     t.decimal "longitude", precision: 10, scale: 7
     t.string "name", null: false
     t.string "phone", null: false
-    t.bigint "service_category_id", null: false
     t.integer "status", default: 0, null: false
     t.datetime "updated_at", null: false
     t.index ["city"], name: "index_workshops_on_city"
     t.index ["country"], name: "index_workshops_on_country"
-    t.index ["service_category_id"], name: "index_workshops_on_service_category_id"
     t.index ["status"], name: "index_workshops_on_status"
   end
 
@@ -141,5 +154,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_22_165328) do
   add_foreign_key "working_hours", "workshops"
   add_foreign_key "workshop_operators", "users"
   add_foreign_key "workshop_operators", "workshops"
-  add_foreign_key "workshops", "service_categories"
+  add_foreign_key "workshop_service_categories", "service_categories"
+  add_foreign_key "workshop_service_categories", "workshops"
 end

@@ -3,13 +3,12 @@
     <div>
       <h1 class="text-2xl font-bold tracking-tight text-gray-900"><%= @workshop.name %></h1>
       <div class="mt-1 flex items-center gap-3">
-        <%= link_to @workshop.service_category.name,
-                    service_category_path(@workshop.service_category),
-                    class: "inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700 hover:bg-gray-200 transition-colors" %>
-        <div class="flex items-center gap-1.5">
-          <div class="h-2 w-2 rounded-full shrink-0 <%= @workshop.open_now? ? 'bg-green-500' : 'bg-red-500' %>"></div>
-          <span class="text-xs text-gray-500"><%= @workshop.open_now? ? t(".open_now") : t(".closed_now") %></span>
-        </div>
+        <% @workshop.service_categories.each do |category| %>
+          <%= link_to category.name,
+                      service_category_path(category),
+                      class: "inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700 hover:bg-gray-200 transition-colors" %>
+        <% end %>
+        <%= workshop_status_indicator(@workshop, open_key: "workshops.show.open_now", closed_key: "workshops.show.closed_now") %>
       </div>
     </div>
 
@@ -51,6 +50,32 @@
       <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
         <h2 class="text-sm font-medium text-gray-900 uppercase tracking-wider mb-3"><%= t(".description") %></h2>
         <p class="text-sm text-gray-600 leading-relaxed"><%= simple_format(@workshop.description) %></p>
+      </div>
+    <% end %>
+
+    <%# Services & Pricing %>
+    <% if @workshop.workshop_service_categories.any? %>
+      <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+        <h2 class="text-sm font-medium text-gray-900 uppercase tracking-wider mb-4"><%= t(".services") %></h2>
+
+        <table class="w-full">
+          <thead>
+            <tr class="border-b border-gray-100">
+              <th class="pb-2 text-left text-xs text-gray-400 uppercase tracking-wider"><%= t(".service_name") %></th>
+              <th class="pb-2 text-right text-xs text-gray-400 uppercase tracking-wider"><%= t(".service_price") %></th>
+              <th class="pb-2 text-right text-xs text-gray-400 uppercase tracking-wider"><%= t(".service_duration") %></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-50">
+            <% @workshop.workshop_service_categories.includes(:service_category).each do |wsc| %>
+              <tr>
+                <td class="py-2.5 text-sm text-gray-900"><%= wsc.service_category.name %></td>
+                <td class="py-2.5 text-sm text-gray-600 text-right"><%= wsc.price_display %></td>
+                <td class="py-2.5 text-sm text-gray-400 text-right"><%= wsc.duration_display %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
       </div>
     <% end %>
 
