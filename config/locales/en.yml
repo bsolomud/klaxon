@@ -209,6 +209,49 @@ en:
       success: "Car was successfully updated."
     destroy:
       success: "Car was successfully removed."
+  car_transfers:
+    statuses:
+      requested: "Requested"
+      approved: "Approved"
+      rejected: "Rejected"
+      cancelled: "Cancelled"
+      expired: "Expired"
+    new:
+      title: "Request Car Transfer"
+      subtitle: "Request ownership transfer for this vehicle"
+      car_details: "Car Details"
+      make: "Make"
+      model: "Model"
+      year: "Year"
+      vin: "VIN"
+      explanation: "By submitting this request, the current owner will receive a transfer request. They can approve or reject it."
+      submit: "Request Transfer"
+      cancel: "Cancel"
+      own_car: "You cannot transfer your own car to yourself."
+    create:
+      success: "Transfer request has been sent."
+      already_active: "There is already an active transfer request for this car."
+    show:
+      title: "Car Transfer"
+      car: "Car"
+      from: "From"
+      to: "To"
+      status: "Status"
+      expires_at: "Expires at"
+      approve: "Approve Transfer"
+      reject: "Reject"
+      cancel_transfer: "Cancel Request"
+      back: "Back to cars"
+    approve:
+      success: "Transfer approved. Car ownership has been transferred."
+      not_authorized: "Only the current owner can approve this transfer."
+      expired: "This transfer request has expired."
+    reject:
+      success: "Transfer has been rejected."
+      not_authorized: "Only the current owner can reject this transfer."
+    cancel:
+      success: "Transfer request has been cancelled."
+      not_authorized: "Only the requester can cancel this transfer."
   service_categories:
     index:
       title: "Service Categories"

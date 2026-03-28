@@ -1,0 +1,15 @@
+pending_transfer:
+  car: leaf
+  from_user: two
+  to_user: one
+  status: 0
+  token: "test-transfer-token-123"
+  expires_at: "<%= 14.days.from_now %>"
+
+approved_transfer:
+  car: other_user_car
+  from_user: driver_no_workshops
+  to_user: two
+  status: 1
+  token: "test-transfer-token-approved"
+  expires_at: "<%= 1.day.ago %>"

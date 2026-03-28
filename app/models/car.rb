@@ -3,6 +3,9 @@ class Car < ApplicationRecord
 
   belongs_to :user
 
+  has_many :car_ownership_records, dependent: :destroy
+  has_many :car_transfers, dependent: :restrict_with_exception
+
   enum :fuel_type, { gasoline: 0, diesel: 1, electric: 2, hybrid: 3 }
   enum :transmission, { manual: 0, automatic: 1 }
 
@@ -21,6 +24,8 @@ class Car < ApplicationRecord
 
   before_validation :nilify_blank_vin
 
+  after_create :create_initial_ownership_record
+
   def display_name
     "#{year} #{make} #{model}"
   end
@@ -35,5 +40,12 @@ class Car < ApplicationRecord
 
   def nilify_blank_vin
     self.vin = nil if vin.blank?
+  end
+
+  def create_initial_ownership_record
+    car_ownership_records.create!(
+      user: user,
+      started_at: Time.current
+    )
   end
 end

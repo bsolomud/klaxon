@@ -158,4 +158,20 @@ class CarTest < ActiveSupport::TestCase
   test "belongs to user" do
     assert_equal users(:one), @car.user
   end
+
+  # --- CarOwnershipRecord on create (Task 46) ---
+
+  test "creating a car auto-creates ownership record" do
+    car = Car.create!(
+      user: users(:two),
+      make: "Test", model: "Auto", year: 2024,
+      license_plate: "ZZ0000AA", fuel_type: :gasoline
+    )
+    assert_equal 1, car.car_ownership_records.count
+    record = car.car_ownership_records.first
+    assert_equal users(:two), record.user
+    assert_nil record.ended_at
+    assert_nil record.car_transfer_id
+    assert_not_nil record.started_at
+  end
 end

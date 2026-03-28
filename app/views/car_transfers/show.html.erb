@@ -1,0 +1,46 @@
+<div class="mb-8">
+  <h1 class="text-2xl font-bold tracking-tight text-gray-900"><%= t(".title") %></h1>
+</div>
+
+<div class="max-w-lg">
+  <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm mb-6">
+    <dl class="grid grid-cols-2 gap-x-6 gap-y-4 text-sm">
+      <div class="col-span-2">
+        <dt class="text-gray-500"><%= t(".car") %></dt>
+        <dd class="font-medium text-gray-900"><%= @transfer.car.display_name %></dd>
+      </div>
+      <div>
+        <dt class="text-gray-500"><%= t(".from") %></dt>
+        <dd class="font-medium text-gray-900"><%= @transfer.from_user.full_name || @transfer.from_user.email %></dd>
+      </div>
+      <div>
+        <dt class="text-gray-500"><%= t(".to") %></dt>
+        <dd class="font-medium text-gray-900"><%= @transfer.to_user.full_name || @transfer.to_user.email %></dd>
+      </div>
+      <div>
+        <dt class="text-gray-500"><%= t(".status") %></dt>
+        <dd class="font-medium text-gray-900"><%= t("car_transfers.statuses.#{@transfer.status}") %></dd>
+      </div>
+      <div>
+        <dt class="text-gray-500"><%= t(".expires_at") %></dt>
+        <dd class="font-medium text-gray-900"><%= l(@transfer.expires_at, format: :long) %></dd>
+      </div>
+    </dl>
+  </div>
+
+  <% if @can_approve || @can_cancel %>
+    <div class="flex gap-3">
+      <% if @can_approve %>
+        <%= button_to t(".approve"), approve_car_transfer_path(token: @transfer.token), method: :patch, class: "btn-primary" %>
+        <%= button_to t(".reject"), reject_car_transfer_path(token: @transfer.token), method: :patch, class: "text-sm font-medium text-red-600 hover:text-red-700 transition-colors" %>
+      <% end %>
+      <% if @can_cancel %>
+        <%= button_to t(".cancel_transfer"), cancel_car_transfer_path(token: @transfer.token), method: :patch, class: "text-sm font-medium text-red-600 hover:text-red-700 transition-colors" %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="mt-4">
+    <%= link_to t(".back"), cars_path, class: "text-sm font-medium text-gray-500 hover:text-black transition-colors" %>
+  </div>
+</div>

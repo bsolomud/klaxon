@@ -23,6 +23,13 @@ Rails.application.routes.draw do
   end
 
   resources :cars
+  resources :car_transfers, only: [:new, :create, :show], param: :token do
+    member do
+      patch :approve
+      patch :reject
+      patch :cancel
+    end
+  end
   resources :service_categories
   resources :workshops
   resources :my_workshops, only: [:index]

@@ -358,7 +358,7 @@
 
 ---
 
-## Phase 8 — Car Transfers
+## Phase 8 — Car Transfers [DONE]
 
 ### Task 43: Create CarTransfer model + migration
 - **Description**: Create `car_transfers` table: `car_id` (fk), `from_user_id` (fk), `to_user_id` (fk), `status` (int, default 0), `token` (string, unique), `expires_at` (datetime). Partial unique index on `car_id` where `status = 0`.

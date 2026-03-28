@@ -1,0 +1,11 @@
+camry_ownership:
+  car: camry
+  user: one
+  started_at: "<%= 1.year.ago %>"
+  car_transfer: ~
+
+leaf_ownership:
+  car: leaf
+  user: two
+  started_at: "<%= 6.months.ago %>"
+  car_transfer: ~

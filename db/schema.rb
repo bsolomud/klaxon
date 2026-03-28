@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_28_104133) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_28_154035) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -49,6 +49,44 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_28_104133) do
     t.datetime "remember_created_at"
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_admins_on_email", unique: true
+  end
+
+  create_table "car_ownership_records", force: :cascade do |t|
+    t.bigint "car_id", null: false
+    t.bigint "car_transfer_id"
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.datetime "ended_at"
+    t.datetime "started_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["car_id"], name: "index_car_ownership_records_on_car_id"
+    t.index ["car_transfer_id"], name: "index_car_ownership_records_on_car_transfer_id"
+    t.index ["user_id"], name: "index_car_ownership_records_on_user_id"
+  end
+
+  create_table "car_transfer_events", force: :cascade do |t|
+    t.bigint "actor_id"
+    t.bigint "car_transfer_id", null: false
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.integer "event_type", null: false
+    t.jsonb "metadata"
+    t.index ["actor_id"], name: "index_car_transfer_events_on_actor_id"
+    t.index ["car_transfer_id"], name: "index_car_transfer_events_on_car_transfer_id"
+  end
+
+  create_table "car_transfers", force: :cascade do |t|
+    t.bigint "car_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "expires_at", null: false
+    t.bigint "from_user_id", null: false
+    t.integer "status", default: 0, null: false
+    t.bigint "to_user_id", null: false
+    t.string "token", null: false
+    t.datetime "updated_at", null: false
+    t.index ["car_id"], name: "index_car_transfers_on_car_id"
+    t.index ["car_id"], name: "index_car_transfers_one_active_per_car", unique: true, where: "(status = 0)"
+    t.index ["from_user_id"], name: "index_car_transfers_on_from_user_id"
+    t.index ["to_user_id"], name: "index_car_transfers_on_to_user_id"
+    t.index ["token"], name: "index_car_transfers_on_token", unique: true
   end
 
   create_table "cars", force: :cascade do |t|
@@ -169,6 +207,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_28_104133) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "car_ownership_records", "car_transfers"
+  add_foreign_key "car_ownership_records", "cars"
+  add_foreign_key "car_ownership_records", "users"
+  add_foreign_key "car_transfer_events", "car_transfers"
+  add_foreign_key "car_transfer_events", "users", column: "actor_id"
+  add_foreign_key "car_transfers", "cars"
+  add_foreign_key "car_transfers", "users", column: "from_user_id"
+  add_foreign_key "car_transfers", "users", column: "to_user_id"
   add_foreign_key "cars", "users"
   add_foreign_key "working_hours", "workshops"
   add_foreign_key "workshop_operators", "users"
