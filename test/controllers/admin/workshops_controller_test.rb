@@ -54,23 +54,23 @@ class Admin::WorkshopsControllerTest < ActionDispatch::IntegrationTest
     workshop = workshops(:pending_workshop)
     get admin_workshop_path(workshop)
     assert_response :success
-    assert_select "form[action=?]", approve_admin_workshop_path(workshop)
+    assert_select "button[type=submit]", text: I18n.t("admin.workshops.show.approve")
   end
 
   test "show does not display approve button for active workshop" do
     workshop = workshops(:one)
     get admin_workshop_path(workshop)
     assert_response :success
-    assert_select "form[action=?]", approve_admin_workshop_path(workshop), count: 0
+    assert_select "button[type=submit]", text: I18n.t("admin.workshops.show.approve"), count: 0
   end
 
-  # --- Approve (Task 22) ---
+  # --- Approve ---
 
   test "approve sets pending workshop to active" do
     workshop = workshops(:pending_workshop)
     assert workshop.pending?
 
-    patch approve_admin_workshop_path(workshop)
+    patch transition_admin_workshop_path(workshop), params: { event: "approve" }
     assert_redirected_to admin_workshop_path(workshop)
 
     workshop.reload
@@ -81,21 +81,21 @@ class Admin::WorkshopsControllerTest < ActionDispatch::IntegrationTest
     workshop = workshops(:one)
     assert workshop.active?
 
-    patch approve_admin_workshop_path(workshop)
+    patch transition_admin_workshop_path(workshop), params: { event: "approve" }
     assert_redirected_to admin_workshop_path(workshop)
-    assert_equal I18n.t("admin.workshops.approve.invalid_status"), flash[:alert]
+    assert_equal I18n.t("admin.workshops.transition.invalid_status"), flash[:alert]
 
     workshop.reload
     assert workshop.active?
   end
 
-  # --- Decline (Task 23) ---
+  # --- Decline ---
 
   test "decline sets pending workshop to declined" do
     workshop = workshops(:pending_workshop)
     assert workshop.pending?
 
-    patch decline_admin_workshop_path(workshop), params: { decline_reason: "Incomplete documents" }
+    patch transition_admin_workshop_path(workshop), params: { event: "decline", decline_reason: "Incomplete documents" }
     assert_redirected_to admin_workshop_path(workshop)
 
     workshop.reload
@@ -106,7 +106,7 @@ class Admin::WorkshopsControllerTest < ActionDispatch::IntegrationTest
   test "decline without reason still works" do
     workshop = workshops(:pending_workshop)
 
-    patch decline_admin_workshop_path(workshop)
+    patch transition_admin_workshop_path(workshop), params: { event: "decline" }
     assert_redirected_to admin_workshop_path(workshop)
 
     workshop.reload
@@ -118,9 +118,9 @@ class Admin::WorkshopsControllerTest < ActionDispatch::IntegrationTest
     workshop = workshops(:one)
     assert workshop.active?
 
-    patch decline_admin_workshop_path(workshop), params: { decline_reason: "test" }
+    patch transition_admin_workshop_path(workshop), params: { event: "decline", decline_reason: "test" }
     assert_redirected_to admin_workshop_path(workshop)
-    assert_equal I18n.t("admin.workshops.decline.invalid_status"), flash[:alert]
+    assert_equal I18n.t("admin.workshops.transition.invalid_status"), flash[:alert]
 
     workshop.reload
     assert workshop.active?
@@ -147,13 +147,13 @@ class Admin::WorkshopsControllerTest < ActionDispatch::IntegrationTest
     assert_select "p", text: workshop.decline_reason
   end
 
-  # --- Suspend (Task 24) ---
+  # --- Suspend ---
 
   test "suspend sets active workshop to suspended" do
     workshop = workshops(:one)
     assert workshop.active?
 
-    patch suspend_admin_workshop_path(workshop)
+    patch transition_admin_workshop_path(workshop), params: { event: "suspend" }
     assert_redirected_to admin_workshop_path(workshop)
 
     workshop.reload
@@ -164,9 +164,9 @@ class Admin::WorkshopsControllerTest < ActionDispatch::IntegrationTest
     workshop = workshops(:pending_workshop)
     assert workshop.pending?
 
-    patch suspend_admin_workshop_path(workshop)
+    patch transition_admin_workshop_path(workshop), params: { event: "suspend" }
     assert_redirected_to admin_workshop_path(workshop)
-    assert_equal I18n.t("admin.workshops.suspend.invalid_status"), flash[:alert]
+    assert_equal I18n.t("admin.workshops.transition.invalid_status"), flash[:alert]
 
     workshop.reload
     assert workshop.pending?
@@ -176,13 +176,13 @@ class Admin::WorkshopsControllerTest < ActionDispatch::IntegrationTest
     workshop = workshops(:one)
     get admin_workshop_path(workshop)
     assert_response :success
-    assert_select "form[action=?]", suspend_admin_workshop_path(workshop)
+    assert_select "button[type=submit]", text: I18n.t("admin.workshops.show.suspend")
   end
 
   test "show does not display suspend button for pending workshop" do
     workshop = workshops(:pending_workshop)
     get admin_workshop_path(workshop)
     assert_response :success
-    assert_select "form[action=?]", suspend_admin_workshop_path(workshop), count: 0
+    assert_select "button[type=submit]", text: I18n.t("admin.workshops.show.suspend"), count: 0
   end
 end

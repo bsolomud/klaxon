@@ -8,9 +8,7 @@ Rails.application.routes.draw do
     root "workshops#index"
     resources :workshops, only: %i[index show] do
       member do
-        patch :approve
-        patch :decline
-        patch :suspend
+        patch :transition
       end
     end
     resources :users, only: %i[index show]

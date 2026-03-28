@@ -1,5 +1,11 @@
 class Admin::WorkshopsController < Admin::BaseController
-  before_action :set_workshop, only: %i[show approve decline suspend]
+  before_action :set_workshop, only: %i[show transition]
+
+  TRANSITIONS = {
+    "approve"  => { from: :pending,  to: :active },
+    "decline"  => { from: :pending,  to: :declined },
+    "suspend"  => { from: :active,   to: :suspended }
+  }.freeze
 
   def index
     @workshops = Workshop.order(created_at: :desc)
@@ -10,31 +16,21 @@ class Admin::WorkshopsController < Admin::BaseController
     @owner = @workshop.workshop_operators.find_by(role: :owner)&.user
   end
 
-  def approve
-    if @workshop.pending?
-      @workshop.active!
-      redirect_to admin_workshop_path(@workshop), notice: t(".success")
-    else
-      redirect_to admin_workshop_path(@workshop), alert: t(".invalid_status")
-    end
-  end
+  def transition
+    event = params[:event]
+    rule = TRANSITIONS[event]
 
-  def decline
-    if @workshop.pending?
-      @workshop.update!(status: :declined, decline_reason: params[:decline_reason])
-      redirect_to admin_workshop_path(@workshop), notice: t(".success")
-    else
-      redirect_to admin_workshop_path(@workshop), alert: t(".invalid_status")
+    unless rule && @workshop.status.to_sym == rule[:from]
+      return redirect_to admin_workshop_path(@workshop), alert: t("admin.workshops.transition.invalid_status")
     end
-  end
 
-  def suspend
-    if @workshop.active?
-      @workshop.suspended!
-      redirect_to admin_workshop_path(@workshop), notice: t(".success")
+    if event == "decline"
+      @workshop.update!(status: rule[:to], decline_reason: params[:decline_reason])
     else
-      redirect_to admin_workshop_path(@workshop), alert: t(".invalid_status")
+      @workshop.update!(status: rule[:to])
     end
+
+    redirect_to admin_workshop_path(@workshop), notice: t("admin.workshops.transition.success")
   end
 
   private

@@ -118,15 +118,9 @@ en:
         suspend: "Suspend"
         suspend_confirm: "Are you sure you want to suspend this workshop?"
         back: "Back to workshops"
-      approve:
-        success: "Workshop has been approved."
-        invalid_status: "Only pending workshops can be approved."
-      decline:
-        success: "Workshop has been declined."
-        invalid_status: "Only pending workshops can be declined."
-      suspend:
-        success: "Workshop has been suspended."
-        invalid_status: "Only active workshops can be suspended."
+      transition:
+        success: "Workshop status updated successfully."
+        invalid_status: "Cannot perform this transition from current status."
     users:
       index:
         title: "Users"

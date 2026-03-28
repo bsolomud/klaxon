@@ -10,14 +10,14 @@
 
     <div class="flex items-center gap-2">
       <% if @workshop.pending? %>
-        <%= button_to t(".approve"), approve_admin_workshop_path(@workshop), method: :patch, class: "btn-primary !w-auto cursor-pointer" %>
+        <%= button_to t(".approve"), transition_admin_workshop_path(@workshop), method: :patch, params: { event: "approve" }, class: "btn-primary !w-auto cursor-pointer" %>
         <button type="button" data-action="click->toggle#toggle" class="inline-flex items-center rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 transition-colors cursor-pointer">
           <%= t(".decline") %>
         </button>
       <% end %>
 
       <% if @workshop.active? %>
-        <%= button_to t(".suspend"), suspend_admin_workshop_path(@workshop), method: :patch, class: "inline-flex items-center rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700 transition-colors cursor-pointer", data: { turbo_confirm: t(".suspend_confirm") } %>
+        <%= button_to t(".suspend"), transition_admin_workshop_path(@workshop), method: :patch, params: { event: "suspend" }, class: "inline-flex items-center rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700 transition-colors cursor-pointer", data: { turbo_confirm: t(".suspend_confirm") } %>
       <% end %>
     </div>
   </div>
@@ -25,7 +25,8 @@
   <% if @workshop.pending? %>
     <div id="decline-form" class="mt-6 hidden">
       <div class="bg-red-50 border border-red-200 rounded-2xl p-6">
-        <%= form_with url: decline_admin_workshop_path(@workshop), method: :patch, class: "space-y-4" do |f| %>
+        <%= form_with url: transition_admin_workshop_path(@workshop), method: :patch, class: "space-y-4" do |f| %>
+          <%= hidden_field_tag :event, "decline" %>
           <label for="decline_reason" class="block text-sm font-medium text-red-800"><%= t(".decline_reason") %></label>
           <textarea name="decline_reason" id="decline_reason" rows="3" class="w-full rounded-lg border-gray-300 shadow-sm focus:ring-red-500 focus:border-red-500 text-sm"></textarea>
           <div class="flex items-center gap-3">
