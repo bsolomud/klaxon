@@ -1,8 +1,12 @@
 class Car < ApplicationRecord
+  include Normalizable
+
   belongs_to :user
 
   enum :fuel_type, { gasoline: 0, diesel: 1, electric: 2, hybrid: 3 }
   enum :transmission, { manual: 0, automatic: 1 }
+
+  normalizes_upcase :license_plate, :vin
 
   validates :make, presence: true
   validates :model, presence: true
@@ -15,8 +19,7 @@ class Car < ApplicationRecord
   validates :engine_volume, absence: { message: :not_applicable_for_electric },
             if: :electric?
 
-  before_validation :normalize_license_plate
-  before_validation :normalize_vin
+  before_validation :nilify_blank_vin
 
   def display_name
     "#{year} #{make} #{model}"
@@ -24,12 +27,7 @@ class Car < ApplicationRecord
 
   private
 
-  def normalize_license_plate
-    self.license_plate = license_plate&.upcase&.strip
-  end
-
-  def normalize_vin
-    self.vin = vin&.upcase&.strip
+  def nilify_blank_vin
     self.vin = nil if vin.blank?
   end
 end
