@@ -27,20 +27,7 @@
         <div class="border-b border-gray-200 px-4 py-4">
           <h2 class="text-sm font-semibold text-gray-900 truncate"><%= @workshop.name %></h2>
           <div class="mt-1">
-            <% case @workshop.status %>
-            <% when "active" %>
-              <span class="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-medium text-green-800">
-                <%= t("layouts.workshop.status_active") %>
-              </span>
-            <% when "pending" %>
-              <span class="inline-flex items-center rounded-full bg-yellow-100 px-2 py-0.5 text-[10px] font-medium text-yellow-800">
-                <%= t("layouts.workshop.status_pending") %>
-              </span>
-            <% when "suspended" %>
-              <span class="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-medium text-red-800">
-                <%= t("layouts.workshop.status_suspended") %>
-              </span>
-            <% end %>
+            <%= workshop_status_badge(@workshop.status) %>
           </div>
         </div>
 
