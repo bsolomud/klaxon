@@ -18,7 +18,6 @@ class CarsController < ApplicationController
     if @car.save
       redirect_to @car, notice: t("cars.create.success")
     else
-      @vin_duplicate = vin_belongs_to_another_user?
       render :new, status: :unprocessable_entity
     end
   end
@@ -50,11 +49,5 @@ class CarsController < ApplicationController
       :make, :model, :year, :license_plate, :vin,
       :fuel_type, :engine_volume, :transmission
     )
-  end
-
-  def vin_belongs_to_another_user?
-    @car.vin.present? &&
-      @car.errors[:vin].any? &&
-      Car.where.not(user: current_user).exists?(vin: @car.vin)
   end
 end

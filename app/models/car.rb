@@ -25,6 +25,12 @@ class Car < ApplicationRecord
     "#{year} #{make} #{model}"
   end
 
+  def vin_duplicate_for_another_user?
+    vin.present? &&
+      errors[:vin].any? &&
+      Car.where.not(user_id: user_id).exists?(vin: vin)
+  end
+
   private
 
   def nilify_blank_vin
