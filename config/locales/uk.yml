@@ -13,6 +13,7 @@ uk:
     models:
       user: "Користувач"
       service_category: "Категорія послуг"
+      car: "Автомобіль"
       workshop: "Майстерня"
       working_hour: "Години роботи"
     attributes:
@@ -153,6 +154,62 @@ uk:
         last_sign_in: "Останній вхід"
         sign_in_count: "Кількість входів"
         back: "Назад до користувачів"
+  cars:
+    fuel_types:
+      gasoline: "Бензин"
+      diesel: "Дизель"
+      electric: "Електро"
+      hybrid: "Гібрид"
+    transmissions:
+      manual: "Механіка"
+      automatic: "Автомат"
+    index:
+      title: "Мої автомобілі"
+      subtitle: "Ваші зареєстровані транспортні засоби"
+      add_car: "Додати авто"
+      empty: "Ви ще не додали жодного автомобіля."
+    show:
+      details: "Деталі"
+      make: "Марка"
+      model: "Модель"
+      year: "Рік"
+      fuel_type: "Тип палива"
+      transmission: "Трансмісія"
+      engine_volume: "Об'єм двигуна"
+      liters: "л"
+      odometer: "Пробіг"
+      km: "км"
+      vin: "VIN"
+      edit: "Редагувати"
+      delete: "Видалити"
+      delete_confirm: "Ви впевнені? Це видалить цей автомобіль."
+      service_history: "Історія обслуговування"
+      no_service_history: "Записів обслуговування ще немає."
+      back: "Назад до автомобілів"
+    new:
+      title: "Додати автомобіль"
+      back: "Назад до автомобілів"
+    edit:
+      title: "Редагування автомобіля"
+      back: "Назад до автомобіля"
+    form:
+      make: "Марка"
+      model: "Модель"
+      year: "Рік"
+      license_plate: "Номерний знак"
+      fuel_type: "Тип палива"
+      transmission: "Трансмісія"
+      transmission_blank: "— оберіть —"
+      engine_volume: "Об'єм двигуна (л)"
+      vin: "VIN"
+      vin_duplicate_title: "Цей автомобіль вже зареєстровано"
+      vin_duplicate_message: "Автомобіль з таким VIN вже існує. Якщо це ваш автомобіль, запросіть передачу від поточного власника."
+    create:
+      success: "Автомобіль успішно додано."
+    update:
+      success: "Автомобіль успішно оновлено."
+    destroy:
+      success: "Автомобіль успішно видалено."
   service_categories:
     index:
       title: "Категорії послуг"

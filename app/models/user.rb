@@ -4,6 +4,7 @@ class User < ApplicationRecord
 
   enum :role, { driver: 0 }
 
+  has_many :cars, dependent: :destroy
   has_many :workshop_operators, dependent: :destroy
   has_many :workshops, through: :workshop_operators
 

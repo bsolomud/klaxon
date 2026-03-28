@@ -13,6 +13,7 @@ en:
     models:
       user: "User"
       service_category: "Service category"
+      car: "Car"
       workshop: "Workshop"
       working_hour: "Working hour"
     attributes:
@@ -153,6 +154,62 @@ en:
         last_sign_in: "Last sign in"
         sign_in_count: "Sign in count"
         back: "Back to users"
+  cars:
+    fuel_types:
+      gasoline: "Gasoline"
+      diesel: "Diesel"
+      electric: "Electric"
+      hybrid: "Hybrid"
+    transmissions:
+      manual: "Manual"
+      automatic: "Automatic"
+    index:
+      title: "My Cars"
+      subtitle: "Your registered vehicles"
+      add_car: "Add car"
+      empty: "You haven't added any cars yet."
+    show:
+      details: "Details"
+      make: "Make"
+      model: "Model"
+      year: "Year"
+      fuel_type: "Fuel type"
+      transmission: "Transmission"
+      engine_volume: "Engine volume"
+      liters: "L"
+      odometer: "Odometer"
+      km: "km"
+      vin: "VIN"
+      edit: "Edit"
+      delete: "Delete"
+      delete_confirm: "Are you sure? This will remove this car."
+      service_history: "Service History"
+      no_service_history: "No service records yet."
+      back: "Back to cars"
+    new:
+      title: "Add Car"
+      back: "Back to cars"
+    edit:
+      title: "Edit Car"
+      back: "Back to car"
+    form:
+      make: "Make"
+      model: "Model"
+      year: "Year"
+      license_plate: "License plate"
+      fuel_type: "Fuel type"
+      transmission: "Transmission"
+      transmission_blank: "— select —"
+      engine_volume: "Engine volume (L)"
+      vin: "VIN"
+      vin_duplicate_title: "This vehicle is already registered"
+      vin_duplicate_message: "A car with this VIN already exists. If this is your car, request a transfer from the current owner."
+    create:
+      success: "Car was successfully added."
+    update:
+      success: "Car was successfully updated."
+    destroy:
+      success: "Car was successfully removed."
   service_categories:
     index:
       title: "Service Categories"

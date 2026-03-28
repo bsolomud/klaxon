@@ -305,7 +305,7 @@
 
 ---
 
-## Phase 7 — Car Model
+## Phase 7 — Car Model [DONE]
 
 ### Task 37: Create Car model + migration
 - **Description**: Create `cars` table: `user_id` (fk), `make`, `model`, `year` (int), `license_plate` (unique), `vin` (unique, nullable), `fuel_type` (int, default 0), `odometer` (int, nullable), `engine_volume` (decimal 3,1, nullable), `transmission` (int, nullable).

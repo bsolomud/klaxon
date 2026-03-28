@@ -24,6 +24,7 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :cars
   resources :service_categories
   resources :workshops
   resources :my_workshops, only: [:index]

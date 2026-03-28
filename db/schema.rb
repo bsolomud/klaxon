@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_25_161809) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_28_104133) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -49,6 +49,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_161809) do
     t.datetime "remember_created_at"
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_admins_on_email", unique: true
+  end
+
+  create_table "cars", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.decimal "engine_volume", precision: 3, scale: 1
+    t.integer "fuel_type", default: 0, null: false
+    t.string "license_plate", null: false
+    t.string "make", null: false
+    t.string "model", null: false
+    t.integer "odometer"
+    t.integer "transmission"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.string "vin"
+    t.integer "year", null: false
+    t.index "lower((license_plate)::text)", name: "index_cars_on_lower_license_plate", unique: true
+    t.index ["user_id"], name: "index_cars_on_user_id"
+    t.index ["vin"], name: "index_cars_on_vin", unique: true
   end
 
   create_table "service_categories", force: :cascade do |t|
@@ -151,6 +169,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_161809) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "cars", "users"
   add_foreign_key "working_hours", "workshops"
   add_foreign_key "workshop_operators", "users"
   add_foreign_key "workshop_operators", "workshops"

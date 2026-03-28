@@ -1,0 +1,71 @@
+<div class="mb-8">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold tracking-tight text-gray-900"><%= @car.display_name %></h1>
+      <p class="mt-1 text-sm text-gray-500"><%= @car.license_plate %></p>
+    </div>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+  <div class="lg:col-span-2 space-y-6">
+    <%# Car details %>
+    <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+      <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-500 mb-4"><%= t(".details") %></h2>
+      <dl class="grid grid-cols-2 gap-x-6 gap-y-4 text-sm">
+        <div>
+          <dt class="text-gray-500"><%= t(".make") %></dt>
+          <dd class="mt-0.5 font-medium text-gray-900"><%= @car.make %></dd>
+        </div>
+        <div>
+          <dt class="text-gray-500"><%= t(".model") %></dt>
+          <dd class="mt-0.5 font-medium text-gray-900"><%= @car.model %></dd>
+        </div>
+        <div>
+          <dt class="text-gray-500"><%= t(".year") %></dt>
+          <dd class="mt-0.5 font-medium text-gray-900"><%= @car.year %></dd>
+        </div>
+        <div>
+          <dt class="text-gray-500"><%= t(".fuel_type") %></dt>
+          <dd class="mt-0.5 font-medium text-gray-900"><%= t("cars.fuel_types.#{@car.fuel_type}") %></dd>
+        </div>
+        <% if @car.transmission.present? %>
+          <div>
+            <dt class="text-gray-500"><%= t(".transmission") %></dt>
+            <dd class="mt-0.5 font-medium text-gray-900"><%= t("cars.transmissions.#{@car.transmission}") %></dd>
+          </div>
+        <% end %>
+        <% if @car.engine_volume.present? %>
+          <div>
+            <dt class="text-gray-500"><%= t(".engine_volume") %></dt>
+            <dd class="mt-0.5 font-medium text-gray-900"><%= @car.engine_volume %> <%= t(".liters") %></dd>
+          </div>
+        <% end %>
+        <% if @car.odometer.present? %>
+          <div>
+            <dt class="text-gray-500"><%= t(".odometer") %></dt>
+            <dd class="mt-0.5 font-medium text-gray-900"><%= number_with_delimiter(@car.odometer) %> <%= t(".km") %></dd>
+          </div>
+        <% end %>
+        <% if @car.vin.present? %>
+          <div class="col-span-2">
+            <dt class="text-gray-500"><%= t(".vin") %></dt>
+            <dd class="mt-0.5 font-mono font-medium text-gray-900"><%= @car.vin %></dd>
+          </div>
+        <% end %>
+      </dl>
+    </div>
+
+    <%# Service history placeholder %>
+    <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+      <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-500 mb-4"><%= t(".service_history") %></h2>
+      <p class="text-sm text-gray-500"><%= t(".no_service_history") %></p>
+    </div>
+  </div>
+
+  <div class="space-y-3">
+    <%= link_to t(".edit"), edit_car_path(@car), class: "block text-sm font-medium text-gray-700 hover:text-black transition-colors" %>
+    <%= link_to t(".delete"), car_path(@car), data: { turbo_method: :delete, turbo_confirm: t(".delete_confirm") }, class: "block text-sm font-medium text-red-600 hover:text-red-700 transition-colors" %>
+    <%= link_to t(".back"), cars_path, class: "block text-sm font-medium text-gray-500 hover:text-black transition-colors" %>
+  </div>
+</div>

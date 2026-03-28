@@ -1,0 +1,69 @@
+<%= form_with(builder: AuFormBuilder, model: car, class: "space-y-6") do |f| %>
+  <%= render "devise/shared/error_messages", resource: car %>
+
+  <% if local_assigns[:vin_duplicate] %>
+    <div class="rounded-lg bg-amber-50 border border-amber-200 p-4" data-turbo-temporary>
+      <div class="flex items-start gap-3">
+        <svg class="h-5 w-5 text-amber-500 mt-0.5 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 6a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 6zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+        </svg>
+        <div>
+          <p class="text-sm font-semibold text-amber-800"><%= t("cars.form.vin_duplicate_title") %></p>
+          <p class="mt-1 text-sm text-amber-700"><%= t("cars.form.vin_duplicate_message") %></p>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
+    <div>
+      <%= f.label :make, t("cars.form.make"), class: "label-input" %>
+      <%= f.text_field :make, autofocus: true %>
+    </div>
+
+    <div>
+      <%= f.label :model, t("cars.form.model"), class: "label-input" %>
+      <%= f.text_field :model %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
+    <div>
+      <%= f.label :year, t("cars.form.year"), class: "label-input" %>
+      <%= f.number_field :year, min: 1886, max: Date.current.year + 1 %>
+    </div>
+
+    <div>
+      <%= f.label :license_plate, t("cars.form.license_plate"), class: "label-input" %>
+      <%= f.text_field :license_plate, placeholder: "AA1234BB" %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
+    <div>
+      <%= f.label :fuel_type, t("cars.form.fuel_type"), class: "label-input" %>
+      <%= f.select :fuel_type, Car.fuel_types.keys.map { |k| [t("cars.fuel_types.#{k}"), k] }, {}, {} %>
+    </div>
+
+    <div>
+      <%= f.label :transmission, t("cars.form.transmission"), class: "label-input" %>
+      <%= f.select :transmission, Car.transmissions.keys.map { |k| [t("cars.transmissions.#{k}"), k] }, { include_blank: t("cars.form.transmission_blank") }, {} %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
+    <div>
+      <%= f.label :engine_volume, t("cars.form.engine_volume"), class: "label-input" %>
+      <%= f.number_field :engine_volume, step: 0.1, min: 0.1, max: 20.0 %>
+    </div>
+
+    <div>
+      <%= f.label :vin, t("cars.form.vin"), class: "label-input" %>
+      <%= f.text_field :vin, placeholder: "1HGBH41JXMN109186", maxlength: 17 %>
+    </div>
+  </div>
+
+  <div>
+    <%= f.submit class: "btn-primary" %>
+  </div>
+<% end %>

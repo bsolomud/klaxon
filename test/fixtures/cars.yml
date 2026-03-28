@@ -1,0 +1,41 @@
+camry:
+  user: one
+  make: "Toyota"
+  model: "Camry"
+  year: 2020
+  license_plate: "AA1234BB"
+  vin: "1HGBH41JXMN109186"
+  fuel_type: 0
+  odometer: 50000
+  engine_volume: 2.5
+  transmission: 0
+
+civic:
+  user: one
+  make: "Honda"
+  model: "Civic"
+  year: 2022
+  license_plate: "KA5678CC"
+  fuel_type: 0
+  engine_volume: 1.5
+  transmission: 1
+
+leaf:
+  user: two
+  make: "Nissan"
+  model: "Leaf"
+  year: 2021
+  license_plate: "BX9999DD"
+  vin: "5N1AT2MV9LC712345"
+  fuel_type: 2
+  transmission: 1
+
+other_user_car:
+  user: driver_no_workshops
+  make: "BMW"
+  model: "X5"
+  year: 2019
+  license_plate: "AX1111EE"
+  fuel_type: 1
+  engine_volume: 3.0
+  transmission: 0

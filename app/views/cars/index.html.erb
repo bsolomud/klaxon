@@ -1,0 +1,37 @@
+<div class="mb-8 flex items-center justify-between">
+  <div>
+    <h1 class="text-2xl font-bold tracking-tight text-gray-900"><%= t(".title") %></h1>
+    <p class="mt-1 text-sm text-gray-500"><%= t(".subtitle") %></p>
+  </div>
+  <%= link_to t(".add_car"), new_car_path, class: "btn-primary" %>
+</div>
+
+<% if @cars.any? %>
+  <div class="space-y-4">
+    <% @cars.each do |car| %>
+      <%= link_to car_path(car), class: "block bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:border-gray-200 transition-colors" do %>
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-base font-semibold text-gray-900"><%= car.display_name %></h2>
+            <div class="mt-1 flex items-center gap-3 text-sm text-gray-500">
+              <span><%= car.license_plate %></span>
+              <span>&middot;</span>
+              <span><%= t("cars.fuel_types.#{car.fuel_type}") %></span>
+              <% if car.transmission.present? %>
+                <span>&middot;</span>
+                <span><%= t("cars.transmissions.#{car.transmission}") %></span>
+              <% end %>
+            </div>
+          </div>
+          <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+          </svg>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+<% else %>
+  <div class="text-center py-12">
+    <p class="text-sm text-gray-500"><%= t(".empty") %></p>
+  </div>
+<% end %>
