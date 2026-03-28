@@ -1,5 +1,6 @@
 class Workshop < ApplicationRecord
   TIME_FORMAT = "%H:%M:%S"
+  include TimeRangeable
 
   geocoded_by :full_address
   after_validation :geocode, if: :needs_geocoding?
@@ -88,15 +89,6 @@ class Workshop < ApplicationRecord
   def today_working_hours
     working_hours.find_by(day_of_week: Time.current.wday)
   end
-
-  def self.time_within_range?(time, opens, closes)
-    if opens <= closes
-      time >= opens && time <= closes
-    else
-      time >= opens || time <= closes
-    end
-  end
-  private_class_method :time_within_range?
 
   def build_missing_working_hours
     existing_days = working_hours.map(&:day_of_week)
