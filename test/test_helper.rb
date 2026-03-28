@@ -11,5 +11,17 @@ module ActiveSupport
     fixtures :all
 
     # Add more helper methods to be used by all tests here...
+
+    def sign_in_admin(admin)
+      post admin_session_path, params: {
+        admin: { email: admin.email, password: "password" }
+      }
+    end
+
+    setup do
+      Geocoder::Lookup::Test.set_default_stub(
+        [{ "latitude" => 50.4501, "longitude" => 30.5234 }]
+      )
+    end
   end
 end

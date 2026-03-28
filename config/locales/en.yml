@@ -62,10 +62,97 @@ en:
       nav:
         workshops: "Workshops"
         users: "Users"
+    workshop:
+      sign_out: "Sign out"
+      status_active: "Active"
+      status_pending: "Pending"
+      status_suspended: "Suspended"
+      switch_workshop: "Switch workshop"
+      nav:
+        dashboard: "Dashboard"
+        requests: "Requests"
+        queue: "Queue"
+        settings: "Settings"
   admin:
     dashboard:
       index:
         title: "Dashboard"
+    workshops:
+      statuses:
+        pending: "Pending"
+        active: "Active"
+        declined: "Declined"
+        suspended: "Suspended"
+      index:
+        title: "Workshops"
+        subtitle: "Manage all workshops on the platform"
+        filter_all: "All"
+        filter_pending: "Pending"
+        filter_active: "Active"
+        filter_declined: "Declined"
+        filter_suspended: "Suspended"
+        col_name: "Name"
+        col_city: "City"
+        col_status: "Status"
+        col_created: "Created"
+        view: "View"
+        empty: "No workshops found."
+      show:
+        details: "Details"
+        phone: "Phone"
+        email: "Email"
+        address: "Address"
+        description: "Description"
+        created_at: "Created at"
+        services: "Service categories"
+        owner: "Owner"
+        owner_name: "Name"
+        owner_email: "Email"
+        no_owner: "No owner assigned."
+        approve: "Approve"
+        decline: "Decline"
+        decline_reason: "Decline reason"
+        confirm_decline: "Confirm decline"
+        cancel: "Cancel"
+        suspend: "Suspend"
+        suspend_confirm: "Are you sure you want to suspend this workshop?"
+        back: "Back to workshops"
+      approve:
+        success: "Workshop has been approved."
+        invalid_status: "Only pending workshops can be approved."
+      decline:
+        success: "Workshop has been declined."
+        invalid_status: "Only pending workshops can be declined."
+      suspend:
+        success: "Workshop has been suspended."
+        invalid_status: "Only active workshops can be suspended."
+    users:
+      index:
+        title: "Users"
+        subtitle: "Manage all users on the platform"
+        col_email: "Email"
+        col_name: "Name"
+        col_role: "Role"
+        col_created: "Created"
+        view: "View"
+        empty: "No users found."
+      show:
+        details: "Details"
+        email: "Email"
+        name: "Name"
+        phone: "Phone"
+        role: "Role"
+        created_at: "Created at"
+        workshops: "Workshops"
+        view_workshop: "View"
+        no_workshops: "No workshops."
+        account: "Account"
+        confirmed: "Confirmed"
+        yes: "Yes"
+        "no": "No"
+        last_sign_in: "Last sign in"
+        sign_in_count: "Sign in count"
+        back: "Back to users"
   service_categories:
     index:
       title: "Service Categories"
@@ -101,6 +188,18 @@ en:
     destroy:
       success: "Service category was successfully deleted."
       has_workshops: "Cannot delete category that has workshops."
+  my_workshops:
+    index:
+      title: "My Workshops"
+      subtitle: "Workshops you own or manage"
+      new_workshop: "New workshop"
+      status_pending: "Pending review"
+      status_active: "Active"
+      status_declined: "Declined"
+      status_suspended: "Suspended"
+      decline_reason: "Reason"
+      manage: "Manage"
+      empty: "You don't have any workshops yet."
   workshops:
     index:
       title: "Workshops"
@@ -177,10 +276,25 @@ en:
       saturday: "Saturday"
     create:
       success: "Workshop was successfully created."
+      submitted: "Your workshop has been submitted for review."
     update:
       success: "Workshop was successfully updated."
     destroy:
       success: "Workshop was successfully deleted."
+  workshop_management:
+    dashboards:
+      show:
+        title: "Dashboard"
+        stat_services: "Service categories"
+        stat_operators: "Team members"
+        stat_status: "Status now"
+        open: "Open"
+        closed: "Closed"
+        services_title: "Services"
+        no_services: "No service categories added yet."
+        hours_title: "Working Hours"
+        no_hours: "Working hours not set."
+        day_closed: "Closed"
   admins:
     sessions:
       new:

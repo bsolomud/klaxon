@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html class="h-full bg-gray-50">
+  <head>
+    <title><%= content_for(:title) || "AULABS" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="h-full antialiased font-sans">
+    <div class="flex h-full">
+      <%# Sidebar %>
+      <aside class="flex w-64 flex-col border-r border-gray-200 bg-white">
+        <%# Logo %>
+        <div class="flex h-14 items-center border-b border-gray-200 px-4">
+          <%= link_to root_path, class: "font-bold tracking-tighter text-lg" do %>
+            AULABS
+          <% end %>
+        </div>
+
+        <%# Workshop info %>
+        <div class="border-b border-gray-200 px-4 py-4">
+          <h2 class="text-sm font-semibold text-gray-900 truncate"><%= @workshop.name %></h2>
+          <div class="mt-1">
+            <% case @workshop.status %>
+            <% when "active" %>
+              <span class="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-medium text-green-800">
+                <%= t("layouts.workshop.status_active") %>
+              </span>
+            <% when "pending" %>
+              <span class="inline-flex items-center rounded-full bg-yellow-100 px-2 py-0.5 text-[10px] font-medium text-yellow-800">
+                <%= t("layouts.workshop.status_pending") %>
+              </span>
+            <% when "suspended" %>
+              <span class="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-medium text-red-800">
+                <%= t("layouts.workshop.status_suspended") %>
+              </span>
+            <% end %>
+          </div>
+        </div>
+
+        <%# Navigation %>
+        <nav class="flex-1 space-y-1 px-3 py-4">
+          <%= link_to t("layouts.workshop.nav.dashboard"),
+                workshop_management_workshop_dashboard_path(@workshop),
+                class: "flex items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors" %>
+          <%= link_to t("layouts.workshop.nav.requests"),
+                "#",
+                class: "flex items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors" %>
+          <%= link_to t("layouts.workshop.nav.queue"),
+                "#",
+                class: "flex items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors" %>
+          <%= link_to t("layouts.workshop.nav.settings"),
+                "#",
+                class: "flex items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors" %>
+        </nav>
+
+        <%# Workshop switcher %>
+        <% if @other_workshops.any? %>
+          <div class="border-t border-gray-200 px-4 py-4">
+            <p class="mb-2 text-[10px] font-medium uppercase tracking-wider text-gray-400"><%= t("layouts.workshop.switch_workshop") %></p>
+            <div class="space-y-1">
+              <% @other_workshops.each do |workshop| %>
+                <%= link_to workshop.name,
+                      workshop_management_workshop_path(workshop),
+                      class: "block truncate rounded-lg px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors" %>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+
+        <%# User & sign out %>
+        <div class="border-t border-gray-200 px-4 py-3">
+          <div class="flex items-center justify-between">
+            <span class="truncate text-xs text-gray-500"><%= current_user.email %></span>
+            <%= button_to t("layouts.workshop.sign_out"), destroy_user_session_path, method: :delete, class: "text-xs text-gray-400 hover:text-gray-700 transition-colors cursor-pointer" %>
+          </div>
+        </div>
+      </aside>
+
+      <%# Main content %>
+      <main class="flex-1 overflow-y-auto">
+        <div class="mx-auto max-w-5xl px-6 py-10">
+          <%= yield %>
+        </div>
+      </main>
+    </div>
+
+    <%= render "shared/flash_messages" %>
+  </body>
+</html>

@@ -7,3 +7,18 @@ staff_two:
   user: two
   workshop: one
   role: 1
+
+pending_owner:
+  user: three
+  workshop: pending_workshop
+  role: 0
+
+declined_owner:
+  user: three
+  workshop: declined_workshop
+  role: 0
+
+suspended_owner:
+  user: three
+  workshop: suspended_workshop
+  role: 0

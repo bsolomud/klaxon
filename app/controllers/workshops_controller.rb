@@ -1,7 +1,9 @@
 class WorkshopsController < ApplicationController
   skip_before_action :authenticate_user!, only: [:index, :show]
 
-  before_action :set_workshop, only: [:show, :edit, :update, :destroy]
+  before_action :set_visible_workshop, only: [:show]
+  before_action :set_workshop, only: [:edit, :update, :destroy]
+  before_action :require_workshop_access!, only: [:edit, :update, :destroy]
   before_action :load_service_categories, only: [:new, :create, :edit, :update]
 
   def index
@@ -10,6 +12,7 @@ class WorkshopsController < ApplicationController
     @workshops = @workshops.by_country(params[:country]) if params[:country].present?
     @workshops = @workshops.by_category_slug(params[:category]) if params[:category].present?
     @workshops = @workshops.open_now if params[:open_now].present?
+    @workshops = @workshops.near_param(params[:near])
   end
 
   def show
@@ -25,13 +28,17 @@ class WorkshopsController < ApplicationController
   def create
     @workshop = Workshop.new(workshop_params)
 
-    if @workshop.save
-      redirect_to @workshop, notice: t("workshops.create.success")
-    else
+    unless @workshop.valid?
       build_missing_working_hours
       build_missing_service_categories
-      render :new, status: :unprocessable_entity
+      return render :new, status: :unprocessable_entity
     end
+
+    ActiveRecord::Base.transaction do
+      @workshop.save!
+      @workshop.workshop_operators.create!(user: current_user, role: :owner)
+    end
+    redirect_to @workshop, notice: t("workshops.create.submitted")
   end
 
   def edit
@@ -56,6 +63,14 @@ class WorkshopsController < ApplicationController
 
   private
 
+  def set_visible_workshop
+    @workshop = Workshop.includes(workshop_service_categories: :service_category).find(params[:id])
+    return if @workshop.active?
+    return if user_signed_in? && current_user.manages_workshop?(@workshop)
+
+    raise ActiveRecord::RecordNotFound
+  end
+
   def set_workshop
     @workshop = Workshop.includes(workshop_service_categories: :service_category).find(params[:id])
   end
@@ -79,19 +94,10 @@ class WorkshopsController < ApplicationController
   end
 
   def build_missing_working_hours
-    existing_days = @workshop.working_hours.map(&:day_of_week)
-    (0..6).each do |day|
-      @workshop.working_hours.build(day_of_week: day) unless existing_days.include?(day)
-    end
+    @workshop.build_missing_working_hours
   end
 
   def build_missing_service_categories
-    existing_ids = @workshop.workshop_service_categories.map(&:service_category_id)
-    @service_categories.each do |category|
-      unless existing_ids.include?(category.id)
-        wsc = @workshop.workshop_service_categories.build(service_category: category)
-        wsc.mark_for_destruction
-      end
-    end
+    @workshop.build_missing_service_categories(@service_categories)
   end
 end

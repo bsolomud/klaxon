@@ -31,7 +31,163 @@ class WorkshopsControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[name*='workshop_service_categories_attributes'][name*='price_min']", minimum: 1
   end
 
-  # --- Create ---
+  # --- Index: only active workshops (Task 31) ---
+
+  test "index excludes pending workshops" do
+    sign_out @user
+    get workshops_path
+    assert_response :success
+    assert_select "h2", text: workshops(:pending_workshop).name, count: 0
+  end
+
+  test "index excludes declined workshops" do
+    sign_out @user
+    get workshops_path
+    assert_response :success
+    assert_select "h2", text: workshops(:declined_workshop).name, count: 0
+  end
+
+  test "index excludes suspended workshops" do
+    sign_out @user
+    get workshops_path
+    assert_response :success
+    assert_select "h2", text: workshops(:suspended_workshop).name, count: 0
+  end
+
+  test "show returns 404 for pending workshop when not owner" do
+    sign_in users(:driver_no_workshops)
+    get workshop_path(workshops(:pending_workshop))
+    assert_response :not_found
+  end
+
+  test "show returns 404 for declined workshop when not owner" do
+    sign_in users(:driver_no_workshops)
+    get workshop_path(workshops(:declined_workshop))
+    assert_response :not_found
+  end
+
+  test "show returns 404 for suspended workshop when not owner" do
+    sign_in users(:driver_no_workshops)
+    get workshop_path(workshops(:suspended_workshop))
+    assert_response :not_found
+  end
+
+  test "show returns 404 for pending workshop when not signed in" do
+    sign_out @user
+    get workshop_path(workshops(:pending_workshop))
+    assert_response :not_found
+  end
+
+  test "show renders active workshop" do
+    get workshop_path(@workshop)
+    assert_response :success
+    assert_select "h1", text: @workshop.name
+  end
+
+  test "show allows owner to view their pending workshop" do
+    sign_in users(:three)
+    get workshop_path(workshops(:pending_workshop))
+    assert_response :success
+  end
+
+  # --- Authorization on edit/update/destroy ---
+
+  test "edit requires workshop access" do
+    sign_in users(:driver_no_workshops)
+    get edit_workshop_path(@workshop)
+    assert_redirected_to root_path
+  end
+
+  test "update requires workshop access" do
+    sign_in users(:driver_no_workshops)
+    patch workshop_path(@workshop), params: { workshop: { name: "Hack" } }
+    assert_redirected_to root_path
+  end
+
+  test "destroy requires workshop access" do
+    sign_in users(:driver_no_workshops)
+    delete workshop_path(@workshop)
+    assert_redirected_to root_path
+  end
+
+  # --- Index with near filter (Task 29) ---
+
+  test "index without near param returns all active workshops" do
+    get workshops_path
+    assert_response :success
+  end
+
+  test "index with near param filters by proximity" do
+    get workshops_path, params: { near: "50.45,30.52" }
+    assert_response :success
+  end
+
+  test "index with invalid near param returns all active workshops" do
+    get workshops_path, params: { near: "invalid" }
+    assert_response :success
+  end
+
+  # --- Create (Task 30) ---
+
+  test "create sets workshop status to pending" do
+    post workshops_path, params: {
+      workshop: {
+        name: "Нова майстерня",
+        phone: "+380501111111",
+        address: "вул. Тестова, 1",
+        city: "Київ",
+        country: "UA"
+      }
+    }
+
+    created = Workshop.order(:created_at).last
+    assert created.pending?
+  end
+
+  test "create assigns current user as owner via workshop_operators" do
+    assert_difference "WorkshopOperator.count", 1 do
+      post workshops_path, params: {
+        workshop: {
+          name: "Нова майстерня",
+          phone: "+380501111111",
+          address: "вул. Тестова, 1",
+          city: "Київ",
+          country: "UA"
+        }
+      }
+    end
+
+    created = Workshop.order(:created_at).last
+    operator = created.workshop_operators.find_by(user: @user)
+    assert_not_nil operator
+    assert operator.owner?
+  end
+
+  test "create redirects with submitted flash message" do
+    post workshops_path, params: {
+      workshop: {
+        name: "Нова майстерня",
+        phone: "+380501111111",
+        address: "вул. Тестова, 1",
+        city: "Київ",
+        country: "UA"
+      }
+    }
+
+    created = Workshop.order(:created_at).last
+    assert_redirected_to workshop_path(created)
+    follow_redirect!
+    assert_match I18n.t("workshops.create.submitted"), flash[:notice]
+  end
+
+  test "create with invalid data does not create workshop_operator" do
+    assert_no_difference "WorkshopOperator.count" do
+      post workshops_path, params: {
+        workshop: { name: "", phone: "" }
+      }
+    end
+    assert_response :unprocessable_entity
+  end
 
   test "create with pricing data saves workshop_service_categories" do
     assert_difference "WorkshopServiceCategory.count", 1 do

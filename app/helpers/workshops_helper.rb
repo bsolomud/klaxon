@@ -6,8 +6,9 @@ module WorkshopsHelper
   end
 
   def workshop_status_indicator(workshop, open_key: "workshops.index.open_now", closed_key: "workshops.index.closed_now")
-    dot_color = workshop.open_now? ? "bg-green-500" : "bg-red-500"
-    label = workshop.open_now? ? t(open_key) : t(closed_key)
+    is_open = workshop.open_now?
+    dot_color = is_open ? "bg-green-500" : "bg-red-500"
+    label = is_open ? t(open_key) : t(closed_key)
 
     tag.div(class: "flex items-center gap-1.5") do
       tag.div(class: "h-2 w-2 rounded-full shrink-0 #{dot_color}") +

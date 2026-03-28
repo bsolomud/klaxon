@@ -1,0 +1,68 @@
+<div class="space-y-8">
+  <div>
+    <h1 class="text-2xl font-bold tracking-tight text-gray-900"><%= t(".title") %></h1>
+    <p class="mt-1 text-sm text-gray-500"><%= @workshop.name %></p>
+  </div>
+
+  <%# Stats cards %>
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <div class="rounded-xl border border-gray-200 bg-white p-5">
+      <p class="text-xs font-medium uppercase tracking-wider text-gray-400"><%= t(".stat_services") %></p>
+      <p class="mt-2 text-2xl font-bold text-gray-900"><%= @service_categories.size %></p>
+    </div>
+
+    <div class="rounded-xl border border-gray-200 bg-white p-5">
+      <p class="text-xs font-medium uppercase tracking-wider text-gray-400"><%= t(".stat_operators") %></p>
+      <p class="mt-2 text-2xl font-bold text-gray-900"><%= @workshop.workshop_operators.count %></p>
+    </div>
+
+    <div class="rounded-xl border border-gray-200 bg-white p-5">
+      <p class="text-xs font-medium uppercase tracking-wider text-gray-400"><%= t(".stat_status") %></p>
+      <p class="mt-2 text-2xl font-bold text-gray-900">
+        <% if @workshop.open_now? %>
+          <span class="text-green-600"><%= t(".open") %></span>
+        <% else %>
+          <span class="text-red-600"><%= t(".closed") %></span>
+        <% end %>
+      </p>
+    </div>
+  </div>
+
+  <%# Service categories %>
+  <div>
+    <h2 class="text-lg font-semibold text-gray-900"><%= t(".services_title") %></h2>
+    <% if @service_categories.any? %>
+      <div class="mt-3 divide-y divide-gray-100 rounded-xl border border-gray-200 bg-white">
+        <% @service_categories.each do |wsc| %>
+          <div class="flex items-center justify-between px-5 py-3">
+            <span class="text-sm font-medium text-gray-900"><%= wsc.service_category.name %></span>
+            <span class="text-sm text-gray-500"><%= wsc.price_display %></span>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="mt-2 text-sm text-gray-500"><%= t(".no_services") %></p>
+    <% end %>
+  </div>
+
+  <%# Working hours %>
+  <div>
+    <h2 class="text-lg font-semibold text-gray-900"><%= t(".hours_title") %></h2>
+    <% if @working_hours.any? %>
+      <div class="mt-3 divide-y divide-gray-100 rounded-xl border border-gray-200 bg-white">
+        <% @working_hours.each do |wh| %>
+          <div class="flex items-center justify-between px-5 py-3">
+            <span class="text-sm font-medium text-gray-900"><%= t("workshops.days.#{Date::DAYNAMES[wh.day_of_week].downcase}") %></span>
+            <% if wh.closed? %>
+              <span class="text-sm text-gray-400"><%= t(".day_closed") %></span>
+            <% else %>
+              <span class="text-sm text-gray-500"><%= wh.opens_at.strftime("%H:%M") %> — <%= wh.closes_at.strftime("%H:%M") %></span>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="mt-2 text-sm text-gray-500"><%= t(".no_hours") %></p>
+    <% end %>
+  </div>
+</div>

@@ -9,3 +9,15 @@ two:
   encrypted_password: "<%= BCrypt::Password.create('password', cost: 4) %>"
   confirmed_at: "<%= Time.current %>"
   role: 0
+
+three:
+  email: "user-three@example.com"
+  encrypted_password: "<%= BCrypt::Password.create('password', cost: 4) %>"
+  confirmed_at: "<%= Time.current %>"
+  role: 0
+
+driver_no_workshops:
+  email: "driver-no-workshops@example.com"
+  encrypted_password: "<%= BCrypt::Password.create('password', cost: 4) %>"
+  confirmed_at: "<%= Time.current %>"
+  role: 0

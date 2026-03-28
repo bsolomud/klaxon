@@ -1,0 +1,81 @@
+<div class="mb-8 flex items-center justify-between">
+  <div>
+    <h1 class="text-2xl font-bold tracking-tight text-gray-900"><%= t(".title") %></h1>
+    <p class="mt-1 text-sm text-gray-500"><%= t(".subtitle") %></p>
+  </div>
+
+  <%= link_to t(".new_workshop"), new_workshop_path, class: "btn-primary !w-auto" %>
+</div>
+
+<% if @workshops.any? %>
+  <div class="space-y-4">
+    <% @workshops.each do |workshop| %>
+      <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <div>
+              <h2 class="text-base font-semibold text-gray-900"><%= workshop.name %></h2>
+              <p class="mt-0.5 text-sm text-gray-500"><%= workshop.city %>, <%= workshop.country %></p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <%# Status badge %>
+            <% case workshop.status %>
+            <% when "pending" %>
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
+                <svg class="h-3 w-3 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                </svg>
+                <%= t(".status_pending") %>
+              </span>
+            <% when "active" %>
+              <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+                <%= t(".status_active") %>
+              </span>
+            <% when "declined" %>
+              <span class="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">
+                <%= t(".status_declined") %>
+              </span>
+            <% when "suspended" %>
+              <span class="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
+                <%= t(".status_suspended") %>
+              </span>
+            <% end %>
+
+            <% if workshop.active? %>
+              <%= link_to t(".manage"), workshop_path(workshop), class: "text-sm font-medium text-gray-500 hover:text-black transition-colors" %>
+            <% end %>
+          </div>
+        </div>
+
+        <% if workshop.declined? && workshop.decline_reason.present? %>
+          <div class="mt-3 rounded-lg bg-red-50 px-4 py-3">
+            <p class="text-sm text-red-700">
+              <span class="font-medium"><%= t(".decline_reason") %>:</span>
+              <%= workshop.decline_reason %>
+            </p>
+          </div>
+        <% end %>
+
+        <% if workshop.service_categories.any? %>
+          <div class="mt-3 flex items-center gap-2 flex-wrap">
+            <% workshop.service_categories.each do |category| %>
+              <span class="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-600">
+                <%= category.name %>
+              </span>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <div class="text-center py-12">
+    <p class="text-sm text-gray-500"><%= t(".empty") %></p>
+    <div class="mt-4">
+      <%= link_to t(".new_workshop"), new_workshop_path, class: "btn-primary !w-auto" %>
+    </div>
+  </div>
+<% end %>

@@ -1,0 +1,39 @@
+<div class="mb-8">
+  <h1 class="text-2xl font-semibold tracking-tight"><%= t(".title") %></h1>
+  <p class="mt-1 text-sm text-gray-500"><%= t(".subtitle") %></p>
+</div>
+
+<% if @users.any? %>
+  <div class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+    <table class="w-full">
+      <thead>
+        <tr class="border-b border-gray-100">
+          <th class="px-6 py-3 text-left text-xs text-gray-400 uppercase tracking-wider"><%= t(".col_email") %></th>
+          <th class="px-6 py-3 text-left text-xs text-gray-400 uppercase tracking-wider"><%= t(".col_name") %></th>
+          <th class="px-6 py-3 text-left text-xs text-gray-400 uppercase tracking-wider"><%= t(".col_role") %></th>
+          <th class="px-6 py-3 text-left text-xs text-gray-400 uppercase tracking-wider"><%= t(".col_created") %></th>
+          <th class="px-6 py-3"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-50">
+        <% @users.each do |user| %>
+          <tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-6 py-4 text-sm font-medium text-gray-900"><%= user.email %></td>
+            <td class="px-6 py-4 text-sm text-gray-600"><%= user.full_name || "—" %></td>
+            <td class="px-6 py-4">
+              <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700"><%= user.role %></span>
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-500"><%= l(user.created_at, format: :short) %></td>
+            <td class="px-6 py-4 text-right">
+              <%= link_to t(".view"), admin_user_path(user), class: "text-sm font-medium text-gray-500 hover:text-black transition-colors" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <div class="text-center py-12">
+    <p class="text-sm text-gray-500"><%= t(".empty") %></p>
+  </div>
+<% end %>

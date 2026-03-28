@@ -62,10 +62,97 @@ uk:
       nav:
         workshops: "Майстерні"
         users: "Користувачі"
+    workshop:
+      sign_out: "Вихід"
+      status_active: "Активна"
+      status_pending: "На розгляді"
+      status_suspended: "Призупинена"
+      switch_workshop: "Змінити майстерню"
+      nav:
+        dashboard: "Панель керування"
+        requests: "Запити"
+        queue: "Черга"
+        settings: "Налаштування"
   admin:
     dashboard:
       index:
         title: "Панель керування"
+    workshops:
+      statuses:
+        pending: "Очікує"
+        active: "Активна"
+        declined: "Відхилена"
+        suspended: "Призупинена"
+      index:
+        title: "Майстерні"
+        subtitle: "Керування всіма майстернями на платформі"
+        filter_all: "Всі"
+        filter_pending: "Очікують"
+        filter_active: "Активні"
+        filter_declined: "Відхилені"
+        filter_suspended: "Призупинені"
+        col_name: "Назва"
+        col_city: "Місто"
+        col_status: "Статус"
+        col_created: "Створено"
+        view: "Переглянути"
+        empty: "Майстерень не знайдено."
+      show:
+        details: "Деталі"
+        phone: "Телефон"
+        email: "Електронна пошта"
+        address: "Адреса"
+        description: "Опис"
+        created_at: "Дата створення"
+        services: "Категорії послуг"
+        owner: "Власник"
+        owner_name: "Ім'я"
+        owner_email: "Електронна пошта"
+        no_owner: "Власник не призначений."
+        approve: "Схвалити"
+        decline: "Відхилити"
+        decline_reason: "Причина відхилення"
+        confirm_decline: "Підтвердити відхилення"
+        cancel: "Скасувати"
+        suspend: "Призупинити"
+        suspend_confirm: "Ви впевнені, що хочете призупинити цю майстерню?"
+        back: "Назад до майстерень"
+      approve:
+        success: "Майстерню схвалено."
+        invalid_status: "Тільки майстерні зі статусом «Очікує» можна схвалити."
+      decline:
+        success: "Майстерню відхилено."
+        invalid_status: "Тільки майстерні зі статусом «Очікує» можна відхилити."
+      suspend:
+        success: "Майстерню призупинено."
+        invalid_status: "Тільки активні майстерні можна призупинити."
+    users:
+      index:
+        title: "Користувачі"
+        subtitle: "Керування всіма користувачами на платформі"
+        col_email: "Електронна пошта"
+        col_name: "Ім'я"
+        col_role: "Роль"
+        col_created: "Створено"
+        view: "Переглянути"
+        empty: "Користувачів не знайдено."
+      show:
+        details: "Деталі"
+        email: "Електронна пошта"
+        name: "Ім'я"
+        phone: "Телефон"
+        role: "Роль"
+        created_at: "Дата реєстрації"
+        workshops: "Майстерні"
+        view_workshop: "Переглянути"
+        no_workshops: "Немає майстерень."
+        account: "Акаунт"
+        confirmed: "Підтверджений"
+        yes: "Так"
+        "no": "Ні"
+        last_sign_in: "Останній вхід"
+        sign_in_count: "Кількість входів"
+        back: "Назад до користувачів"
   service_categories:
     index:
       title: "Категорії послуг"
@@ -103,6 +190,18 @@ uk:
     destroy:
       success: "Категорію послуг успішно видалено."
       has_workshops: "Неможливо видалити категорію, яка має майстерні."
+  my_workshops:
+    index:
+      title: "Мої майстерні"
+      subtitle: "Майстерні, якими ви володієте або керуєте"
+      new_workshop: "Нова майстерня"
+      status_pending: "На розгляді"
+      status_active: "Активна"
+      status_declined: "Відхилена"
+      status_suspended: "Призупинена"
+      decline_reason: "Причина"
+      manage: "Керувати"
+      empty: "У вас ще немає майстерень."
   workshops:
     index:
       title: "Майстерні"
@@ -179,10 +278,25 @@ uk:
       saturday: "Субота"
     create:
       success: "Майстерню успішно створено."
+      submitted: "Вашу майстерню подано на розгляд."
     update:
       success: "Майстерню успішно оновлено."
     destroy:
       success: "Майстерню успішно видалено."
+  workshop_management:
+    dashboards:
+      show:
+        title: "Панель керування"
+        stat_services: "Категорії послуг"
+        stat_operators: "Команда"
+        stat_status: "Статус зараз"
+        open: "Відчинено"
+        closed: "Зачинено"
+        services_title: "Послуги"
+        no_services: "Категорій послуг ще не додано."
+        hours_title: "Години роботи"
+        no_hours: "Годин роботи не вказано."
+        day_closed: "Зачинено"
   admins:
     sessions:
       new:

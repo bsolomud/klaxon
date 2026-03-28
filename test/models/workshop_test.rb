@@ -94,4 +94,75 @@ class WorkshopTest < ActiveSupport::TestCase
     assert_includes results, workshops(:one)
     assert_not_includes results, workshops(:pending_workshop)
   end
+
+  # Task 27 — geocoordinates columns
+
+  test "latitude and longitude accept decimal values" do
+    @workshop.update!(latitude: 50.450100, longitude: 30.523400)
+    @workshop.reload
+    assert_equal BigDecimal("50.4501000"), @workshop.latitude
+    assert_equal BigDecimal("30.5234000"), @workshop.longitude
+  end
+
+  test "latitude and longitude are nullable" do
+    @workshop.update!(latitude: nil, longitude: nil)
+    @workshop.reload
+    assert_nil @workshop.latitude
+    assert_nil @workshop.longitude
+  end
+
+  # Task 28 — geocoding
+
+  test "full_address combines address, city, and country" do
+    assert_equal "вул. Хрещатик, 1, Київ, UA", @workshop.full_address
+  end
+
+  test "geocodes on create when address is present" do
+    workshop = Workshop.create!(
+      name: "Тест Майстерня",
+      phone: "+380501111111",
+      address: "вул. Велика Васильківська, 100",
+      city: "Київ",
+      country: "UA"
+    )
+    assert_equal BigDecimal("50.4501"), workshop.latitude
+    assert_equal BigDecimal("30.5234"), workshop.longitude
+  end
+
+  test "geocodes when address changes" do
+    Geocoder::Lookup::Test.add_stub(
+      "вул. Нова, 5, Львів, UA",
+      [{ "latitude" => 49.8397, "longitude" => 24.0297 }]
+    )
+    @workshop.update!(address: "вул. Нова, 5", city: "Львів")
+    assert_equal BigDecimal("49.8397"), @workshop.latitude
+    assert_equal BigDecimal("24.0297"), @workshop.longitude
+  end
+
+  test "does not geocode when non-address fields change" do
+    @workshop.update_columns(latitude: 48.0, longitude: 25.0)
+    @workshop.reload
+    @workshop.update!(name: "Нова Назва")
+    assert_equal BigDecimal("48.0"), @workshop.latitude
+    assert_equal BigDecimal("25.0"), @workshop.longitude
+  end
+
+  # Task 29 — near_location scope
+
+  test "near_location returns workshops within bounding box" do
+    results = Workshop.near_location(50.45, 30.52)
+    assert_includes results, workshops(:one)
+    assert_includes results, workshops(:two)
+  end
+
+  test "near_location excludes workshops outside radius" do
+    results = Workshop.near_location(48.0, 24.0, 5)
+    assert_not_includes results, workshops(:one)
+    assert_not_includes results, workshops(:two)
+  end
+
+  test "near_location with small radius narrows results" do
+    results = Workshop.near_location(50.4501, 30.5234, 1)
+    assert_includes results, workshops(:one)
+  end
 end

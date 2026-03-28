@@ -24,12 +24,6 @@ class Admin::BaseControllerTest < ActionDispatch::IntegrationTest
 
   private
 
-  def sign_in_admin(admin)
-    post admin_session_path, params: {
-      admin: { email: admin.email, password: "password" }
-    }
-  end
-
   def sign_in_user(user)
     post user_session_path, params: {
       user: { email: user.email, password: "password" }

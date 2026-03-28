@@ -98,7 +98,7 @@
 
 ---
 
-## Phase 3 — Workshop Service Categories + Pricing
+## Phase 3 — Workshop Service Categories + Pricing [DONE]
 
 ### Task 12: Create WorkshopServiceCategory model + migration
 - **Description**: Create `workshop_service_categories` table: `workshop_id` (fk), `service_category_id` (fk), `price_min` (decimal 10,2), `price_max` (decimal 10,2), `price_unit` (string), `currency` (string, default "UAH"), `estimated_duration_minutes` (integer). Unique index on `[workshop_id, service_category_id]`.
@@ -170,7 +170,7 @@
 
 ---
 
-## Phase 4 — Admin Workshop Management
+## Phase 4 — Admin Workshop Management [DONE]
 
 ### Task 21: Admin::WorkshopsController — index + show
 - **Description**: Create controller inheriting `Admin::BaseController`. Index: all workshops filterable by status. Show: workshop detail + owner info.
@@ -222,7 +222,7 @@
 
 ---
 
-## Phase 5 — Workshop Self-Registration
+## Phase 5 — Workshop Self-Registration [DONE]
 
 ### Task 27: Add geocoordinates to workshops
 - **Description**: Migration to add `latitude` (decimal, precision: 10, scale: 6) and `longitude` (decimal, precision: 10, scale: 6), both nullable, to workshops.
@@ -271,7 +271,7 @@
 
 ---
 
-## Phase 6 — Workshop Management Layout + Namespace
+## Phase 6 — Workshop Management Layout + Namespace [DONE]
 
 ### Task 33: Create workshop management layout
 - **Description**: Create `app/views/layouts/workshop.html.erb` — sidebar with workshop name, status, nav links (Requests, Queue, Settings). Workshop switcher if user manages multiple.

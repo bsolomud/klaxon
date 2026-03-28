@@ -1,0 +1,99 @@
+<div class="mb-8">
+  <h1 class="text-2xl font-semibold tracking-tight"><%= @user.full_name || @user.email %></h1>
+  <div class="mt-1 flex items-center gap-2">
+    <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700"><%= @user.role %></span>
+    <span class="text-sm text-gray-500"><%= @user.email %></span>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+  <%# Main content %>
+  <div class="lg:col-span-2 space-y-6">
+    <%# User details %>
+    <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+      <h2 class="text-sm font-medium text-gray-900 uppercase tracking-wider mb-4"><%= t(".details") %></h2>
+
+      <dl class="space-y-3">
+        <div>
+          <dt class="text-xs text-gray-400 uppercase tracking-wider"><%= t(".email") %></dt>
+          <dd class="mt-0.5 text-sm text-gray-900"><%= @user.email %></dd>
+        </div>
+
+        <% if @user.full_name.present? %>
+          <div>
+            <dt class="text-xs text-gray-400 uppercase tracking-wider"><%= t(".name") %></dt>
+            <dd class="mt-0.5 text-sm text-gray-900"><%= @user.full_name %></dd>
+          </div>
+        <% end %>
+
+        <% if @user.phone_number.present? %>
+          <div>
+            <dt class="text-xs text-gray-400 uppercase tracking-wider"><%= t(".phone") %></dt>
+            <dd class="mt-0.5 text-sm text-gray-900"><%= @user.phone_number %></dd>
+          </div>
+        <% end %>
+
+        <div>
+          <dt class="text-xs text-gray-400 uppercase tracking-wider"><%= t(".role") %></dt>
+          <dd class="mt-0.5 text-sm text-gray-900"><%= @user.role %></dd>
+        </div>
+
+        <div>
+          <dt class="text-xs text-gray-400 uppercase tracking-wider"><%= t(".created_at") %></dt>
+          <dd class="mt-0.5 text-sm text-gray-900"><%= l(@user.created_at, format: :long) %></dd>
+        </div>
+      </dl>
+    </div>
+
+    <%# Workshops %>
+    <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+      <h2 class="text-sm font-medium text-gray-900 uppercase tracking-wider mb-4"><%= t(".workshops") %></h2>
+
+      <% if @workshops.any? %>
+        <div class="divide-y divide-gray-50">
+          <% @workshops.each do |workshop| %>
+            <div class="py-3 flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-gray-900"><%= workshop.name %></p>
+                <p class="text-xs text-gray-500"><%= workshop.city %></p>
+              </div>
+              <%= link_to t(".view_workshop"), admin_workshop_path(workshop), class: "text-sm font-medium text-gray-500 hover:text-black transition-colors" %>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-sm text-gray-500"><%= t(".no_workshops") %></p>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Sidebar — Account info %>
+  <div class="space-y-6">
+    <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+      <h2 class="text-sm font-medium text-gray-900 uppercase tracking-wider mb-4"><%= t(".account") %></h2>
+
+      <dl class="space-y-3">
+        <div>
+          <dt class="text-xs text-gray-400 uppercase tracking-wider"><%= t(".confirmed") %></dt>
+          <dd class="mt-0.5 text-sm text-gray-900"><%= @user.confirmed_at ? t(".yes") : t(".no") %></dd>
+        </div>
+
+        <% if @user.last_sign_in_at.present? %>
+          <div>
+            <dt class="text-xs text-gray-400 uppercase tracking-wider"><%= t(".last_sign_in") %></dt>
+            <dd class="mt-0.5 text-sm text-gray-900"><%= l(@user.last_sign_in_at, format: :long) %></dd>
+          </div>
+        <% end %>
+
+        <div>
+          <dt class="text-xs text-gray-400 uppercase tracking-wider"><%= t(".sign_in_count") %></dt>
+          <dd class="mt-0.5 text-sm text-gray-900"><%= @user.sign_in_count %></dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</div>
+
+<div class="mt-8">
+  <%= link_to t(".back"), admin_users_path, class: "text-sm font-medium text-gray-500 hover:text-black transition-colors" %>
+</div>
