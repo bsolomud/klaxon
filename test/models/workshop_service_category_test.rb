@@ -56,7 +56,7 @@ class WorkshopServiceCategoryTest < ActiveSupport::TestCase
     @wsc.price_min = 1000
     @wsc.price_max = 500
     assert_not @wsc.valid?
-    assert_includes @wsc.errors[:price_max], "must be greater than or equal to price_min"
+    assert_includes @wsc.errors[:price_max], "must be greater than or equal to minimum price"
   end
 
   test "estimated_duration_minutes must be positive integer" do

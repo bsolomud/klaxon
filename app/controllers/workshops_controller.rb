@@ -75,6 +75,8 @@ class WorkshopsController < ApplicationController
   def build_missing_records
     @workshop.build_missing_working_hours
     @workshop.build_missing_service_categories(@service_categories)
+    @sorted_workshop_service_categories = @workshop.workshop_service_categories
+      .sort_by { |wsc| wsc.service_category&.name.to_s }
   end
 
   def workshop_params

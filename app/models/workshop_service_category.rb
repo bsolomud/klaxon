@@ -37,6 +37,6 @@ class WorkshopServiceCategory < ApplicationRecord
   def price_max_greater_than_or_equal_to_min
     return if price_min.blank? || price_max.blank? || price_max >= price_min
 
-    errors.add(:price_max, "must be greater than or equal to price_min")
+    errors.add(:price_max, :greater_than_or_equal_to_price_min)
   end
 end

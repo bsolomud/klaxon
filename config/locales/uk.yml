@@ -10,6 +10,11 @@ uk:
         confirmation: "не збігається з підтвердженням"
         restrict_dependent_destroy:
           has_many: "Неможливо видалити запис, оскільки існують залежні майстерні"
+      models:
+        workshop_service_category:
+          attributes:
+            price_max:
+              greater_than_or_equal_to_price_min: "повинна бути більшою або рівною мінімальній ціні"
     models:
       user: "Користувач"
       service_category: "Категорія послуг"

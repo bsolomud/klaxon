@@ -24,8 +24,7 @@
     <legend class="text-sm font-medium text-gray-900 uppercase tracking-wider mb-4"><%= t("workshops.form.categories") %></legend>
 
     <div class="space-y-3">
-      <% sorted_wscs = workshop.workshop_service_categories.sort_by { |wsc| wsc.service_category&.name.to_s } %>
-      <%= f.fields_for :workshop_service_categories, sorted_wscs do |wsc| %>
+      <%= f.fields_for :workshop_service_categories, @sorted_workshop_service_categories do |wsc| %>
         <div data-controller="pricing-fields" class="border border-gray-100 rounded-lg p-3">
           <%= wsc.hidden_field :service_category_id %>
           <%= wsc.hidden_field :id if wsc.object.persisted? %>

@@ -10,6 +10,11 @@ en:
         confirmation: "doesn't match confirmation"
         restrict_dependent_destroy:
           has_many: "Cannot delete record because dependent workshops exist"
+      models:
+        workshop_service_category:
+          attributes:
+            price_max:
+              greater_than_or_equal_to_price_min: "must be greater than or equal to minimum price"
     models:
       user: "User"
       service_category: "Service category"

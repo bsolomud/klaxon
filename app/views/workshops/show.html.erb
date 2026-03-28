@@ -67,7 +67,7 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-50">
-            <% @workshop.workshop_service_categories.includes(:service_category).each do |wsc| %>
+            <% @workshop.workshop_service_categories.each do |wsc| %>
               <tr>
                 <td class="py-2.5 text-sm text-gray-900"><%= wsc.service_category.name %></td>
                 <td class="py-2.5 text-sm text-gray-600 text-right"><%= wsc.price_display %></td>
