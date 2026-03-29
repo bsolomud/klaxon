@@ -58,6 +58,9 @@
             method: :patch,
             params: { lock_version: @service_request.lock_version },
             class: "w-full btn-primary" %>
+    <% elsif @service_request.in_progress? %>
+      <%= link_to t(".complete"), new_workshop_management_workshop_service_request_service_record_path(@workshop, @service_request),
+            class: "block w-full text-center btn-primary" %>
     <% end %>
 
     <%= link_to t(".back"), workshop_management_workshop_service_requests_path(@workshop),

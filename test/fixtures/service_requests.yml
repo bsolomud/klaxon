@@ -28,6 +28,26 @@ in_progress_request:
   preferred_time: "<%= 1.day.from_now.change(hour: 11) %>"
   lock_version: 0
 
+completed_request:
+  car: camry
+  workshop: one
+  workshop_service_category: tire_express
+  price_snapshot: { "min": 500, "max": 1500, "unit": "послуга", "currency": "UAH" }
+  status: 4
+  description: "Заміна передніх гальмівних колодок"
+  preferred_time: "<%= 1.day.ago.change(hour: 11) %>"
+  lock_version: 0
+
+in_progress_no_record:
+  car: camry
+  workshop: one
+  workshop_service_category: tire_express
+  price_snapshot: { "min": 500, "max": 1500, "unit": "послуга", "currency": "UAH" }
+  status: 3
+  description: "Діагностика двигуна"
+  preferred_time: "<%= 1.day.from_now.change(hour: 15) %>"
+  lock_version: 0
+
 other_user_request:
   car: leaf
   workshop: two

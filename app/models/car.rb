@@ -6,6 +6,7 @@ class Car < ApplicationRecord
   has_many :car_ownership_records, dependent: :destroy
   has_many :car_transfers, dependent: :restrict_with_exception
   has_many :service_requests, dependent: :restrict_with_exception
+  has_many :service_records, through: :service_requests
 
   enum :fuel_type, { gasoline: 0, diesel: 1, electric: 2, hybrid: 3 }
   enum :transmission, { manual: 0, automatic: 1 }

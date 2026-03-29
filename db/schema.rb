@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_28_160706) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_29_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -113,6 +113,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_28_160706) do
     t.string "slug", null: false
     t.datetime "updated_at", null: false
     t.index ["slug"], name: "index_service_categories_on_slug", unique: true
+  end
+
+  create_table "service_records", force: :cascade do |t|
+    t.datetime "completed_at", null: false
+    t.datetime "created_at", null: false
+    t.string "currency", default: "UAH", null: false
+    t.decimal "labor_cost", precision: 10, scale: 2
+    t.date "next_service_at_date"
+    t.integer "next_service_at_km"
+    t.integer "odometer_at_service"
+    t.decimal "parts_cost", precision: 10, scale: 2
+    t.jsonb "parts_used"
+    t.string "performed_by"
+    t.text "recommendations"
+    t.bigint "service_request_id", null: false
+    t.text "summary", null: false
+    t.datetime "updated_at", null: false
+    t.index ["service_request_id"], name: "index_service_records_on_service_request_id", unique: true
   end
 
   create_table "service_requests", force: :cascade do |t|
@@ -234,6 +252,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_28_160706) do
   add_foreign_key "car_transfers", "users", column: "from_user_id"
   add_foreign_key "car_transfers", "users", column: "to_user_id"
   add_foreign_key "cars", "users"
+  add_foreign_key "service_records", "service_requests"
   add_foreign_key "service_requests", "cars"
   add_foreign_key "service_requests", "workshop_service_categories"
   add_foreign_key "service_requests", "workshops"

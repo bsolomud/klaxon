@@ -6,6 +6,9 @@ class CarsController < ApplicationController
   end
 
   def show
+    @service_records = @car.service_records
+      .includes(service_request: [:workshop, { workshop_service_category: :service_category }])
+      .order(completed_at: :desc)
   end
 
   def new

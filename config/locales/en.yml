@@ -191,6 +191,9 @@ en:
       delete_confirm: "Are you sure? This will remove this car."
       service_history: "Service History"
       no_service_history: "No service records yet."
+      recommendations: "Recommendations"
+      performed_by: "Performed by"
+      total_cost: "Total cost"
       back: "Back to cars"
     new:
       title: "Add Car"
@@ -457,6 +460,7 @@ en:
         reject: "Reject"
         reject_confirm: "Are you sure you want to reject this request?"
         start: "Start Work"
+        complete: "Complete Work"
         back: "Back to requests"
       accept:
         success: "Request accepted."
@@ -467,6 +471,21 @@ en:
       start:
         success: "Work started."
         stale: "This request was already updated by another action."
+    service_records:
+      new:
+        title: "Complete Work"
+        summary: "Work performed"
+        recommendations: "Recommendations"
+        performed_by: "Performed by"
+        odometer_at_service: "Odometer at service (km)"
+        labor_cost: "Labor cost"
+        parts_cost: "Parts cost"
+        next_service_at_km: "Next service at (km)"
+        next_service_at_date: "Next service by"
+        submit: "Save & Complete"
+        back: "Back to request"
+      create:
+        success: "Work completed. Service record created."
     dashboards:
       show:
         title: "Dashboard"

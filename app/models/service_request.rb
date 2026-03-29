@@ -3,6 +3,8 @@ class ServiceRequest < ApplicationRecord
   belongs_to :workshop
   belongs_to :workshop_service_category
 
+  has_one :service_record, dependent: :destroy
+
   enum :status, { pending: 0, accepted: 1, rejected: 2, in_progress: 3, completed: 4 }
 
   validates :description, presence: true

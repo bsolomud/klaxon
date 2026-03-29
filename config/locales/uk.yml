@@ -191,6 +191,9 @@ uk:
       delete_confirm: "Ви впевнені? Це видалить цей автомобіль."
       service_history: "Історія обслуговування"
       no_service_history: "Записів обслуговування ще немає."
+      recommendations: "Рекомендації"
+      performed_by: "Виконавець"
+      total_cost: "Вартість"
       back: "Назад до автомобілів"
     new:
       title: "Додати автомобіль"
@@ -459,6 +462,7 @@ uk:
         reject: "Відхилити"
         reject_confirm: "Ви впевнені, що хочете відхилити цей запит?"
         start: "Почати роботу"
+        complete: "Завершити роботу"
         back: "Назад до запитів"
       accept:
         success: "Запит прийнято."
@@ -469,6 +473,21 @@ uk:
       start:
         success: "Роботу розпочато."
         stale: "Цей запит вже оновлено іншою дією."
+    service_records:
+      new:
+        title: "Завершення роботи"
+        summary: "Опис виконаних робіт"
+        recommendations: "Рекомендації"
+        performed_by: "Виконавець"
+        odometer_at_service: "Пробіг при обслуговуванні (км)"
+        labor_cost: "Вартість роботи (грн)"
+        parts_cost: "Вартість запчастин (грн)"
+        next_service_at_km: "Наступне ТО при (км)"
+        next_service_at_date: "Наступне ТО до"
+        submit: "Зберегти та завершити"
+        back: "Назад до запиту"
+      create:
+        success: "Роботу завершено. Запис обслуговування створено."
     dashboards:
       show:
         title: "Панель керування"

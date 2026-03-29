@@ -25,6 +25,7 @@ Rails.application.routes.draw do
           patch :reject
           patch :start
         end
+        resource :service_record, only: [:new, :create]
       end
     end
   end
