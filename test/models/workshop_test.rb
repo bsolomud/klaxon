@@ -18,8 +18,9 @@ class WorkshopTest < ActiveSupport::TestCase
   end
 
   test "destroying workshop destroys workshop_operators" do
-    assert_difference "WorkshopOperator.count", -2 do
-      @workshop.destroy
+    workshop = workshops(:pending_workshop)
+    assert_difference "WorkshopOperator.count", -1 do
+      workshop.destroy
     end
   end
 
@@ -72,8 +73,9 @@ class WorkshopTest < ActiveSupport::TestCase
   end
 
   test "destroying workshop destroys workshop_service_categories" do
+    workshop = workshops(:pending_workshop)
     assert_difference "WorkshopServiceCategory.count", -1 do
-      @workshop.destroy
+      workshop.destroy
     end
   end
 

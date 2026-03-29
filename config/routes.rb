@@ -23,6 +23,7 @@ Rails.application.routes.draw do
   end
 
   resources :cars
+  resources :service_requests, only: [:index, :show, :new, :create]
   resources :car_transfers, only: [:new, :create, :show], param: :token do
     member do
       patch :approve

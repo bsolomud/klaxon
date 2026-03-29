@@ -5,3 +5,7 @@ tire_service:
 car_wash:
   name: "Автомийка"
   slug: "car-wash"
+
+diagnostics:
+  name: "Діагностика"
+  slug: "diagnostics"

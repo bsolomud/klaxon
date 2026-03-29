@@ -187,8 +187,9 @@ class CarsControllerTest < ActionDispatch::IntegrationTest
   # --- Destroy ---
 
   test "destroy removes car" do
+    car_without_requests = cars(:civic)
     assert_difference "Car.count", -1 do
-      delete car_path(@car)
+      delete car_path(car_without_requests)
     end
     assert_redirected_to cars_path
     assert_equal I18n.t("cars.destroy.success"), flash[:notice]

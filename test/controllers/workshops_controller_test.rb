@@ -294,16 +294,17 @@ class WorkshopsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "update removes deselected category" do
-    existing_wsc = workshop_service_categories(:tire_express)
-    assert_includes @workshop.service_category_ids, @tire_service.id
+    removable_wsc = workshop_service_categories(:diagnostics_express)
+    diagnostics = service_categories(:diagnostics)
+    assert_includes @workshop.service_category_ids, diagnostics.id
 
     assert_difference "WorkshopServiceCategory.count", -1 do
       patch workshop_path(@workshop), params: {
         workshop: {
           workshop_service_categories_attributes: {
             "0" => {
-              id: existing_wsc.id,
-              service_category_id: @tire_service.id,
+              id: removable_wsc.id,
+              service_category_id: diagnostics.id,
               _destroy: "1"
             }
           }
@@ -312,7 +313,7 @@ class WorkshopsControllerTest < ActionDispatch::IntegrationTest
     end
 
     @workshop.reload
-    assert_empty @workshop.service_categories
+    assert_not_includes @workshop.service_category_ids, diagnostics.id
   end
 
   test "update modifies pricing on existing category" do

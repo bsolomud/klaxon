@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_28_154035) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_28_160706) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -115,6 +115,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_28_154035) do
     t.index ["slug"], name: "index_service_categories_on_slug", unique: true
   end
 
+  create_table "service_requests", force: :cascade do |t|
+    t.bigint "car_id", null: false
+    t.datetime "created_at", null: false
+    t.text "description", null: false
+    t.integer "lock_version", default: 0, null: false
+    t.datetime "preferred_time", null: false
+    t.jsonb "price_snapshot"
+    t.integer "status", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "workshop_id", null: false
+    t.bigint "workshop_service_category_id", null: false
+    t.index ["car_id", "status"], name: "index_service_requests_on_car_id_and_status"
+    t.index ["car_id"], name: "index_service_requests_on_car_id"
+    t.index ["workshop_id", "status"], name: "index_service_requests_on_workshop_id_and_status"
+    t.index ["workshop_id"], name: "index_service_requests_on_workshop_id"
+    t.index ["workshop_service_category_id"], name: "index_service_requests_on_workshop_service_category_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.datetime "confirmation_sent_at"
     t.string "confirmation_token"
@@ -216,6 +234,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_28_154035) do
   add_foreign_key "car_transfers", "users", column: "from_user_id"
   add_foreign_key "car_transfers", "users", column: "to_user_id"
   add_foreign_key "cars", "users"
+  add_foreign_key "service_requests", "cars"
+  add_foreign_key "service_requests", "workshop_service_categories"
+  add_foreign_key "service_requests", "workshops"
   add_foreign_key "working_hours", "workshops"
   add_foreign_key "workshop_operators", "users"
   add_foreign_key "workshop_operators", "workshops"

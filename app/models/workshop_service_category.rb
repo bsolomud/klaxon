@@ -2,6 +2,8 @@ class WorkshopServiceCategory < ApplicationRecord
   belongs_to :workshop
   belongs_to :service_category
 
+  has_many :service_requests, dependent: :restrict_with_exception
+
   validates :workshop_id, uniqueness: { scope: :service_category_id }
   validates :price_min, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   validates :price_max, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true

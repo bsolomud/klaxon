@@ -16,6 +16,15 @@ car_wash_basic:
   currency: "UAH"
   estimated_duration_minutes: 30
 
+diagnostics_express:
+  workshop: one
+  service_category: diagnostics
+  price_min: 300
+  price_max: 800
+  price_unit: "авто"
+  currency: "UAH"
+  estimated_duration_minutes: 60
+
 no_price:
   workshop: pending_workshop
   service_category: tire_service

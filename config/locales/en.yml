@@ -11,6 +11,12 @@ en:
         restrict_dependent_destroy:
           has_many: "Cannot delete record because dependent workshops exist"
       models:
+        service_request:
+          attributes:
+            car:
+              not_owned_by_requestor: "does not belong to you"
+            workshop_service_category:
+              not_offered_by_workshop: "is not offered by this workshop"
         workshop_service_category:
           attributes:
             price_max:
@@ -20,6 +26,7 @@ en:
       service_category: "Service category"
       car: "Car"
       workshop: "Workshop"
+      service_request: "Service request"
       working_hour: "Working hour"
     attributes:
       user:
@@ -252,6 +259,48 @@ en:
     cancel:
       success: "Transfer request has been cancelled."
       not_authorized: "Only the requester can cancel this transfer."
+  service_requests:
+    price_on_request: "Price on request"
+    statuses:
+      pending: "Pending"
+      accepted: "Accepted"
+      rejected: "Rejected"
+      in_progress: "In Progress"
+      completed: "Completed"
+    index:
+      title: "My Service Requests"
+      subtitle: "Your service requests to workshops"
+      empty: "You have no service requests yet."
+      col_workshop: "Workshop"
+      col_service: "Service"
+      col_status: "Status"
+      col_date: "Preferred Time"
+      col_price: "Price"
+      view: "View"
+    show:
+      details: "Request Details"
+      workshop: "Workshop"
+      service: "Service"
+      car: "Car"
+      description: "Description"
+      preferred_time: "Preferred Time"
+      price: "Price"
+      status: "Status"
+      created_at: "Created"
+      back: "Back to requests"
+    new:
+      title: "Request Service"
+      back: "Back to workshop"
+    form:
+      car: "Car"
+      car_blank: "— select car —"
+      service_category: "Service"
+      service_category_blank: "— select service —"
+      description: "Description"
+      description_hint: "Describe what you need"
+      preferred_time: "Preferred Time"
+    create:
+      success: "Service request submitted."
   service_categories:
     index:
       title: "Service Categories"
@@ -330,6 +379,7 @@ en:
       service_name: "Service"
       service_price: "Price"
       service_duration: "Duration"
+      request_service: "Request Service"
       back: "Back to workshops"
     new:
       title: "New Workshop"

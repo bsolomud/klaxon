@@ -1,0 +1,29 @@
+pending_request:
+  car: camry
+  workshop: one
+  workshop_service_category: tire_express
+  price_snapshot: { "min": 500, "max": 1500, "unit": "послуга", "currency": "UAH" }
+  status: 0
+  description: "Потрібно замінити зимову гуму"
+  preferred_time: "<%= 2.days.from_now.change(hour: 10) %>"
+  lock_version: 0
+
+accepted_request:
+  car: camry
+  workshop: one
+  workshop_service_category: tire_express
+  price_snapshot: { "min": 500, "max": 1500, "unit": "послуга", "currency": "UAH" }
+  status: 1
+  description: "Балансування коліс"
+  preferred_time: "<%= 3.days.from_now.change(hour: 14) %>"
+  lock_version: 0
+
+other_user_request:
+  car: leaf
+  workshop: two
+  workshop_service_category: car_wash_basic
+  price_snapshot: { "min": 200, "max": 200, "unit": "послуга", "currency": "UAH" }
+  status: 0
+  description: "Повна мийка авто"
+  preferred_time: "<%= 1.day.from_now.change(hour: 9) %>"
+  lock_version: 0

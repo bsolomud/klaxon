@@ -14,6 +14,8 @@ class Workshop < ApplicationRecord
     allow_destroy: true,
     reject_if: proc { |attrs| attrs["_destroy"] == "1" && attrs["id"].blank? }
 
+  has_many :service_requests, dependent: :restrict_with_exception
+
   has_many :working_hours, dependent: :destroy
   accepts_nested_attributes_for :working_hours, allow_destroy: true
 

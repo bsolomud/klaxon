@@ -1,0 +1,35 @@
+<%= form_with(builder: AuFormBuilder, model: service_request, class: "space-y-6") do |f| %>
+  <%= render "devise/shared/error_messages", resource: service_request %>
+
+  <%= f.hidden_field :workshop_id, value: workshop.id %>
+
+  <div>
+    <%= f.label :car_id, t("service_requests.form.car"), class: "label-input" %>
+    <%= f.select :car_id,
+          cars.map { |c| [c.display_name, c.id] },
+          { include_blank: t("service_requests.form.car_blank") },
+          {} %>
+  </div>
+
+  <div>
+    <%= f.label :workshop_service_category_id, t("service_requests.form.service_category"), class: "label-input" %>
+    <%= f.select :workshop_service_category_id,
+          categories.map { |wsc| ["#{wsc.service_category.name} — #{wsc.price_display}", wsc.id] },
+          { include_blank: t("service_requests.form.service_category_blank") },
+          {} %>
+  </div>
+
+  <div>
+    <%= f.label :description, t("service_requests.form.description"), class: "label-input" %>
+    <%= f.text_area :description, rows: 4, placeholder: t("service_requests.form.description_hint") %>
+  </div>
+
+  <div>
+    <%= f.label :preferred_time, t("service_requests.form.preferred_time"), class: "label-input" %>
+    <%= f.datetime_local_field :preferred_time %>
+  </div>
+
+  <div>
+    <%= f.submit class: "btn-primary" %>
+  </div>
+<% end %>

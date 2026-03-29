@@ -11,6 +11,12 @@ uk:
         restrict_dependent_destroy:
           has_many: "Неможливо видалити запис, оскільки існують залежні майстерні"
       models:
+        service_request:
+          attributes:
+            car:
+              not_owned_by_requestor: "не належить вам"
+            workshop_service_category:
+              not_offered_by_workshop: "не пропонується цією майстернею"
         workshop_service_category:
           attributes:
             price_max:
@@ -20,6 +26,7 @@ uk:
       service_category: "Категорія послуг"
       car: "Автомобіль"
       workshop: "Майстерня"
+      service_request: "Запит на обслуговування"
       working_hour: "Години роботи"
     attributes:
       user:
@@ -252,6 +259,48 @@ uk:
     cancel:
       success: "Запит на передачу скасовано."
       not_authorized: "Тільки заявник може скасувати цю передачу."
+  service_requests:
+    price_on_request: "Ціна за запитом"
+    statuses:
+      pending: "Очікує"
+      accepted: "Прийнято"
+      rejected: "Відхилено"
+      in_progress: "В роботі"
+      completed: "Завершено"
+    index:
+      title: "Мої запити на обслуговування"
+      subtitle: "Ваші запити до майстерень"
+      empty: "У вас ще немає запитів на обслуговування."
+      col_workshop: "Майстерня"
+      col_service: "Послуга"
+      col_status: "Статус"
+      col_date: "Бажаний час"
+      col_price: "Ціна"
+      view: "Переглянути"
+    show:
+      details: "Деталі запиту"
+      workshop: "Майстерня"
+      service: "Послуга"
+      car: "Автомобіль"
+      description: "Опис"
+      preferred_time: "Бажаний час"
+      price: "Ціна"
+      status: "Статус"
+      created_at: "Створено"
+      back: "Назад до запитів"
+    new:
+      title: "Замовити послугу"
+      back: "Назад до майстерні"
+    form:
+      car: "Автомобіль"
+      car_blank: "— оберіть авто —"
+      service_category: "Послуга"
+      service_category_blank: "— оберіть послугу —"
+      description: "Опис"
+      description_hint: "Опишіть, що вам потрібно"
+      preferred_time: "Бажаний час"
+    create:
+      success: "Запит на обслуговування надіслано."
   service_categories:
     index:
       title: "Категорії послуг"
@@ -332,6 +381,7 @@ uk:
       service_name: "Послуга"
       service_price: "Ціна"
       service_duration: "Тривалість"
+      request_service: "Замовити послугу"
       back: "Назад до майстерень"
     new:
       title: "Нова майстерня"
