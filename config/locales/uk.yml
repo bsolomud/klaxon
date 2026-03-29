@@ -433,6 +433,42 @@ uk:
     destroy:
       success: "Майстерню успішно видалено."
   workshop_management:
+    service_requests:
+      invalid_transition: "Ця дія недоступна для поточного статусу запиту."
+      index:
+        title: "Запити на обслуговування"
+        subtitle: "Вхідні запити для вашої майстерні"
+        filter_all: "Всі"
+        col_car: "Автомобіль"
+        col_service: "Послуга"
+        col_status: "Статус"
+        col_date: "Бажаний час"
+        col_price: "Ціна"
+        view: "Переглянути"
+        empty: "Запитів на обслуговування ще немає."
+      show:
+        title: "Запит на обслуговування"
+        car: "Автомобіль"
+        service: "Послуга"
+        driver: "Водій"
+        description: "Опис"
+        preferred_time: "Бажаний час"
+        price: "Ціна"
+        created_at: "Створено"
+        accept: "Прийняти"
+        reject: "Відхилити"
+        reject_confirm: "Ви впевнені, що хочете відхилити цей запит?"
+        start: "Почати роботу"
+        back: "Назад до запитів"
+      accept:
+        success: "Запит прийнято."
+        stale: "Цей запит вже оновлено іншою дією."
+      reject:
+        success: "Запит відхилено."
+        stale: "Цей запит вже оновлено іншою дією."
+      start:
+        success: "Роботу розпочато."
+        stale: "Цей запит вже оновлено іншою дією."
     dashboards:
       show:
         title: "Панель керування"

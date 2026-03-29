@@ -431,6 +431,42 @@ en:
     destroy:
       success: "Workshop was successfully deleted."
   workshop_management:
+    service_requests:
+      invalid_transition: "This action is not available for the current request status."
+      index:
+        title: "Service Requests"
+        subtitle: "Incoming service requests for your workshop"
+        filter_all: "All"
+        col_car: "Car"
+        col_service: "Service"
+        col_status: "Status"
+        col_date: "Preferred Time"
+        col_price: "Price"
+        view: "View"
+        empty: "No service requests yet."
+      show:
+        title: "Service Request"
+        car: "Car"
+        service: "Service"
+        driver: "Driver"
+        description: "Description"
+        preferred_time: "Preferred Time"
+        price: "Price"
+        created_at: "Created"
+        accept: "Accept"
+        reject: "Reject"
+        reject_confirm: "Are you sure you want to reject this request?"
+        start: "Start Work"
+        back: "Back to requests"
+      accept:
+        success: "Request accepted."
+        stale: "This request was already updated by another action."
+      reject:
+        success: "Request rejected."
+        stale: "This request was already updated by another action."
+      start:
+        success: "Work started."
+        stale: "This request was already updated by another action."
     dashboards:
       show:
         title: "Dashboard"

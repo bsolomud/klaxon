@@ -1,0 +1,51 @@
+<div class="mb-8">
+  <h1 class="text-2xl font-bold tracking-tight text-gray-900"><%= t(".title") %></h1>
+  <p class="mt-1 text-sm text-gray-500"><%= t(".subtitle") %></p>
+</div>
+
+<%# Status filter tabs %>
+<div class="mb-6 flex flex-wrap gap-2">
+  <%= link_to t(".filter_all"),
+        workshop_management_workshop_service_requests_path(@workshop),
+        class: "inline-flex items-center rounded-full px-3 py-1 text-sm font-medium transition-colors #{params[:status].blank? ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}" %>
+  <% %w[pending accepted in_progress completed rejected].each do |status| %>
+    <%= link_to t("service_requests.statuses.#{status}"),
+          workshop_management_workshop_service_requests_path(@workshop, status: status),
+          class: "inline-flex items-center rounded-full px-3 py-1 text-sm font-medium transition-colors #{params[:status] == status ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}" %>
+  <% end %>
+</div>
+
+<% if @service_requests.any? %>
+  <div class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+    <table class="w-full">
+      <thead>
+        <tr class="border-b border-gray-100">
+          <th class="px-6 py-3 text-left text-xs text-gray-400 uppercase tracking-wider"><%= t(".col_car") %></th>
+          <th class="px-6 py-3 text-left text-xs text-gray-400 uppercase tracking-wider"><%= t(".col_service") %></th>
+          <th class="px-6 py-3 text-left text-xs text-gray-400 uppercase tracking-wider"><%= t(".col_status") %></th>
+          <th class="px-6 py-3 text-left text-xs text-gray-400 uppercase tracking-wider"><%= t(".col_date") %></th>
+          <th class="px-6 py-3 text-right text-xs text-gray-400 uppercase tracking-wider"><%= t(".col_price") %></th>
+          <th class="px-6 py-3"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-50">
+        <% @service_requests.each do |sr| %>
+          <tr>
+            <td class="px-6 py-3 text-sm text-gray-900"><%= sr.car.display_name %></td>
+            <td class="px-6 py-3 text-sm text-gray-600"><%= sr.workshop_service_category.service_category.name %></td>
+            <td class="px-6 py-3"><%= service_request_status_badge(sr.status) %></td>
+            <td class="px-6 py-3 text-sm text-gray-600"><%= l(sr.preferred_time, format: :short) %></td>
+            <td class="px-6 py-3 text-sm text-gray-600 text-right"><%= sr.display_price %></td>
+            <td class="px-6 py-3 text-right">
+              <%= link_to t(".view"),
+                    workshop_management_workshop_service_request_path(@workshop, sr),
+                    class: "text-sm font-medium text-gray-500 hover:text-black transition-colors" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <p class="text-sm text-gray-500"><%= t(".empty") %></p>
+<% end %>

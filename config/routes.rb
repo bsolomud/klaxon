@@ -19,6 +19,13 @@ Rails.application.routes.draw do
   namespace :workshop_management do
     resources :workshops, only: [:show] do
       resource :dashboard, only: [:show]
+      resources :service_requests, only: [:index, :show] do
+        member do
+          patch :accept
+          patch :reject
+          patch :start
+        end
+      end
     end
   end
 
