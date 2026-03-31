@@ -1,31 +1,18 @@
 module QueuesHelper
-  def queue_status_badge(status)
-    config = {
-      "open"   => { bg: "bg-green-100", text: "text-green-800" },
-      "paused" => { bg: "bg-yellow-100", text: "text-yellow-800" },
-      "closed" => { bg: "bg-gray-100", text: "text-gray-800" }
-    }
-    colors = config[status] || config["open"]
+  QUEUE_STATUS_COLORS = {
+    "open" => "green", "paused" => "yellow", "closed" => "gray"
+  }.freeze
 
-    tag.span(
-      t("workshop_management.queues.statuses.#{status}"),
-      class: "inline-flex items-center rounded-full #{colors[:bg]} px-2 py-0.5 text-xs font-medium #{colors[:text]}"
-    )
+  QUEUE_ENTRY_STATUS_COLORS = {
+    "waiting" => "yellow", "called" => "blue", "in_service" => "indigo",
+    "completed" => "green", "no_show" => "red"
+  }.freeze
+
+  def queue_status_badge(status)
+    status_badge(status, QUEUE_STATUS_COLORS, "workshop_management.queues.statuses.#{status}")
   end
 
   def queue_entry_status_badge(status)
-    config = {
-      "waiting"    => { bg: "bg-yellow-100", text: "text-yellow-800" },
-      "called"     => { bg: "bg-blue-100",   text: "text-blue-800" },
-      "in_service" => { bg: "bg-indigo-100", text: "text-indigo-800" },
-      "completed"  => { bg: "bg-green-100",  text: "text-green-800" },
-      "no_show"    => { bg: "bg-red-100",    text: "text-red-800" }
-    }
-    colors = config[status] || config["waiting"]
-
-    tag.span(
-      t("queue_entries.statuses.#{status}"),
-      class: "inline-flex items-center rounded-full #{colors[:bg]} px-2 py-0.5 text-xs font-medium #{colors[:text]}"
-    )
+    status_badge(status, QUEUE_ENTRY_STATUS_COLORS, "queue_entries.statuses.#{status}")
   end
 end

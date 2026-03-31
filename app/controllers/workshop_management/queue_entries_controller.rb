@@ -1,26 +1,29 @@
 class WorkshopManagement::QueueEntriesController < WorkshopManagement::BaseController
+  include StateTransitionable
+
   before_action :set_queue
   before_action :set_entry
 
   def call
-    transition_entry(:waiting, :called!) do
-      @entry.called_at = Time.current
+    transition_queue_entry(:waiting, :called!) do |entry|
+      entry.called_at = Time.current
     end
+    @entry.recompute_wait_estimates if @entry.called?
   end
 
   def serve
-    transition_entry(:called, :in_service!)
+    transition_queue_entry(:called, :in_service!)
   end
 
   def complete
-    transition_entry(:in_service, :completed!) do
-      @entry.recompute_wait_estimates
+    transition_queue_entry(:in_service, :completed!) do |entry|
+      entry.recompute_wait_estimates
     end
   end
 
   def no_show
-    transition_entry(:called, :no_show!) do
-      @entry.recompute_wait_estimates
+    transition_queue_entry(:called, :no_show!) do |entry|
+      entry.recompute_wait_estimates
     end
   end
 
@@ -34,21 +37,14 @@ class WorkshopManagement::QueueEntriesController < WorkshopManagement::BaseContr
     @entry = @queue.queue_entries.find(params[:id])
   end
 
-  def transition_entry(required_status, transition_method)
-    unless @entry.status == required_status.to_s
-      redirect_to workshop_management_workshop_queue_path(@workshop, @queue),
-                  alert: t("workshop_management.queue_entries.invalid_transition")
-      return
-    end
-
-    @entry.lock_version = params[:lock_version].to_i
-    yield if block_given?
-    @entry.send(transition_method)
-    @entry.recompute_wait_estimates if transition_method == :called!
-    redirect_to workshop_management_workshop_queue_path(@workshop, @queue),
-                notice: t(".success")
-  rescue ActiveRecord::StaleObjectError
-    redirect_to workshop_management_workshop_queue_path(@workshop, @queue),
-                alert: t(".stale")
+  def transition_queue_entry(required_status, transition, &block)
+    transition_status(
+      @entry,
+      required_status: required_status,
+      transition: transition,
+      redirect_path: workshop_management_workshop_queue_path(@workshop, @queue),
+      invalid_message: t("workshop_management.queue_entries.invalid_transition"),
+      &block
+    )
   end
 end

@@ -1,4 +1,6 @@
 class WorkshopManagement::ServiceRequestsController < WorkshopManagement::BaseController
+  include StateTransitionable
+
   before_action :set_service_request, only: [:show, :accept, :reject, :start]
 
   def index
@@ -12,15 +14,15 @@ class WorkshopManagement::ServiceRequestsController < WorkshopManagement::BaseCo
   end
 
   def accept
-    transition_request(:pending, :accepted!)
+    transition_service_request(:pending, :accepted!)
   end
 
   def reject
-    transition_request(:pending, :rejected!)
+    transition_service_request(:pending, :rejected!)
   end
 
   def start
-    transition_request(:accepted, :in_progress!)
+    transition_service_request(:accepted, :in_progress!)
   end
 
   private
@@ -29,19 +31,13 @@ class WorkshopManagement::ServiceRequestsController < WorkshopManagement::BaseCo
     @service_request = @workshop.service_requests.find(params[:id])
   end
 
-  def transition_request(required_status, transition_method)
-    unless @service_request.status == required_status.to_s
-      redirect_to workshop_management_workshop_service_request_path(@workshop, @service_request),
-                  alert: t("workshop_management.service_requests.invalid_transition")
-      return
-    end
-
-    @service_request.lock_version = params[:lock_version].to_i
-    @service_request.send(transition_method)
-    redirect_to workshop_management_workshop_service_request_path(@workshop, @service_request),
-                notice: t(".success")
-  rescue ActiveRecord::StaleObjectError
-    redirect_to workshop_management_workshop_service_request_path(@workshop, @service_request),
-                alert: t(".stale")
+  def transition_service_request(required_status, transition)
+    transition_status(
+      @service_request,
+      required_status: required_status,
+      transition: transition,
+      redirect_path: workshop_management_workshop_service_request_path(@workshop, @service_request),
+      invalid_message: t("workshop_management.service_requests.invalid_transition")
+    )
   end
 end

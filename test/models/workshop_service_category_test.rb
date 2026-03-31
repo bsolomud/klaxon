@@ -87,41 +87,41 @@ class WorkshopServiceCategoryTest < ActiveSupport::TestCase
 
   # --- Task 13: Display methods ---
 
-  test "price_display with range" do
-    assert_equal "500\u20131500 UAH / послуга", @wsc.price_display
+  test "display_price with range" do
+    assert_equal "500\u20131500 UAH / послуга", @wsc.display_price
   end
 
-  test "price_display with equal min and max" do
+  test "display_price with equal min and max" do
     wsc = workshop_service_categories(:car_wash_basic)
-    assert_equal "200 UAH / послуга", wsc.price_display
+    assert_equal "200 UAH / послуга", wsc.display_price
   end
 
-  test "price_display with only min" do
+  test "display_price with only min" do
     @wsc.price_max = nil
-    assert_equal "from 500 UAH / послуга", @wsc.price_display
+    assert_equal "from 500 UAH / послуга", @wsc.display_price
   end
 
-  test "price_display with only max" do
+  test "display_price with only max" do
     @wsc.price_min = nil
-    assert_equal "up to 1500 UAH / послуга", @wsc.price_display
+    assert_equal "up to 1500 UAH / послуга", @wsc.display_price
   end
 
-  test "price_display with no prices" do
+  test "display_price with no prices" do
     wsc = workshop_service_categories(:no_price)
-    assert_equal "Price on request", wsc.price_display
+    assert_equal "Price on request", wsc.display_price
   end
 
-  test "price_display with prices but no price_unit" do
+  test "display_price with prices but no price_unit" do
     @wsc.price_unit = nil
-    assert_equal "500\u20131500 UAH", @wsc.price_display
+    assert_equal "500\u20131500 UAH", @wsc.display_price
   end
 
-  test "duration_display with minutes" do
-    assert_equal "~45 min", @wsc.duration_display
+  test "display_duration with minutes" do
+    assert_equal "~45 min", @wsc.display_duration
   end
 
-  test "duration_display returns nil when no duration" do
+  test "display_duration returns nil when no duration" do
     wsc = workshop_service_categories(:no_price)
-    assert_nil wsc.duration_display
+    assert_nil wsc.display_duration
   end
 end

@@ -1,4 +1,6 @@
 class ServiceRequest < ApplicationRecord
+  include PriceFormattable
+
   belongs_to :car
   belongs_to :workshop
   belongs_to :workshop_service_category
@@ -19,23 +21,11 @@ class ServiceRequest < ApplicationRecord
   def display_price
     return I18n.t("service_requests.price_on_request") if price_snapshot.blank?
 
-    min = price_snapshot["min"]
-    max = price_snapshot["max"]
-    currency = price_snapshot["currency"]
-
-    if min.present? && max.present?
-      if min == max
-        "#{min.to_i} #{currency}"
-      else
-        "#{min.to_i}\u2013#{max.to_i} #{currency}"
-      end
-    elsif min.present?
-      I18n.t("workshops.pricing.from", price: "#{min.to_i} #{currency}")
-    elsif max.present?
-      I18n.t("workshops.pricing.up_to", price: "#{max.to_i} #{currency}")
-    else
-      I18n.t("service_requests.price_on_request")
-    end
+    format_price(
+      price_snapshot["min"],
+      price_snapshot["max"],
+      price_snapshot["currency"]
+    )
   end
 
   private

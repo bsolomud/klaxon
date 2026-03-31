@@ -1,6 +1,4 @@
 class Car < ApplicationRecord
-  include Normalizable
-
   belongs_to :user
 
   has_many :car_ownership_records, dependent: :destroy
@@ -11,7 +9,8 @@ class Car < ApplicationRecord
   enum :fuel_type, { gasoline: 0, diesel: 1, electric: 2, hybrid: 3 }
   enum :transmission, { manual: 0, automatic: 1 }
 
-  normalizes_upcase :license_plate, :vin
+  normalizes :license_plate, with: ->(v) { v&.strip&.upcase }
+  normalizes :vin, with: ->(v) { v&.strip&.upcase }
 
   validates :make, presence: true
   validates :model, presence: true

@@ -80,8 +80,8 @@
             <% @workshop.workshop_service_categories.each do |wsc| %>
               <tr>
                 <td class="py-2.5 text-sm text-gray-900"><%= wsc.service_category.name %></td>
-                <td class="py-2.5 text-sm text-gray-600 text-right"><%= wsc.price_display %></td>
-                <td class="py-2.5 text-sm text-gray-400 text-right"><%= wsc.duration_display %></td>
+                <td class="py-2.5 text-sm text-gray-600 text-right"><%= wsc.display_price %></td>
+                <td class="py-2.5 text-sm text-gray-400 text-right"><%= wsc.display_duration %></td>
               </tr>
             <% end %>
           </tbody>

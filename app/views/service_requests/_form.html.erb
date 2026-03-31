@@ -14,7 +14,7 @@
   <div>
     <%= f.label :workshop_service_category_id, t("service_requests.form.service_category"), class: "label-input" %>
     <%= f.select :workshop_service_category_id,
-          categories.map { |wsc| ["#{wsc.service_category.name} — #{wsc.price_display}", wsc.id] },
+          categories.map { |wsc| ["#{wsc.service_category.name} — #{wsc.display_price}", wsc.id] },
           { include_blank: t("service_requests.form.service_category_blank") },
           {} %>
   </div>

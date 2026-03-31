@@ -36,7 +36,7 @@
         <% @service_categories.each do |wsc| %>
           <div class="flex items-center justify-between px-5 py-3">
             <span class="text-sm font-medium text-gray-900"><%= wsc.service_category.name %></span>
-            <span class="text-sm text-gray-500"><%= wsc.price_display %></span>
+            <span class="text-sm text-gray-500"><%= wsc.display_price %></span>
           </div>
         <% end %>
       </div>
