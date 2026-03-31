@@ -17,6 +17,7 @@ class WorkshopsController < ApplicationController
 
   def show
     @working_hours = @workshop.working_hours.order(:day_of_week)
+    @open_queues = @workshop.service_queues.open.today
   end
 
   def new

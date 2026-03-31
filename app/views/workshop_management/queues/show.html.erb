@@ -1,0 +1,103 @@
+<div class="mb-8">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold tracking-tight text-gray-900">
+        <%= @queue.service_category&.name || t(".general_queue") %>
+      </h1>
+      <p class="mt-1 text-sm text-gray-500"><%= l(@queue.date) %></p>
+    </div>
+    <div class="flex items-center gap-2">
+      <%= queue_status_badge(@queue.status) %>
+
+      <% if @queue.paused? %>
+        <%= button_to t(".reopen"),
+              open_workshop_management_workshop_queues_path(@workshop, service_category_id: @queue.service_category_id),
+              method: :patch,
+              class: "btn-primary cursor-pointer" %>
+      <% end %>
+      <% if @queue.open? %>
+        <%= button_to t(".pause"),
+              pause_workshop_management_workshop_queue_path(@workshop, @queue),
+              method: :patch,
+              class: "inline-flex items-center rounded-lg bg-yellow-50 px-3 py-1.5 text-sm font-medium text-yellow-700 hover:bg-yellow-100 transition-colors cursor-pointer" %>
+      <% end %>
+      <% if @queue.open? || @queue.paused? %>
+        <%= button_to t(".close"),
+              close_workshop_management_workshop_queue_path(@workshop, @queue),
+              method: :patch,
+              class: "inline-flex items-center rounded-lg bg-red-50 px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-100 transition-colors cursor-pointer" %>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<% if @entries.any? %>
+  <div class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+    <table class="w-full">
+      <thead>
+        <tr class="border-b border-gray-100">
+          <th class="px-6 py-3 text-left text-xs text-gray-400 uppercase tracking-wider"><%= t(".col_position") %></th>
+          <th class="px-6 py-3 text-left text-xs text-gray-400 uppercase tracking-wider"><%= t(".col_driver") %></th>
+          <th class="px-6 py-3 text-left text-xs text-gray-400 uppercase tracking-wider"><%= t(".col_car") %></th>
+          <th class="px-6 py-3 text-left text-xs text-gray-400 uppercase tracking-wider"><%= t(".col_status") %></th>
+          <th class="px-6 py-3 text-left text-xs text-gray-400 uppercase tracking-wider"><%= t(".col_wait") %></th>
+          <th class="px-6 py-3"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-50">
+        <% @entries.each do |entry| %>
+          <tr id="<%= dom_id(entry) %>">
+            <td class="px-6 py-3 text-sm font-semibold text-gray-900"><%= entry.position %></td>
+            <td class="px-6 py-3 text-sm text-gray-700"><%= entry.user.full_name || entry.user.email %></td>
+            <td class="px-6 py-3 text-sm text-gray-600"><%= entry.car&.display_name || "—" %></td>
+            <td class="px-6 py-3"><%= queue_entry_status_badge(entry.status) %></td>
+            <td class="px-6 py-3 text-sm text-gray-600">
+              <% if entry.waiting? && entry.estimated_wait_minutes.present? %>
+                ~<%= entry.estimated_wait_minutes %> <%= t(".minutes") %>
+              <% else %>
+                —
+              <% end %>
+            </td>
+            <td class="px-6 py-3 text-right">
+              <div class="flex items-center justify-end gap-2">
+                <% if entry.waiting? %>
+                  <%= button_to t(".call"),
+                        call_workshop_management_workshop_queue_queue_entry_path(@workshop, @queue, entry),
+                        method: :patch,
+                        params: { lock_version: entry.lock_version },
+                        class: "text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors cursor-pointer" %>
+                <% end %>
+                <% if entry.called? %>
+                  <%= button_to t(".serve"),
+                        serve_workshop_management_workshop_queue_queue_entry_path(@workshop, @queue, entry),
+                        method: :patch,
+                        params: { lock_version: entry.lock_version },
+                        class: "text-sm font-medium text-green-600 hover:text-green-800 transition-colors cursor-pointer" %>
+                  <%= button_to t(".no_show"),
+                        no_show_workshop_management_workshop_queue_queue_entry_path(@workshop, @queue, entry),
+                        method: :patch,
+                        params: { lock_version: entry.lock_version },
+                        class: "text-sm font-medium text-red-600 hover:text-red-800 transition-colors cursor-pointer" %>
+                <% end %>
+                <% if entry.in_service? %>
+                  <%= button_to t(".complete"),
+                        complete_workshop_management_workshop_queue_queue_entry_path(@workshop, @queue, entry),
+                        method: :patch,
+                        params: { lock_version: entry.lock_version },
+                        class: "text-sm font-medium text-green-600 hover:text-green-800 transition-colors cursor-pointer" %>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <p class="text-sm text-gray-500"><%= t(".empty") %></p>
+<% end %>
+
+<div class="mt-8">
+  <%= link_to t(".back"), workshop_management_workshop_queues_path(@workshop),
+        class: "text-sm font-medium text-gray-500 hover:text-black transition-colors" %>
+</div>

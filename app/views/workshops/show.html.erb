@@ -15,6 +15,12 @@
     <% if user_signed_in? %>
       <div class="flex items-center gap-2">
         <% if @workshop.active? %>
+          <% @open_queues.each do |queue| %>
+            <%= button_to t(".join_queue"),
+                  queue_entries_path(queue_id: queue.id),
+                  method: :post,
+                  class: "btn-primary cursor-pointer" %>
+          <% end %>
           <%= link_to t(".request_service"), new_service_request_path(workshop_id: @workshop.id),
                 class: "btn-primary" %>
         <% end %>

@@ -27,10 +27,28 @@ Rails.application.routes.draw do
         end
         resource :service_record, only: [:new, :create]
       end
+      resources :queues, only: [:index, :show] do
+        collection do
+          patch :open
+        end
+        member do
+          patch :pause
+          patch :close
+        end
+        resources :queue_entries, only: [] do
+          member do
+            patch :call
+            patch :serve
+            patch :complete
+            patch :no_show
+          end
+        end
+      end
     end
   end
 
   resources :cars
+  resources :queue_entries, only: [:show, :create]
   resources :service_requests, only: [:index, :show, :new, :create]
   resources :car_transfers, only: [:new, :create, :show], param: :token do
     member do

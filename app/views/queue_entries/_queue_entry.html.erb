@@ -1,0 +1,30 @@
+<div id="<%= dom_id(entry) %>" class="max-w-lg mx-auto">
+  <div class="bg-white border border-gray-100 rounded-2xl p-8 shadow-sm text-center">
+    <h1 class="text-2xl font-bold tracking-tight text-gray-900 mb-2"><%= t("queue_entries.show.title") %></h1>
+    <p class="text-sm text-gray-500 mb-8"><%= entry.service_queue.workshop.name %></p>
+
+    <div class="mb-6">
+      <p class="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1"><%= t("queue_entries.show.your_position") %></p>
+      <p class="text-6xl font-bold text-gray-900"><%= entry.position %></p>
+    </div>
+
+    <div class="mb-6">
+      <p class="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1"><%= t("queue_entries.show.status") %></p>
+      <p class="text-lg font-semibold"><%= t("queue_entries.statuses.#{entry.status}") %></p>
+    </div>
+
+    <% if entry.waiting? && entry.estimated_wait_minutes.present? %>
+      <div class="mb-6">
+        <p class="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1"><%= t("queue_entries.show.estimated_wait") %></p>
+        <p class="text-lg font-semibold text-gray-700">~<%= entry.estimated_wait_minutes %> <%= t("queue_entries.show.minutes") %></p>
+      </div>
+    <% end %>
+
+    <% if entry.car.present? %>
+      <div class="mb-6">
+        <p class="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1"><%= t("queue_entries.show.car") %></p>
+        <p class="text-sm text-gray-700"><%= entry.car.display_name %></p>
+      </div>
+    <% end %>
+  </div>
+</div>

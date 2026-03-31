@@ -79,6 +79,35 @@ end
 puts "Seeded example workshop: #{workshop.name}"
 
 # ============================================================
+# Sample Queues
+# ============================================================
+
+[sto, tire, car_wash].each do |category|
+  queue = ServiceQueue.find_or_create_by!(workshop: workshop, service_category: category, date: Date.current) do |q|
+    q.status = :open
+  end
+
+  if queue.queue_entries.empty?
+    # Create sample users for queue entries
+    3.times do |i|
+      user = User.find_or_create_by!(email: "queue-user-#{category.slug}-#{i}@example.com") do |u|
+        u.password = "password"
+        u.confirmed_at = Time.current
+      end
+
+      queue.queue_entries.create!(
+        user: user,
+        position: i + 1,
+        joined_at: Time.current - (3 - i).minutes,
+        estimated_wait_minutes: i * (category == tire ? 45 : 30)
+      )
+    end
+  end
+
+  puts "Seeded queue for #{workshop.name} — #{category.name} (#{queue.queue_entries.count} entries)"
+end
+
+# ============================================================
 # Admin Account
 # ============================================================
 

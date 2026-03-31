@@ -518,7 +518,7 @@
 
 ---
 
-## Phase 11 — Service Records
+## Phase 11 — Service Records [DONE]
 
 ### Task 60: Create ServiceRecord model + migration
 - **Description**: Create `service_records` table: `service_request_id` (fk, unique index), `summary` (text, not null), `recommendations` (text), `performed_by` (string), `odometer_at_service` (int), `parts_used` (jsonb), `labor_cost` (decimal 10,2), `parts_cost` (decimal 10,2), `currency` (string, default "UAH"), `next_service_at_km` (int), `next_service_at_date` (date), `completed_at` (datetime, not null).
@@ -557,7 +557,7 @@
 
 ---
 
-## Phase 12 — Queue System
+## Phase 12 — Queue System [DONE]
 
 ### Task 64: Create Queue model + migration
 - **Description**: Create `queues` table: `workshop_id` (fk), `service_category_id` (fk, nullable), `date` (date, not null), `status` (int, default 0). Unique index on `[workshop_id, service_category_id, date]`.

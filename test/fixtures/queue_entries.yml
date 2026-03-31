@@ -1,0 +1,17 @@
+waiting_entry:
+  queue_id: <%= ActiveRecord::FixtureSet.identify(:open_queue) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:one) %>
+  car_id: <%= ActiveRecord::FixtureSet.identify(:camry) %>
+  position: 1
+  status: 0
+  estimated_wait_minutes: 0
+  joined_at: "<%= Time.current - 30.minutes %>"
+
+waiting_entry_two:
+  queue_id: <%= ActiveRecord::FixtureSet.identify(:open_queue) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:two) %>
+  car_id: <%= ActiveRecord::FixtureSet.identify(:leaf) %>
+  position: 2
+  status: 0
+  estimated_wait_minutes: 45
+  joined_at: "<%= Time.current - 15.minutes %>"

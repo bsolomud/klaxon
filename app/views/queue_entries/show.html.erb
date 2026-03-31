@@ -1,0 +1,9 @@
+<%= turbo_stream_from "queue_#{@queue.id}" %>
+
+<%= render partial: "queue_entries/queue_entry", locals: { entry: @entry } %>
+
+<div class="max-w-lg mx-auto mt-8 text-center">
+  <p class="text-xs text-gray-400 mb-4"><%= t(".joined_at") %>: <%= l(@entry.joined_at, format: :short) %></p>
+  <%= link_to t(".back"), workshop_path(@queue.workshop),
+        class: "text-sm font-medium text-gray-500 hover:text-black transition-colors" %>
+</div>

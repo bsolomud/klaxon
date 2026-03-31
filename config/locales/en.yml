@@ -67,9 +67,31 @@ en:
         other: "%{count} errors prevented this %{resource} from being saved:"
   authorization:
     access_denied: "Access denied"
+  dashboard:
+    index:
+      title: "Dashboard"
+      my_workshops: "My Workshops"
+      manage: "Manage"
+      my_cars: "My Cars"
+      add_car: "Add car"
+      no_cars: "You haven't added any cars yet."
+      view: "View"
+      recent_requests: "Recent Requests"
+      view_all_requests: "View all"
+      col_workshop: "Workshop"
+      col_car: "Car"
+      col_status: "Status"
+      col_date: "Date"
+      no_requests: "No service requests yet."
+      find_workshop: "Find a Workshop"
   layouts:
     application:
       sign_out: "Sign out"
+      nav:
+        workshops: "Workshops"
+        my_cars: "My Cars"
+        my_requests: "My Requests"
+        my_workshops: "My Workshops"
     admin:
       sign_out: "Sign out"
       nav:
@@ -262,6 +284,24 @@ en:
     cancel:
       success: "Transfer request has been cancelled."
       not_authorized: "Only the requester can cancel this transfer."
+  queue_entries:
+    statuses:
+      waiting: "Waiting"
+      called: "Called"
+      in_service: "In Service"
+      completed: "Completed"
+      no_show: "No Show"
+    create:
+      success: "You have joined the queue."
+    show:
+      title: "Your Queue Position"
+      your_position: "Your position"
+      status: "Status"
+      estimated_wait: "Estimated wait"
+      minutes: "min"
+      car: "Car"
+      joined_at: "Joined at"
+      back: "Back to workshop"
   service_requests:
     price_on_request: "Price on request"
     statuses:
@@ -383,6 +423,7 @@ en:
       service_price: "Price"
       service_duration: "Duration"
       request_service: "Request Service"
+      join_queue: "Join Queue"
       back: "Back to workshops"
     new:
       title: "New Workshop"
@@ -486,6 +527,60 @@ en:
         back: "Back to request"
       create:
         success: "Work completed. Service record created."
+    queues:
+      invalid_transition: "This action is not available for the current queue status."
+      statuses:
+        open: "Open"
+        paused: "Paused"
+        closed: "Closed"
+      index:
+        title: "Queues"
+        subtitle: "Today's queues for your workshop"
+        general_queue: "General Queue"
+        entries_count:
+          zero: "No entries"
+          one: "1 entry"
+          other: "%{count} entries"
+        view: "View"
+        empty: "No queues open today."
+        open_queue: "Open Queue"
+      show:
+        general_queue: "General Queue"
+        col_position: "#"
+        col_driver: "Driver"
+        col_car: "Car"
+        col_status: "Status"
+        col_wait: "Est. Wait"
+        minutes: "min"
+        call: "Call"
+        serve: "Serve"
+        complete: "Complete"
+        no_show: "No Show"
+        reopen: "Reopen"
+        pause: "Pause"
+        close: "Close"
+        empty: "No entries in this queue yet."
+        back: "Back to queues"
+      open:
+        success: "Queue opened."
+      pause:
+        success: "Queue paused."
+      close:
+        success: "Queue closed."
+    queue_entries:
+      call:
+        success: "Driver called."
+        stale: "This entry was already updated by another action."
+      serve:
+        success: "Service started."
+        stale: "This entry was already updated by another action."
+      complete:
+        success: "Service completed."
+        stale: "This entry was already updated by another action."
+      no_show:
+        success: "Marked as no-show."
+        stale: "This entry was already updated by another action."
+      invalid_transition: "This action is not available for the current entry status."
     dashboards:
       show:
         title: "Dashboard"

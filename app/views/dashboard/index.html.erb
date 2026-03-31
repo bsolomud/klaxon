@@ -1,0 +1,77 @@
+<div class="space-y-8">
+  <h1 class="text-2xl font-bold"><%= t("dashboard.index.title") %></h1>
+
+  <% if @workshops.any? %>
+    <section>
+      <h2 class="text-lg font-semibold mb-4"><%= t("dashboard.index.my_workshops") %></h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <% @workshops.each do |workshop| %>
+          <div class="bg-white rounded-lg border border-gray-200 p-4">
+            <h3 class="font-medium"><%= workshop.name %></h3>
+            <p class="text-sm text-gray-500 mt-1"><%= workshop.city %></p>
+            <%= link_to t("dashboard.index.manage"), workshop_management_workshop_dashboard_path(workshop), class: "text-sm text-blue-600 hover:text-blue-800 mt-2 inline-block" %>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <section>
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-semibold"><%= t("dashboard.index.my_cars") %></h2>
+      <%= link_to t("dashboard.index.add_car"), new_car_path, class: "text-sm text-blue-600 hover:text-blue-800" %>
+    </div>
+    <% if @cars.any? %>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <% @cars.each do |car| %>
+          <div class="bg-white rounded-lg border border-gray-200 p-4">
+            <h3 class="font-medium"><%= car.make %> <%= car.model %></h3>
+            <p class="text-sm text-gray-500 mt-1"><%= car.year %> &middot; <%= car.license_plate %></p>
+            <%= link_to t("dashboard.index.view"), car_path(car), class: "text-sm text-blue-600 hover:text-blue-800 mt-2 inline-block" %>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-sm text-gray-500"><%= t("dashboard.index.no_cars") %></p>
+    <% end %>
+  </section>
+
+  <section>
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-semibold"><%= t("dashboard.index.recent_requests") %></h2>
+      <%= link_to t("dashboard.index.view_all_requests"), service_requests_path, class: "text-sm text-blue-600 hover:text-blue-800" %>
+    </div>
+    <% if @service_requests.any? %>
+      <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase"><%= t("dashboard.index.col_workshop") %></th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase"><%= t("dashboard.index.col_car") %></th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase"><%= t("dashboard.index.col_status") %></th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase"><%= t("dashboard.index.col_date") %></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            <% @service_requests.each do |request| %>
+              <tr>
+                <td class="px-4 py-3 text-sm"><%= request.workshop.name %></td>
+                <td class="px-4 py-3 text-sm"><%= request.car.make %> <%= request.car.model %></td>
+                <td class="px-4 py-3 text-sm"><%= t("service_requests.statuses.#{request.status}") %></td>
+                <td class="px-4 py-3 text-sm">
+                  <%= link_to l(request.created_at, format: :short), service_request_path(request), class: "text-blue-600 hover:text-blue-800" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <p class="text-sm text-gray-500"><%= t("dashboard.index.no_requests") %></p>
+    <% end %>
+  </section>
+
+  <section class="text-center py-6">
+    <%= link_to t("dashboard.index.find_workshop"), workshops_path, class: "btn-primary inline-block px-6 py-3" %>
+  </section>
+</div>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_29_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_29_100002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -105,6 +105,37 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_000001) do
     t.index "lower((license_plate)::text)", name: "index_cars_on_lower_license_plate", unique: true
     t.index ["user_id"], name: "index_cars_on_user_id"
     t.index ["vin"], name: "index_cars_on_vin", unique: true
+  end
+
+  create_table "queue_entries", force: :cascade do |t|
+    t.datetime "called_at"
+    t.bigint "car_id"
+    t.datetime "created_at", null: false
+    t.integer "estimated_wait_minutes"
+    t.datetime "joined_at", null: false
+    t.integer "lock_version", default: 0, null: false
+    t.integer "position", null: false
+    t.bigint "queue_id", null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["car_id"], name: "index_queue_entries_on_car_id"
+    t.index ["queue_id", "position"], name: "index_queue_entries_on_queue_id_and_position", unique: true
+    t.index ["queue_id", "user_id"], name: "index_queue_entries_active_user_per_queue", unique: true, where: "(status = ANY (ARRAY[0, 1, 2]))"
+    t.index ["queue_id"], name: "index_queue_entries_on_queue_id"
+    t.index ["user_id"], name: "index_queue_entries_on_user_id"
+  end
+
+  create_table "queues", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.date "date", null: false
+    t.bigint "service_category_id"
+    t.integer "status", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "workshop_id", null: false
+    t.index ["service_category_id"], name: "index_queues_on_service_category_id"
+    t.index ["workshop_id", "service_category_id", "date"], name: "index_queues_on_workshop_category_date", unique: true
+    t.index ["workshop_id"], name: "index_queues_on_workshop_id"
   end
 
   create_table "service_categories", force: :cascade do |t|
@@ -252,6 +283,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_000001) do
   add_foreign_key "car_transfers", "users", column: "from_user_id"
   add_foreign_key "car_transfers", "users", column: "to_user_id"
   add_foreign_key "cars", "users"
+  add_foreign_key "queue_entries", "cars"
+  add_foreign_key "queue_entries", "queues"
+  add_foreign_key "queue_entries", "users"
+  add_foreign_key "queues", "service_categories"
+  add_foreign_key "queues", "workshops"
   add_foreign_key "service_records", "service_requests"
   add_foreign_key "service_requests", "cars"
   add_foreign_key "service_requests", "workshop_service_categories"

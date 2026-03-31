@@ -67,9 +67,31 @@ uk:
         other: "%{count} помилок завадили збереженню %{resource}:"
   authorization:
     access_denied: "Доступ заборонено"
+  dashboard:
+    index:
+      title: "Головна"
+      my_workshops: "Мої майстерні"
+      manage: "Керувати"
+      my_cars: "Мої автомобілі"
+      add_car: "Додати авто"
+      no_cars: "Ви ще не додали жодного автомобіля."
+      view: "Переглянути"
+      recent_requests: "Останні запити"
+      view_all_requests: "Всі запити"
+      col_workshop: "Майстерня"
+      col_car: "Автомобіль"
+      col_status: "Статус"
+      col_date: "Дата"
+      no_requests: "Запитів на обслуговування ще немає."
+      find_workshop: "Знайти майстерню"
   layouts:
     application:
       sign_out: "Вихід"
+      nav:
+        workshops: "Майстерні"
+        my_cars: "Мої авто"
+        my_requests: "Мої запити"
+        my_workshops: "Мої майстерні"
     admin:
       sign_out: "Вихід"
       nav:
@@ -262,6 +284,24 @@ uk:
     cancel:
       success: "Запит на передачу скасовано."
       not_authorized: "Тільки заявник може скасувати цю передачу."
+  queue_entries:
+    statuses:
+      waiting: "Очікує"
+      called: "Викликано"
+      in_service: "Обслуговується"
+      completed: "Завершено"
+      no_show: "Не з'явився"
+    create:
+      success: "Ви стали в чергу."
+    show:
+      title: "Ваша позиція в черзі"
+      your_position: "Ваша позиція"
+      status: "Статус"
+      estimated_wait: "Орієнтовний час очікування"
+      minutes: "хв"
+      car: "Автомобіль"
+      joined_at: "Час приєднання"
+      back: "Назад до майстерні"
   service_requests:
     price_on_request: "Ціна за запитом"
     statuses:
@@ -385,6 +425,7 @@ uk:
       service_price: "Ціна"
       service_duration: "Тривалість"
       request_service: "Замовити послугу"
+      join_queue: "Стати в чергу"
       back: "Назад до майстерень"
     new:
       title: "Нова майстерня"
@@ -488,6 +529,62 @@ uk:
         back: "Назад до запиту"
       create:
         success: "Роботу завершено. Запис обслуговування створено."
+    queues:
+      invalid_transition: "Ця дія недоступна для поточного статусу черги."
+      statuses:
+        open: "Відкрита"
+        paused: "Призупинена"
+        closed: "Закрита"
+      index:
+        title: "Черги"
+        subtitle: "Сьогоднішні черги вашої майстерні"
+        general_queue: "Загальна черга"
+        entries_count:
+          zero: "Немає записів"
+          one: "1 запис"
+          few: "%{count} записи"
+          many: "%{count} записів"
+          other: "%{count} записів"
+        view: "Переглянути"
+        empty: "Сьогодні черг немає."
+        open_queue: "Відкрити чергу"
+      show:
+        general_queue: "Загальна черга"
+        col_position: "#"
+        col_driver: "Водій"
+        col_car: "Автомобіль"
+        col_status: "Статус"
+        col_wait: "Очікування"
+        minutes: "хв"
+        call: "Викликати"
+        serve: "Обслужити"
+        complete: "Завершити"
+        no_show: "Не з'явився"
+        reopen: "Відкрити знову"
+        pause: "Призупинити"
+        close: "Закрити"
+        empty: "У цій черзі ще немає записів."
+        back: "Назад до черг"
+      open:
+        success: "Чергу відкрито."
+      pause:
+        success: "Чергу призупинено."
+      close:
+        success: "Чергу закрито."
+    queue_entries:
+      call:
+        success: "Водія викликано."
+        stale: "Цей запис вже оновлено іншою дією."
+      serve:
+        success: "Обслуговування розпочато."
+        stale: "Цей запис вже оновлено іншою дією."
+      complete:
+        success: "Обслуговування завершено."
+        stale: "Цей запис вже оновлено іншою дією."
+      no_show:
+        success: "Відмічено як не з'явився."
+        stale: "Цей запис вже оновлено іншою дією."
+      invalid_transition: "Ця дія недоступна для поточного статусу запису."
     dashboards:
       show:
         title: "Панель керування"

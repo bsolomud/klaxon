@@ -14,6 +14,7 @@ class Workshop < ApplicationRecord
     allow_destroy: true,
     reject_if: proc { |attrs| attrs["_destroy"] == "1" && attrs["id"].blank? }
 
+  has_many :service_queues, foreign_key: :workshop_id, dependent: :destroy
   has_many :service_requests, dependent: :restrict_with_exception
 
   has_many :working_hours, dependent: :destroy
