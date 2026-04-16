@@ -1,0 +1,7 @@
+<%= t("mailers.car_transfer_mailer.expired.heading") %>
+
+<%= t("mailers.car_transfer_mailer.expired.body") %>
+
+<%= t("mailers.car_transfer_mailer.expired.car") %>: <%= "#{@car.make} #{@car.model} (#{@car.year})" %>
+
+<%= t("mailers.car_transfer_mailer.expired.cta") %>: <%= car_transfer_url(@transfer.token) %>

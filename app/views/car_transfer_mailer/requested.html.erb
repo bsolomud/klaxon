@@ -1,0 +1,16 @@
+<h1><%= t("mailers.car_transfer_mailer.requested.heading") %></h1>
+
+<p><%= t("mailers.car_transfer_mailer.requested.body") %></p>
+
+<h3><%= t("mailers.car_transfer_mailer.requested.details") %></h3>
+<ul>
+  <li><strong><%= t("mailers.car_transfer_mailer.requested.car") %>:</strong> <%= "#{@car.make} #{@car.model} (#{@car.year})" %></li>
+  <li><strong><%= t("mailers.car_transfer_mailer.requested.requested_by") %>:</strong> <%= @to_user.email %></li>
+  <li><strong><%= t("mailers.car_transfer_mailer.requested.expires_at") %>:</strong> <%= l(@transfer.expires_at, format: :long) %></li>
+</ul>
+
+<p>
+  <%= link_to t("mailers.car_transfer_mailer.requested.cta"),
+              car_transfer_url(@transfer.token),
+              class: "btn" %>
+</p>

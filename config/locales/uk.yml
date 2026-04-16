@@ -17,6 +17,11 @@ uk:
               not_owned_by_requestor: "не належить вам"
             workshop_service_category:
               not_offered_by_workshop: "не пропонується цією майстернею"
+        review:
+          attributes:
+            service_request:
+              not_completed: "має бути завершеним перед відгуком"
+              not_owned_by_reviewer: "не належить вам"
         workshop_service_category:
           attributes:
             price_max:
@@ -84,6 +89,21 @@ uk:
       col_date: "Дата"
       no_requests: "Запитів на обслуговування ще немає."
       find_workshop: "Знайти майстерню"
+      checklist_title: "Перші кроки"
+      checklist_add_car: "Додати автомобіль"
+      checklist_browse_workshops: "Переглянути майстерні"
+      checklist_submit_request: "Надіслати перший запит на обслуговування"
+      banner_title: "Ласкаво просимо до AULABS!"
+      banner_body: "Почніть з додавання автомобіля або пошуку найближчої майстерні. Ми допоможемо зробити автосервіс простішим."
+      banner_dismiss: "Закрити"
+      welcome_title: "Ласкаво просимо до AULABS!"
+      welcome_body: "Все для вашого авто в одному місці. Почніть з додавання автомобіля, пошуку майстерні або реєстрації свого бізнесу."
+      welcome_add_car: "Додати перший автомобіль"
+      welcome_add_car_hint: "Зареєструйте авто для відстеження історії обслуговування"
+      welcome_find_workshop: "Знайти майстерню"
+      welcome_find_workshop_hint: "Перегляньте автосервіси поблизу"
+      welcome_register_workshop: "Зареєструвати майстерню"
+      welcome_register_workshop_hint: "Розмістіть свій бізнес на AULABS"
   layouts:
     application:
       sign_out: "Вихід"
@@ -97,6 +117,7 @@ uk:
       nav:
         workshops: "Майстерні"
         users: "Користувачі"
+        reviews: "Відгуки"
     workshop:
       sign_out: "Вихід"
       status_active: "Активна"
@@ -155,6 +176,31 @@ uk:
       transition:
         success: "Статус майстерні оновлено."
         invalid_status: "Неможливо виконати цю дію з поточним статусом."
+    reviews:
+      statuses:
+        published: "Опубліковано"
+        hidden: "Приховано"
+        flagged: "Позначено"
+      index:
+        title: "Відгуки"
+        subtitle: "Модерація відгуків користувачів"
+        filter_all: "Усі"
+        filter_published: "Опубліковані"
+        filter_hidden: "Приховані"
+        filter_flagged: "Позначені"
+        col_workshop: "Майстерня"
+        col_user: "Користувач"
+        col_rating: "Оцінка"
+        col_body: "Відгук"
+        col_status: "Статус"
+        col_date: "Дата"
+        col_actions: "Дії"
+        hide: "Приховати"
+        unhide: "Відновити"
+        empty: "Відгуків не знайдено."
+      update:
+        success: "Статус відгуку оновлено."
+        invalid_status: "Недопустимий статус."
     users:
       index:
         title: "Користувачі"
@@ -196,6 +242,7 @@ uk:
       subtitle: "Ваші зареєстровані транспортні засоби"
       add_car: "Додати авто"
       empty: "Ви ще не додали жодного автомобіля."
+      empty_title: "Автомобілів ще немає"
     show:
       details: "Деталі"
       make: "Марка"
@@ -302,6 +349,7 @@ uk:
       car: "Автомобіль"
       joined_at: "Час приєднання"
       back: "Назад до майстерні"
+      you_are_up: "Ваша черга! Прямуйте до майстерні."
   service_requests:
     price_on_request: "Ціна за запитом"
     statuses:
@@ -314,6 +362,8 @@ uk:
       title: "Мої запити на обслуговування"
       subtitle: "Ваші запити до майстерень"
       empty: "У вас ще немає запитів на обслуговування."
+      empty_title: "Запитів ще немає"
+      find_workshop: "Знайти майстерню"
       col_workshop: "Майстерня"
       col_service: "Послуга"
       col_status: "Статус"
@@ -330,6 +380,7 @@ uk:
       price: "Ціна"
       status: "Статус"
       created_at: "Створено"
+      leave_review: "Залишити відгук"
       back: "Назад до запитів"
     new:
       title: "Замовити послугу"
@@ -393,6 +444,7 @@ uk:
       decline_reason: "Причина"
       manage: "Керувати"
       empty: "У вас ще немає майстерень."
+      empty_title: "Майстерень ще немає"
   workshops:
     index:
       title: "Майстерні"
@@ -402,6 +454,9 @@ uk:
       open_now_filter: "Зараз відчинено"
       open_now: "Зараз відчинено"
       closed_now: "Зачинено"
+      no_reviews: "Відгуків ще немає"
+      search_placeholder: "Пошук..."
+      search_button: "Знайти"
       empty: "Майстерень не знайдено."
     show:
       open_now: "Зараз відчинено"
@@ -426,6 +481,15 @@ uk:
       service_duration: "Тривалість"
       request_service: "Замовити послугу"
       join_queue: "Стати в чергу"
+      reviews: "Відгуки"
+      reviews_count:
+        zero: "відгуків немає"
+        one: "1 відгук"
+        few: "%{count} відгуки"
+        many: "%{count} відгуків"
+        other: "%{count} відгуків"
+      no_photos: "Фото ще немає"
+      no_reviews: "Відгуків ще немає."
       back: "Назад до майстерень"
     new:
       title: "Нова майстерня"
@@ -452,6 +516,8 @@ uk:
       media: "Логотип та фото"
       logo: "Логотип"
       photos: "Фото"
+      photos_hint: "Нові фото буде додано до існуючих."
+      photos_drop: "Натисніть або перетягніть фото сюди"
       price_min: "Мін. ціна"
       price_max: "Макс. ціна"
       price_unit: "Одиниця ціни"
@@ -705,3 +771,136 @@ uk:
       password_change:
         greeting: "Вітаємо %{email}!"
         message: "Повідомляємо, що ваш пароль було змінено."
+  mailers:
+    footer:
+      tagline: "AULABS — автосервіс по-новому."
+      disclaimer: "Ви отримали цей лист, оскільки маєте обліковий запис на AULABS. Якщо ви вважаєте, що лист надіслано помилково, проігноруйте його."
+    workshop_mailer:
+      approved:
+        subject: "Майстерню схвалено: %{name}"
+        heading: "Вашу майстерню схвалено"
+        body: "Чудові новини! Ваша майстерня %{name} схвалена та доступна на AULABS."
+        body_html: "Чудові новини! Ваша майстерня %{name} схвалена та доступна на AULABS."
+        cta: "Керувати майстернею"
+      declined:
+        subject: "Майстерню відхилено: %{name}"
+        heading: "Подання вашої майстерні відхилено"
+        body: "На жаль, ваша майстерня %{name} не може бути схвалена наразі."
+        body_html: "На жаль, ваша майстерня %{name} не може бути схвалена наразі."
+        reason_label: "Причина"
+        cta: "Мої майстерні"
+    service_request_mailer:
+      created:
+        subject: "Новий запит на обслуговування для %{workshop}"
+        heading: "Надіслано новий запит на обслуговування"
+        body: "Водій надіслав новий запит на обслуговування для вашої майстерні."
+        details: "Деталі запиту"
+        car: "Автомобіль"
+        service: "Послуга"
+        driver: "Водій"
+        preferred_time: "Бажаний час"
+        price: "Ціна"
+        cta: "Переглянути запит"
+      accepted:
+        subject: "Ваш запит на обслуговування прийнято"
+        heading: "Ваш запит прийнято"
+        body: "%{workshop} прийняла ваш запит. Ви отримаєте повідомлення, коли робота розпочнеться."
+        cta: "Мій запит"
+      rejected:
+        subject: "Ваш запит на обслуговування відхилено"
+        heading: "Ваш запит відхилено"
+        body: "%{workshop} не може прийняти цей запит наразі."
+        cta: "Мій запит"
+      started:
+        subject: "Розпочато роботу над вашим запитом"
+        heading: "Роботу розпочато"
+        body: "%{workshop} розпочала роботу над вашим запитом."
+        cta: "Мій запит"
+      completed:
+        subject: "Ваше обслуговування завершено"
+        heading: "Обслуговування завершено"
+        body: "%{workshop} завершила роботу над вашим автомобілем. Повний запис з'явився у вашій історії."
+        cta: "Переглянути запис"
+    car_transfer_mailer:
+      requested:
+        subject: "Запит на передачу вашого автомобіля"
+        heading: "Надіслано запит на передачу"
+        body: "Інший користувач запитує передачу права власності на ваш автомобіль."
+        details: "Деталі передачі"
+        car: "Автомобіль"
+        requested_by: "Запитувач"
+        expires_at: "Дійсний до"
+        cta: "Переглянути запит"
+      approved:
+        subject: "Право власності на автомобіль передано"
+        heading: "Ви новий власник"
+        body: "Передачу схвалено. Автомобіль тепер у вашому гаражі."
+        car: "Автомобіль"
+        cta: "Мої автомобілі"
+      rejected:
+        subject: "Запит на передачу відхилено"
+        heading: "Передачу відхилено"
+        body: "Ваш запит на передачу відхилено поточним власником."
+        car: "Автомобіль"
+        cta: "Переглянути передачу"
+      cancelled:
+        subject: "Запит на передачу скасовано"
+        heading: "Передачу скасовано"
+        body: "Запит на передачу скасовано."
+        car: "Автомобіль"
+        cta: "Переглянути передачу"
+      expired:
+        subject: "Термін запиту на передачу закінчився"
+        heading: "Термін дії минув"
+        body: "Запит на передачу прострочено без жодної дії."
+        car: "Автомобіль"
+        cta: "Переглянути передачу"
+    queue_mailer:
+      called:
+        subject: "Ваша черга! %{workshop}"
+        heading: "Зараз ваша черга!"
+        body: "Прямуйте до %{workshop} — вас готові прийняти."
+        position: "Позиція"
+        address: "Адреса"
+        cta: "Переглянути чергу"
+  reviews:
+    new:
+      title: "Залишити відгук"
+      rating: "Оцінка"
+      body: "Ваш відгук"
+      body_placeholder: "Поділіться враженнями..."
+      submit: "Надіслати відгук"
+      cancel: "Скасувати"
+    create:
+      success: "Дякуємо за ваш відгук!"
+      already_reviewed: "Ви вже залишили відгук на цю послугу."
+  notifications:
+    index:
+      title: "Сповіщення"
+      subtitle: "Нещодавня активність у вашому акаунті"
+      empty: "Ще немає сповіщень."
+      mark_all_read: "Позначити всі прочитаними"
+      view: "Відкрити"
+      col_event: "Подія"
+      col_date: "Дата"
+    update:
+      success: "Сповіщення позначено як прочитане."
+    update_all:
+      success: "Всі сповіщення позначено як прочитані."
+    events:
+      workshop_approved: "Майстерню схвалено"
+      workshop_declined: "Майстерню відхилено"
+      service_request_created: "Новий запит на обслуговування"
+      service_request_accepted: "Запит на обслуговування прийнято"
+      service_request_rejected: "Запит на обслуговування відхилено"
+      service_request_started: "Обслуговування розпочато"
+      service_request_completed: "Обслуговування завершено"
+      car_transfer_requested: "Запит на передачу авто"
+      car_transfer_approved: "Передачу авто схвалено"
+      car_transfer_rejected: "Передачу авто відхилено"
+      car_transfer_cancelled: "Передачу авто скасовано"
+      car_transfer_expired: "Термін передачі минув"
+      queue_called: "Ваша черга"
+    bell:
+      label: "Сповіщення"
+      unread_title: "%{count} непрочитаних сповіщень"

@@ -711,6 +711,20 @@ Phase 11 (Tasks 60-63): Service Records ←── depends on Phase 10
 Phase 12 (Tasks 64-74): Queue System ←── depends on Phase 6
     ↓
 Phase 13 (Tasks 75-77): Dashboard + Nav ←── depends on all above
+    ↓
+Phase 14 (Tasks 78-89): Mailers & Notifications [P0] ←── depends on Phase 4 + 8 + 10 + 12
+    ↓
+Phase 15 (Tasks 90-95): Real-time Turbo Streams [P0] ←── depends on Phase 12
+    ↓
+Phase 16 (Tasks 96-102): Reviews & Ratings [P1] ←── depends on Phase 11
+    ↓
+Phase 17 (Tasks 103-110): Search, Sort, Pagination [P1] ←── depends on Phase 5 + 16
+    ↓
+Phase 18 (Tasks 111-114): Onboarding & Empty States [P2] ←── depends on Phase 13
+    ↓
+Phase 19 (Tasks 115-118): Workshop Photo Gallery [P2] ←── depends on Phase 5
+    ↓
+Phase 20 (Tasks 119-125): System Tests & Mobile Polish [P2] ←── depends on all above
 ```
 
 ### Parallelizable Phases
@@ -718,3 +732,8 @@ Phase 13 (Tasks 75-77): Dashboard + Nav ←── depends on all above
 - **Phase 7** can start as soon as Phase 1 is done (parallel with Phase 3-6)
 - **Phase 8** can run in parallel with Phase 9 (both depend on Phase 7, but not on each other)
 - **Phase 12** can start as soon as Phase 6 is done (parallel with Phase 9-11)
+- **Phase 14 + Phase 15** are both P0 and can run in parallel (mailers and real-time are independent concerns)
+- **Phase 16 + Phase 19** can run in parallel (both depend only on earlier phases, not on each other)
+- **Phase 17** depends on Phase 16 for the `min_rating` filter; pagination parts can be done earlier
+- **Phase 18** can start anytime after Phase 13
+- **Phase 20** is the final quality gate — run last, after all other phases

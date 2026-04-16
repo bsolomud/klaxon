@@ -43,7 +43,11 @@ class CarTransfersControllerTest < ActionDispatch::IntegrationTest
     @transfer.cancelled!
 
     assert_difference ["CarTransfer.count", "CarTransferEvent.count"], 1 do
-      post car_transfers_path, params: { car_transfer: { vin: @car_with_vin.vin } }
+      assert_difference "Notification.count", 1 do
+        assert_enqueued_emails 1 do
+          post car_transfers_path, params: { car_transfer: { vin: @car_with_vin.vin } }
+        end
+      end
     end
 
     transfer = CarTransfer.last
@@ -57,6 +61,11 @@ class CarTransfersControllerTest < ActionDispatch::IntegrationTest
     event = CarTransferEvent.last
     assert event.transfer_requested?
     assert_equal @user, event.actor
+
+    notification = Notification.last
+    assert_equal @other_user, notification.user
+    assert_equal transfer, notification.notifiable
+    assert notification.car_transfer_requested?
 
     assert_redirected_to car_transfer_path(transfer)
   end
@@ -133,12 +142,20 @@ class CarTransfersControllerTest < ActionDispatch::IntegrationTest
     @car_with_vin.car_ownership_records.create!(user: @other_user, started_at: 6.months.ago)
 
     assert_difference "CarOwnershipRecord.count", 1 do
-      patch approve_car_transfer_path(token: @transfer.token)
+      assert_difference "Notification.count", 1 do
+        assert_enqueued_emails 1 do
+          patch approve_car_transfer_path(token: @transfer.token)
+        end
+      end
     end
 
     @transfer.reload
     assert @transfer.approved?
     assert_equal @user.id, @car_with_vin.reload.user_id
+
+    notification = Notification.last
+    assert_equal @user, notification.user
+    assert notification.car_transfer_approved?
 
     assert_redirected_to car_transfer_path(token: @transfer.token)
     assert_equal I18n.t("car_transfers.approve.success"), flash[:notice]
@@ -175,10 +192,19 @@ class CarTransfersControllerTest < ActionDispatch::IntegrationTest
     sign_in @other_user # from_user
 
     assert_difference "CarTransferEvent.count", 1 do
-      patch reject_car_transfer_path(token: @transfer.token)
+      assert_difference "Notification.count", 1 do
+        assert_enqueued_emails 1 do
+          patch reject_car_transfer_path(token: @transfer.token)
+        end
+      end
     end
 
     assert @transfer.reload.rejected?
+
+    notification = Notification.last
+    assert_equal @user, notification.user # to_user notified
+    assert notification.car_transfer_rejected?
+
     assert_redirected_to car_transfer_path(token: @transfer.token)
     assert_equal I18n.t("car_transfers.reject.success"), flash[:notice]
   end
@@ -202,10 +228,19 @@ class CarTransfersControllerTest < ActionDispatch::IntegrationTest
 
   test "cancel changes status and creates event" do
     assert_difference "CarTransferEvent.count", 1 do
-      patch cancel_car_transfer_path(token: @transfer.token)
+      assert_difference "Notification.count", 1 do
+        assert_enqueued_emails 1 do
+          patch cancel_car_transfer_path(token: @transfer.token)
+        end
+      end
     end
 
     assert @transfer.reload.cancelled?
+
+    notification = Notification.last
+    assert_equal @other_user, notification.user # from_user notified
+    assert notification.car_transfer_cancelled?
+
     assert_redirected_to car_transfer_path(token: @transfer.token)
     assert_equal I18n.t("car_transfers.cancel.success"), flash[:notice]
   end

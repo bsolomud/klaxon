@@ -62,4 +62,33 @@ class UserTest < ActiveSupport::TestCase
     @user.update_columns(first_name: nil, last_name: nil)
     assert_nil @user.full_name
   end
+
+  test "show_welcome_banner? returns true for new user" do
+    user = users(:brand_new_user)
+    assert user.show_welcome_banner?
+  end
+
+  test "show_welcome_banner? returns false after dismissal" do
+    user = users(:brand_new_user)
+    user.dismiss_welcome_banner!
+    assert_not user.show_welcome_banner?
+  end
+
+  test "show_welcome_banner? returns false for user older than 7 days" do
+    user = users(:brand_new_user)
+    user.update_columns(created_at: 8.days.ago)
+    assert_not user.show_welcome_banner?
+  end
+
+  test "dismiss_welcome_banner! sets flags" do
+    user = users(:brand_new_user)
+    user.dismiss_welcome_banner!
+    assert_equal true, user.onboarding_flags["welcome_dismissed"]
+    assert user.onboarding_flags["welcome_dismissed_at"].present?
+  end
+
+  test "onboarding_flags defaults to empty hash" do
+    user = User.new
+    assert_equal({}, user.onboarding_flags)
+  end
 end

@@ -125,4 +125,23 @@ class WorkshopManagement::ServiceRecordsControllerTest < ActionDispatch::Integra
     get workshop_management_workshop_service_request_path(@workshop, @in_progress_request)
     assert_select "a", text: I18n.t("workshop_management.service_requests.show.complete")
   end
+
+  test "create enqueues completed email and notification" do
+    sign_in @owner
+    driver = @in_progress_request.car.user
+    assert_enqueued_email_with ServiceRequestMailer, :completed, params: { service_request: @in_progress_request } do
+      assert_difference -> { Notification.where(user: driver, notifiable: @in_progress_request, event: :service_request_completed).count }, 1 do
+        post workshop_management_workshop_service_request_service_record_path(@workshop, @in_progress_request),
+             params: { service_record: { summary: "Готово", odometer_at_service: 60000 } }
+      end
+    end
+  end
+
+  test "create does not enqueue completed email on validation error" do
+    sign_in @owner
+    assert_no_enqueued_emails do
+      post workshop_management_workshop_service_request_service_record_path(@workshop, @in_progress_request),
+           params: { service_record: { summary: "" } }
+    end
+  end
 end

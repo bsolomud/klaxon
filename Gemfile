@@ -63,6 +63,9 @@ end
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
+
+  # Open emails sent in development in the browser at /dev/letters
+  gem "letter_opener_web", "~> 3.0"
 end
 
 group :test do
@@ -76,3 +79,4 @@ gem "devise", "~> 5.0"
 gem "omniauth"
 gem "omniauth-rails_csrf_protection"
 gem "geocoder", "~> 1.8"
+gem "pagy", "~> 9.0"

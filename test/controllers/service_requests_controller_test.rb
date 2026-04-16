@@ -102,6 +102,33 @@ class ServiceRequestsControllerTest < ActionDispatch::IntegrationTest
     assert sr.price_snapshot.present?
   end
 
+  test "create enqueues created email and creates notifications for operators" do
+    operator_ids = @workshop.workshop_operators.pluck(:user_id)
+    assert_enqueued_emails 1 do
+      assert_difference -> { Notification.where(event: :service_request_created, user_id: operator_ids).count }, operator_ids.size do
+        post service_requests_path, params: { service_request: {
+          car_id: cars(:camry).id,
+          workshop_id: @workshop.id,
+          workshop_service_category_id: @wsc.id,
+          description: "Notify test",
+          preferred_time: 2.days.from_now
+        } }
+      end
+    end
+  end
+
+  test "create does not enqueue email on validation error" do
+    assert_no_enqueued_emails do
+      post service_requests_path, params: { service_request: {
+        car_id: cars(:camry).id,
+        workshop_id: @workshop.id,
+        workshop_service_category_id: @wsc.id,
+        description: "",
+        preferred_time: nil
+      } }
+    end
+  end
+
   test "create re-renders form on validation error" do
     assert_no_difference "ServiceRequest.count" do
       post service_requests_path, params: { service_request: {

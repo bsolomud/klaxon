@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  mount LetterOpenerWeb::Engine, at: "/dev/letters" if Rails.env.development?
+
   devise_for :users, controllers: {
     registrations: "users/registrations"
   }
@@ -12,6 +14,7 @@ Rails.application.routes.draw do
       end
     end
     resources :users, only: %i[index show]
+    resources :reviews, only: %i[index update]
   end
 
   get "up" => "rails/health#show", as: :rails_health_check
@@ -47,9 +50,17 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :notifications, only: [:index, :update] do
+    collection do
+      patch :update_all
+    end
+  end
+
   resources :cars
   resources :queue_entries, only: [:show, :create]
-  resources :service_requests, only: [:index, :show, :new, :create]
+  resources :service_requests, only: [:index, :show, :new, :create] do
+    resource :review, only: [:new, :create]
+  end
   resources :car_transfers, only: [:new, :create, :show], param: :token do
     member do
       patch :approve
@@ -60,6 +71,7 @@ Rails.application.routes.draw do
   resources :service_categories
   resources :workshops
   resources :my_workshops, only: [:index]
+  resource :onboarding, only: [:update], controller: "onboarding"
 
   root "dashboard#index"
 end

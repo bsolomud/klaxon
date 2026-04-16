@@ -2,7 +2,7 @@ class CarsController < ApplicationController
   before_action :set_car, only: [:show, :edit, :update, :destroy]
 
   def index
-    @cars = current_user.cars.order(created_at: :desc)
+    @pagy, @cars = pagy(current_user.cars.order(created_at: :desc), limit: 10)
   end
 
   def show

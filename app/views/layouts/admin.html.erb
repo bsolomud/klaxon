@@ -13,20 +13,38 @@
   </head>
 
   <body class="h-full antialiased font-sans">
-    <header class="bg-black text-white">
+    <header class="bg-black text-white" data-controller="toggle">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex h-14 items-center justify-between">
         <div class="flex items-center gap-6">
           <div class="font-bold tracking-tighter text-lg">AULABS <span class="text-gray-400 font-normal text-sm">admin</span></div>
-          <nav class="flex items-center gap-4">
+          <nav class="hidden sm:flex items-center gap-4">
             <%= link_to t("layouts.admin.nav.workshops"), admin_workshops_path, class: "text-sm text-gray-400 hover:text-white transition-colors" %>
             <%= link_to t("layouts.admin.nav.users"), admin_users_path, class: "text-sm text-gray-400 hover:text-white transition-colors" %>
+            <%= link_to t("layouts.admin.nav.reviews"), admin_reviews_path, class: "text-sm text-gray-400 hover:text-white transition-colors" %>
           </nav>
         </div>
-        <nav class="flex items-center gap-4">
-          <span class="text-sm text-gray-500"><%= current_admin.email if admin_signed_in? %></span>
-          <%= button_to t("layouts.admin.sign_out"), destroy_admin_session_path, method: :delete, class: "text-sm text-gray-400 hover:text-white transition-colors" if admin_signed_in? %>
-        </nav>
+        <div class="flex items-center gap-4">
+          <span class="hidden sm:inline text-sm text-gray-500"><%= current_admin.email if admin_signed_in? %></span>
+          <%= button_to t("layouts.admin.sign_out"), destroy_admin_session_path, method: :delete, class: "hidden sm:inline text-sm text-gray-400 hover:text-white transition-colors" if admin_signed_in? %>
+          <button data-action="toggle#toggle" data-toggle-target-value="admin-mobile-nav" type="button" class="sm:hidden text-gray-400 hover:text-white" aria-label="Menu">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+          </button>
+        </div>
       </div>
+
+      <nav id="admin-mobile-nav" class="hidden sm:hidden border-t border-gray-800 px-4 pb-3 pt-2 space-y-1">
+        <%= link_to t("layouts.admin.nav.workshops"), admin_workshops_path, class: "block rounded-lg px-3 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800" %>
+        <%= link_to t("layouts.admin.nav.users"), admin_users_path, class: "block rounded-lg px-3 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800" %>
+        <%= link_to t("layouts.admin.nav.reviews"), admin_reviews_path, class: "block rounded-lg px-3 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800" %>
+        <% if admin_signed_in? %>
+          <div class="border-t border-gray-800 pt-2 mt-2">
+            <span class="block px-3 py-1 text-xs text-gray-500"><%= current_admin.email %></span>
+            <%= button_to t("layouts.admin.sign_out"), destroy_admin_session_path, method: :delete, class: "block w-full text-left rounded-lg px-3 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800" %>
+          </div>
+        <% end %>
+      </nav>
     </header>
 
     <main class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">

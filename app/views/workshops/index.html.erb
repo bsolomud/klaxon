@@ -1,4 +1,4 @@
-<div class="mb-8 flex items-center justify-between">
+<div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
   <div>
     <h1 class="text-2xl font-bold tracking-tight text-gray-900"><%= t(".title") %></h1>
     <p class="mt-1 text-sm text-gray-500"><%= t(".subtitle") %></p>
@@ -9,9 +9,23 @@
   <% end %>
 </div>
 
+<%# Search %>
+<div class="mb-6">
+  <%= form_with url: workshops_path, method: :get, class: "flex gap-2" do %>
+    <% request.query_parameters.except("q", "page").each do |key, value| %>
+      <%= hidden_field_tag key, value %>
+    <% end %>
+    <%= text_field_tag :q, params[:q],
+          placeholder: t(".search_placeholder"),
+          class: "flex-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-black focus:ring-1 focus:ring-black" %>
+    <%= submit_tag t(".search_button"), class: "btn-primary !w-auto" %>
+  <% end %>
+</div>
+
 <%# Filters %>
 <%
   filters = [
+    { key: "q",        label: params[:q],       bg: "bg-blue-100",  text: "text-blue-700", icon_color: "text-blue-400 hover:text-blue-600" },
     { key: "city",     label: params[:city],    bg: "bg-gray-100",  text: "text-gray-700", icon_color: "text-gray-400 hover:text-gray-600" },
     { key: "country",  label: params[:country],  bg: "bg-gray-100",  text: "text-gray-700", icon_color: "text-gray-400 hover:text-gray-600" },
     { key: "category", label: params[:category], bg: "bg-gray-100",  text: "text-gray-700", icon_color: "text-gray-400 hover:text-gray-600" },
@@ -41,3 +55,5 @@
     <p class="text-sm text-gray-500"><%= t(".empty") %></p>
   </div>
 <% end %>
+
+<%= render "shared/pagy_nav", pagy: @pagy %>

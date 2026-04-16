@@ -17,7 +17,10 @@ class QueueEntry < ApplicationRecord
   scope :active, -> { where(status: [:waiting, :called, :in_service]) }
 
   after_create :recompute_wait_estimates
-  after_update_commit :broadcast_queue_update, if: :saved_change_to_status?
+  after_create_commit :broadcast_entry_created
+  after_update_commit :broadcast_entry_updated, if: :saved_change_to_status?
+  after_update_commit :broadcast_sibling_wait_estimates, if: :saved_change_to_status?
+  after_destroy_commit :broadcast_entry_removed
 
   def recompute_wait_estimates
     queue = service_queue
@@ -26,20 +29,66 @@ class QueueEntry < ApplicationRecord
                     &.find_by(workshop_id: queue.workshop_id)
                     &.estimated_duration_minutes || 30
 
-    waiting_entries = queue.queue_entries.waiting.order(:position).pluck(:id)
-    waiting_entries.each_with_index do |entry_id, index|
-      QueueEntry.where(id: entry_id).update_all(estimated_wait_minutes: index * duration)
-    end
+    waiting_ids = queue.queue_entries.waiting.order(:position).pluck(:id)
+    return if waiting_ids.empty?
+
+    cases = waiting_ids.each_with_index.map { |id, i| "WHEN #{id} THEN #{i * duration}" }
+    queue.queue_entries.where(id: waiting_ids).update_all(
+      "estimated_wait_minutes = CASE id #{cases.join(' ')} END"
+    )
   end
 
   private
 
-  def broadcast_queue_update
+  def broadcast_entry_created
+    broadcast_append_to(
+      "queue_#{queue_id}_drivers",
+      target: "queue_entries",
+      partial: "queue_entries/queue_entry",
+      locals: { entry: self }
+    )
+    broadcast_append_to(
+      "queue_#{queue_id}_operators",
+      target: "operator_queue_entries",
+      partial: "workshop_management/queue_entries/queue_entry",
+      locals: { entry: self }
+    )
+  end
+
+  def broadcast_entry_updated
     broadcast_replace_to(
-      "queue_#{queue_id}",
+      "queue_#{queue_id}_drivers",
       target: ActionView::RecordIdentifier.dom_id(self),
       partial: "queue_entries/queue_entry",
       locals: { entry: self }
     )
+    broadcast_replace_to(
+      "queue_#{queue_id}_operators",
+      target: ActionView::RecordIdentifier.dom_id(self, :operator),
+      partial: "workshop_management/queue_entries/queue_entry",
+      locals: { entry: self }
+    )
+  end
+
+  def broadcast_entry_removed
+    broadcast_remove_to("queue_#{queue_id}_drivers", target: ActionView::RecordIdentifier.dom_id(self))
+    broadcast_remove_to("queue_#{queue_id}_operators", target: ActionView::RecordIdentifier.dom_id(self, :operator))
+  end
+
+  def broadcast_sibling_wait_estimates
+    service_queue.queue_entries.waiting.where.not(id: id).find_each do |entry|
+      entry.broadcast_replace_to(
+        "queue_#{queue_id}_drivers",
+        target: ActionView::RecordIdentifier.dom_id(entry),
+        partial: "queue_entries/queue_entry",
+        locals: { entry: entry }
+      )
+      entry.broadcast_replace_to(
+        "queue_#{queue_id}_operators",
+        target: ActionView::RecordIdentifier.dom_id(entry, :operator),
+        partial: "workshop_management/queue_entries/queue_entry",
+        locals: { entry: entry }
+      )
+    end
   end
 end

@@ -6,6 +6,7 @@ class ServiceRequest < ApplicationRecord
   belongs_to :workshop_service_category
 
   has_one :service_record, dependent: :destroy
+  has_one :review, dependent: :destroy
 
   enum :status, { pending: 0, accepted: 1, rejected: 2, in_progress: 3, completed: 4 }
 
@@ -13,6 +14,7 @@ class ServiceRequest < ApplicationRecord
   validates :preferred_time, presence: true
 
   before_create :snapshot_price
+  after_update_commit :broadcast_status_change, if: :saved_change_to_status?
 
   validate :service_offered_by_workshop
 
@@ -47,5 +49,20 @@ class ServiceRequest < ApplicationRecord
     if workshop_service_category.workshop_id != workshop_id
       errors.add(:workshop_service_category, :not_offered_by_workshop)
     end
+  end
+
+  def broadcast_status_change
+    broadcast_replace_to(
+      "user_#{car.user_id}_requests",
+      target: ActionView::RecordIdentifier.dom_id(self),
+      partial: "service_requests/service_request",
+      locals: { service_request: self }
+    )
+    broadcast_replace_to(
+      "workshop_#{workshop_id}_requests",
+      target: ActionView::RecordIdentifier.dom_id(self, :workshop),
+      partial: "workshop_management/service_requests/service_request",
+      locals: { service_request: self }
+    )
   end
 end

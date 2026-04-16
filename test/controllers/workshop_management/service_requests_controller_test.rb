@@ -242,4 +242,52 @@ class WorkshopManagement::ServiceRequestsControllerTest < ActionDispatch::Integr
     assert_equal I18n.t("workshop_management.service_requests.invalid_transition"), flash[:alert]
     assert @pending_request.reload.pending?
   end
+
+  # === Mailer / notification side effects ===
+
+  test "accept enqueues accepted email and notification" do
+    sign_in @owner
+    assert_enqueued_email_with ServiceRequestMailer, :accepted, params: { service_request: @pending_request } do
+      assert_difference -> { Notification.where(notifiable: @pending_request, event: :service_request_accepted).count }, 1 do
+        patch accept_workshop_management_workshop_service_request_path(@workshop, @pending_request),
+              params: { lock_version: @pending_request.lock_version }
+      end
+    end
+  end
+
+  test "reject enqueues rejected email and notification" do
+    sign_in @owner
+    assert_enqueued_email_with ServiceRequestMailer, :rejected, params: { service_request: @pending_request } do
+      assert_difference -> { Notification.where(notifiable: @pending_request, event: :service_request_rejected).count }, 1 do
+        patch reject_workshop_management_workshop_service_request_path(@workshop, @pending_request),
+              params: { lock_version: @pending_request.lock_version }
+      end
+    end
+  end
+
+  test "start enqueues started email and notification" do
+    sign_in @owner
+    assert_enqueued_email_with ServiceRequestMailer, :started, params: { service_request: @accepted_request } do
+      assert_difference -> { Notification.where(notifiable: @accepted_request, event: :service_request_started).count }, 1 do
+        patch start_workshop_management_workshop_service_request_path(@workshop, @accepted_request),
+              params: { lock_version: @accepted_request.lock_version }
+      end
+    end
+  end
+
+  test "accept does not enqueue email on stale object error" do
+    sign_in @owner
+    assert_no_enqueued_emails do
+      patch accept_workshop_management_workshop_service_request_path(@workshop, @pending_request),
+            params: { lock_version: @pending_request.lock_version + 999 }
+    end
+  end
+
+  test "accept does not enqueue email on invalid state" do
+    sign_in @owner
+    assert_no_enqueued_emails do
+      patch accept_workshop_management_workshop_service_request_path(@workshop, @accepted_request),
+            params: { lock_version: @accepted_request.lock_version }
+    end
+  end
 end

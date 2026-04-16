@@ -1,0 +1,7 @@
+<h1><%= t("mailers.workshop_mailer.approved.heading") %></h1>
+
+<p><%= t("mailers.workshop_mailer.approved.body_html", name: tag.strong(@workshop.name)) %></p>
+
+<p>
+  <%= link_to t("mailers.workshop_mailer.approved.cta"), my_workshops_url, class: "btn" %>
+</p>

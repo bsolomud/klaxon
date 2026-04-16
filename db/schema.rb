@@ -10,9 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_29_100002) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_14_194219) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+  enable_extension "pg_trgm"
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
@@ -107,6 +108,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_100002) do
     t.index ["vin"], name: "index_cars_on_vin", unique: true
   end
 
+  create_table "notifications", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "event", null: false
+    t.bigint "notifiable_id", null: false
+    t.string "notifiable_type", null: false
+    t.datetime "read_at"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable"
+    t.index ["user_id", "read_at"], name: "index_notifications_on_user_id_and_read_at"
+    t.index ["user_id"], name: "index_notifications_on_user_id"
+  end
+
   create_table "queue_entries", force: :cascade do |t|
     t.datetime "called_at"
     t.bigint "car_id"
@@ -136,6 +150,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_100002) do
     t.index ["service_category_id"], name: "index_queues_on_service_category_id"
     t.index ["workshop_id", "service_category_id", "date"], name: "index_queues_on_workshop_category_date", unique: true
     t.index ["workshop_id"], name: "index_queues_on_workshop_id"
+  end
+
+  create_table "reviews", force: :cascade do |t|
+    t.text "body"
+    t.datetime "created_at", null: false
+    t.integer "rating", null: false
+    t.bigint "service_request_id", null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.bigint "workshop_id", null: false
+    t.index ["service_request_id"], name: "index_reviews_on_service_request_id", unique: true
+    t.index ["user_id"], name: "index_reviews_on_user_id"
+    t.index ["workshop_id", "status"], name: "index_reviews_on_workshop_id_and_status"
   end
 
   create_table "service_categories", force: :cascade do |t|
@@ -198,6 +226,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_100002) do
     t.string "last_sign_in_ip"
     t.datetime "locked_at"
     t.string "middle_name"
+    t.jsonb "onboarding_flags", default: {}, null: false
     t.string "phone_number"
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
@@ -255,6 +284,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_100002) do
 
   create_table "workshops", force: :cascade do |t|
     t.string "address", null: false
+    t.decimal "avg_rating", precision: 3, scale: 2
     t.string "city", null: false
     t.string "country", null: false
     t.datetime "created_at", null: false
@@ -265,10 +295,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_100002) do
     t.decimal "longitude", precision: 10, scale: 7
     t.string "name", null: false
     t.string "phone", null: false
+    t.integer "review_count", default: 0, null: false
     t.integer "status", default: 0, null: false
     t.datetime "updated_at", null: false
+    t.index ["address"], name: "index_workshops_on_address_trgm", opclass: :gin_trgm_ops, using: :gin
     t.index ["city"], name: "index_workshops_on_city"
     t.index ["country"], name: "index_workshops_on_country"
+    t.index ["name"], name: "index_workshops_on_name_trgm", opclass: :gin_trgm_ops, using: :gin
     t.index ["status"], name: "index_workshops_on_status"
   end
 
@@ -283,11 +316,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_100002) do
   add_foreign_key "car_transfers", "users", column: "from_user_id"
   add_foreign_key "car_transfers", "users", column: "to_user_id"
   add_foreign_key "cars", "users"
+  add_foreign_key "notifications", "users"
   add_foreign_key "queue_entries", "cars"
   add_foreign_key "queue_entries", "queues"
   add_foreign_key "queue_entries", "users"
   add_foreign_key "queues", "service_categories"
   add_foreign_key "queues", "workshops"
+  add_foreign_key "reviews", "service_requests"
+  add_foreign_key "reviews", "users"
+  add_foreign_key "reviews", "workshops"
   add_foreign_key "service_records", "service_requests"
   add_foreign_key "service_requests", "cars"
   add_foreign_key "service_requests", "workshop_service_categories"

@@ -1,5 +1,5 @@
 <div class="mb-8" <%= 'data-controller="toggle" data-toggle-target-value="decline-form"'.html_safe if @workshop.pending? %>>
-  <div class="flex items-center justify-between">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
     <div>
       <h1 class="text-2xl font-semibold tracking-tight"><%= @workshop.name %></h1>
       <div class="mt-1 flex items-center gap-2">
@@ -8,7 +8,7 @@
       </div>
     </div>
 
-    <div class="flex items-center gap-2">
+    <div class="flex flex-wrap items-center gap-2">
       <% if @workshop.pending? %>
         <%= button_to t(".approve"), transition_admin_workshop_path(@workshop), method: :patch, params: { event: "approve" }, class: "btn-primary !w-auto cursor-pointer" %>
         <button type="button" data-action="click->toggle#toggle" class="inline-flex items-center rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 transition-colors cursor-pointer">

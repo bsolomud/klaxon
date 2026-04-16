@@ -9,7 +9,19 @@ class ExpireCarTransfersJob < ApplicationJob
           car_transfer: transfer,
           event_type: :expired
         )
+        Notification.create!(
+          user: transfer.from_user,
+          notifiable: transfer,
+          event: :car_transfer_expired
+        )
+        Notification.create!(
+          user: transfer.to_user,
+          notifiable: transfer,
+          event: :car_transfer_expired
+        )
       end
+
+      CarTransferMailer.with(transfer: transfer).expired.deliver_later
     end
   end
 end

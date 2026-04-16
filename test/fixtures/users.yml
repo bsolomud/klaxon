@@ -21,3 +21,9 @@ driver_no_workshops:
   encrypted_password: "<%= BCrypt::Password.create('password', cost: 4) %>"
   confirmed_at: "<%= Time.current %>"
   role: 0
+
+brand_new_user:
+  email: "brand-new@example.com"
+  encrypted_password: "<%= BCrypt::Password.create('password', cost: 4) %>"
+  confirmed_at: "<%= Time.current %>"
+  role: 0

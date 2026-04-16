@@ -1,0 +1,18 @@
+<h1><%= t("mailers.service_request_mailer.created.heading") %></h1>
+
+<p><%= t("mailers.service_request_mailer.created.body") %></p>
+
+<h3><%= t("mailers.service_request_mailer.created.details") %></h3>
+<ul>
+  <li><strong><%= t("mailers.service_request_mailer.created.car") %>:</strong> <%= "#{@service_request.car.make} #{@service_request.car.model}" %></li>
+  <li><strong><%= t("mailers.service_request_mailer.created.service") %>:</strong> <%= @service_request.workshop_service_category.service_category.name %></li>
+  <li><strong><%= t("mailers.service_request_mailer.created.driver") %>:</strong> <%= @service_request.car.user.email %></li>
+  <li><strong><%= t("mailers.service_request_mailer.created.preferred_time") %>:</strong> <%= l(@service_request.preferred_time, format: :long) if @service_request.preferred_time %></li>
+  <li><strong><%= t("mailers.service_request_mailer.created.price") %>:</strong> <%= @service_request.display_price %></li>
+</ul>
+
+<p>
+  <%= link_to t("mailers.service_request_mailer.created.cta"),
+              workshop_management_workshop_service_request_url(@workshop, @service_request),
+              class: "btn" %>
+</p>

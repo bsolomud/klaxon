@@ -1,0 +1,12 @@
+<div class="py-4 border-b border-gray-50 last:border-0">
+  <div class="flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <div class="flex"><%= star_icons(review.rating) %></div>
+      <span class="text-sm font-medium text-gray-900"><%= review.user.first_name || review.user.email.split("@").first %></span>
+    </div>
+    <span class="text-xs text-gray-400"><%= l(review.created_at, format: :short) %></span>
+  </div>
+  <% if review.body.present? %>
+    <p class="mt-2 text-sm text-gray-600"><%= review.body %></p>
+  <% end %>
+</div>

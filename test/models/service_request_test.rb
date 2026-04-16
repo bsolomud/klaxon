@@ -1,6 +1,8 @@
 require "test_helper"
 
 class ServiceRequestTest < ActiveSupport::TestCase
+  include ActionCable::TestHelper
+
   def setup
     @user = users(:one)
     @car = cars(:camry)
@@ -111,5 +113,21 @@ class ServiceRequestTest < ActiveSupport::TestCase
 
   test "recent scope orders by created_at desc" do
     assert_equal ServiceRequest.order(created_at: :desc).to_a, ServiceRequest.recent.to_a
+  end
+
+  test "broadcasts to user and workshop streams on status change" do
+    assert_broadcasts("user_#{@request.car.user_id}_requests", 1) do
+      assert_broadcasts("workshop_#{@request.workshop_id}_requests", 1) do
+        @request.update!(status: :accepted)
+      end
+    end
+  end
+
+  test "does not broadcast on non-status update" do
+    assert_no_broadcasts("user_#{@request.car.user_id}_requests") do
+      assert_no_broadcasts("workshop_#{@request.workshop_id}_requests") do
+        @request.update!(description: "Updated description")
+      end
+    end
   end
 end

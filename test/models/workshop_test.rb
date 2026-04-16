@@ -167,4 +167,102 @@ class WorkshopTest < ActiveSupport::TestCase
     results = Workshop.near_location(50.4501, 30.5234, 1)
     assert_includes results, workshops(:one)
   end
+
+  # Task 107 — sorted_by_distance scope
+
+  test "sorted_by_distance orders by proximity" do
+    # Workshop :one is at 50.4501, 30.5234
+    # Workshop :two is at 50.4628, 30.5179
+    # Point near workshop :two
+    results = Workshop.sorted_by_distance(50.4630, 30.5180)
+    one_idx = results.index(workshops(:one))
+    two_idx = results.index(workshops(:two))
+    assert two_idx < one_idx, "closer workshop should come first"
+  end
+
+  test "sorted_by_distance puts workshops without coordinates last" do
+    workshops(:pending_workshop).update_columns(latitude: nil, longitude: nil)
+    results = Workshop.sorted_by_distance(50.45, 30.52)
+    last_with_coords = results.select { |w| w.latitude.present? }.last
+    first_without = results.detect { |w| w.latitude.nil? }
+    assert results.index(last_with_coords) < results.index(first_without) if first_without
+  end
+
+  # Task 97 — cached rating fields
+
+  test "review_count defaults to 0" do
+    workshop = Workshop.create!(name: "Тест", phone: "+380500000000", address: "вул. Тестова, 1", city: "Київ", country: "UA")
+    assert_equal 0, workshop.review_count
+  end
+
+  test "recompute_rating! updates avg_rating and review_count" do
+    workshop = workshops(:one)
+    workshop.recompute_rating!
+    workshop.reload
+
+    published = workshop.reviews.published
+    expected_count = published.count
+    expected_avg = published.average(:rating)&.round(2)
+
+    assert_equal expected_count, workshop.review_count
+    assert_equal expected_avg, workshop.avg_rating
+  end
+
+  test "creating a review updates cached rating" do
+    workshop = workshops(:two)
+    # hidden_review exists for workshop :two but is hidden
+    assert_equal 0, workshop.review_count
+
+    completed = service_requests(:other_user_completed)
+    # Remove the hidden review to free up the service_request
+    reviews(:hidden_review).destroy!
+
+    Review.create!(
+      user: users(:two),
+      workshop: workshop,
+      service_request: completed,
+      rating: 4
+    )
+    workshop.reload
+
+    assert_equal 1, workshop.review_count
+    assert_equal BigDecimal("4.0"), workshop.avg_rating
+  end
+
+  test "hiding a review excludes it from aggregate" do
+    workshop = workshops(:one)
+    review = reviews(:published_review)
+
+    assert_equal 1, workshop.reviews.published.count
+
+    review.update!(status: :hidden)
+    workshop.reload
+
+    assert_equal 0, workshop.review_count
+    assert_nil workshop.avg_rating
+  end
+
+  # Task 105 — text_search scope
+
+  test "text_search returns matches by name" do
+    results = Workshop.text_search("Експрес")
+    assert_includes results, workshops(:one)
+    assert_not_includes results, workshops(:two)
+  end
+
+  test "text_search returns matches by address" do
+    results = Workshop.text_search("Хрещатик")
+    assert_includes results, workshops(:one)
+    assert_not_includes results, workshops(:two)
+  end
+
+  test "text_search is case-insensitive" do
+    results = Workshop.text_search("експрес")
+    assert_includes results, workshops(:one)
+  end
+
+  test "text_search returns all when query is blank" do
+    assert_equal Workshop.all.count, Workshop.text_search("").count
+    assert_equal Workshop.all.count, Workshop.text_search(nil).count
+  end
 end

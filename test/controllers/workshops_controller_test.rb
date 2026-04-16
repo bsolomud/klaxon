@@ -127,6 +127,38 @@ class WorkshopsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  # --- Index with ?q= search (Task 106) ---
+
+  test "index with q param narrows results to matching workshops" do
+    sign_out @user
+    get workshops_path, params: { q: "Експрес" }
+    assert_response :success
+    assert_select "h2", text: workshops(:one).name
+    assert_select "h2", text: workshops(:two).name, count: 0
+  end
+
+  test "index search combined with other filters" do
+    sign_out @user
+    get workshops_path, params: { q: "Експрес", city: "Київ" }
+    assert_response :success
+    assert_select "h2", text: workshops(:one).name
+  end
+
+  test "index search persists query in search input" do
+    sign_out @user
+    get workshops_path, params: { q: "Блиск" }
+    assert_response :success
+    assert_select "input[name=q][value=Блиск]"
+  end
+
+  # --- Index with ?near= distance sort (Task 107) ---
+
+  test "index with near param sorts by distance" do
+    sign_out @user
+    get workshops_path, params: { near: "50.4630,30.5180" }
+    assert_response :success
+  end
+
   # --- Create (Task 30) ---
 
   test "create sets workshop status to pending" do
@@ -248,6 +280,51 @@ class WorkshopsControllerTest < ActionDispatch::IntegrationTest
 
     created = Workshop.order(:created_at).last
     assert_empty created.workshop_service_categories
+  end
+
+  # --- Photo uploads (Task 115) ---
+
+  test "create with photos attaches them to workshop" do
+    photo1 = fixture_file_upload("test_photo.png", "image/png")
+    photo2 = fixture_file_upload("test_photo.png", "image/png")
+
+    post workshops_path, params: {
+      workshop: {
+        name: "Майстерня з фото",
+        phone: "+380501111111",
+        address: "вул. Тестова, 1",
+        city: "Київ",
+        country: "UA",
+        photos: [photo1, photo2]
+      }
+    }
+
+    created = Workshop.order(:created_at).last
+    assert_equal 2, created.photos.count
+  end
+
+  test "update with photos adds to existing photos" do
+    @workshop.photos.attach(
+      io: File.open(Rails.root.join("test/fixtures/files/test_photo.png")),
+      filename: "existing.png",
+      content_type: "image/png"
+    )
+    assert_equal 1, @workshop.photos.count
+
+    new_photo = fixture_file_upload("test_photo.png", "image/png")
+
+    patch workshop_path(@workshop), params: {
+      workshop: { photos: [new_photo] }
+    }
+
+    @workshop.reload
+    assert_equal 2, @workshop.photos.count
+  end
+
+  test "form shows drag-drop zone for photos" do
+    get new_workshop_path
+    assert_response :success
+    assert_select "input[type=file][name='workshop[photos][]'][multiple]"
   end
 
   # --- Update ---

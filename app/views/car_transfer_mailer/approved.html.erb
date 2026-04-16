@@ -1,0 +1,11 @@
+<h1><%= t("mailers.car_transfer_mailer.approved.heading") %></h1>
+
+<p><%= t("mailers.car_transfer_mailer.approved.body") %></p>
+
+<p>
+  <strong><%= t("mailers.car_transfer_mailer.approved.car") %>:</strong> <%= "#{@car.make} #{@car.model} (#{@car.year})" %>
+</p>
+
+<p>
+  <%= link_to t("mailers.car_transfer_mailer.approved.cta"), cars_url, class: "btn" %>
+</p>

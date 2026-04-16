@@ -14,11 +14,20 @@ class WorkshopManagement::QueueEntriesControllerTest < ActionDispatch::Integrati
   # --- Call ---
 
   test "call transitions waiting to called" do
-    patch call_workshop_management_workshop_queue_queue_entry_path(@workshop, @queue, @entry),
-          params: { lock_version: @entry.lock_version }
+    assert_difference "Notification.count", 1 do
+      assert_enqueued_emails 1 do
+        patch call_workshop_management_workshop_queue_queue_entry_path(@workshop, @queue, @entry),
+              params: { lock_version: @entry.lock_version }
+      end
+    end
     assert_redirected_to workshop_management_workshop_queue_path(@workshop, @queue)
     assert @entry.reload.called?
     assert_not_nil @entry.called_at
+
+    notification = Notification.last
+    assert_equal @entry.user, notification.user
+    assert_equal @entry, notification.notifiable
+    assert notification.queue_called?
   end
 
   test "call rejects non-waiting entry" do

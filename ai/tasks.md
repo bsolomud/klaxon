@@ -681,40 +681,434 @@
   - Both locale files have matching keys
   - Ukrainian is primary UI language
 
+## Phase 14 — Mailers & Notifications [P0] [Done]
+
+> Closes the biggest gap in the MVP: the app changes state but never tells anyone. Car transfers depend on an email that does not exist; service requests are invisible to operators; queue calls never reach drivers.
+
+### Task 78: Configure ActionMailer
+- **Description**: Configure ActionMailer in `config/environments/development.rb` and `production.rb`. Set `default_url_options` (host), delivery_method, SMTP settings via ENV. Install `letter_opener_web` in dev group, mount at `/dev/letters`.
+- **Files**: `config/environments/development.rb`, `config/environments/production.rb`, `Gemfile`, `config/routes.rb`
+- **Acceptance Criteria**:
+  - `ActionMailer::Base.deliveries` populates in test
+  - Dev emails open in `/dev/letters`
+  - SMTP via ENV in production
+  - Delivery is async via `deliver_later` (SolidQueue)
+
+### Task 79: Create ApplicationMailer base + layout
+- **Description**: Replace boilerplate `ApplicationMailer` with a base that sets `default from: ENV["MAIL_FROM"]` and `layout "mailer"`. Create `app/views/layouts/mailer.html.erb` and `.text.erb` with AULABS branding and Ukrainian footer.
+- **Files**: `app/mailers/application_mailer.rb`, `app/views/layouts/mailer.html.erb`, `app/views/layouts/mailer.text.erb`
+- **Acceptance Criteria**:
+  - All mailers inherit ApplicationMailer
+  - Layout renders header + footer in Ukrainian
+  - Both HTML and text versions exist
+
+### Task 80: WorkshopMailer — approved + declined
+- **Description**: Create `WorkshopMailer` with `#approved(workshop)` and `#declined(workshop)` methods. Declined email includes `decline_reason`. Templates link to `my_workshops_path`.
+- **Files**: `app/mailers/workshop_mailer.rb`, `app/views/workshop_mailer/approved.html.erb`, `app/views/workshop_mailer/approved.text.erb`, `app/views/workshop_mailer/declined.html.erb`, `app/views/workshop_mailer/declined.text.erb`, `test/mailers/workshop_mailer_test.rb`
+- **Acceptance Criteria**:
+  - Recipient is the workshop owner (via `workshop_operators.owner`)
+  - Declined email renders `decline_reason`
+  - Tests assert delivery + body content
+
+### Task 81: Hook WorkshopMailer into Admin::WorkshopsController
+- **Description**: Call `WorkshopMailer.with(workshop: @workshop).approved.deliver_later` after `approve` action; same for `declined`. Ensure both owners (multiple operators) receive if applicable.
+- **Files**: `app/controllers/admin/workshops_controller.rb`, `test/controllers/admin/workshops_controller_test.rb`
+- **Acceptance Criteria**:
+  - Approve enqueues the approved email
+  - Decline enqueues the declined email
+  - Tests use `assert_enqueued_email_with`
+
+### Task 82: ServiceRequestMailer — all lifecycle events
+- **Description**: Create `ServiceRequestMailer` with methods: `#created(request)` (to workshop members), `#accepted(request)`, `#rejected(request)`, `#started(request)`, `#completed(request)` (to driver). Templates link to relevant pages.
+- **Files**: `app/mailers/service_request_mailer.rb`, `app/views/service_request_mailer/*.html.erb`, `*.text.erb`, `test/mailers/service_request_mailer_test.rb`
+- **Acceptance Criteria**:
+  - `#created` is sent to each workshop operator
+  - Other methods are sent to `request.car.user` (the driver)
+  - Templates include request details + price_snapshot
+  - Tests assert recipients + content
+
+### Task 83: Hook ServiceRequestMailer into controllers
+- **Description**: Trigger `#created` in `ServiceRequestsController#create`. Trigger `#accepted`, `#rejected`, `#started` in `WorkshopManagement::ServiceRequestsController` member actions. Trigger `#completed` in `WorkshopManagement::ServiceRecordsController#create`.
+- **Files**: `app/controllers/service_requests_controller.rb`, `app/controllers/workshop_management/service_requests_controller.rb`, `app/controllers/workshop_management/service_records_controller.rb`
+- **Acceptance Criteria**:
+  - Each state transition enqueues the correct email
+  - Failed transitions (stale object) do NOT enqueue email
+  - Tests cover each path
+
+### Task 84: CarTransferMailer — all lifecycle events
+- **Description**: Create `CarTransferMailer` with `#requested(transfer)` (to from_user, includes tokenized approval URL — critical, the transfer flow depends on this), `#approved(transfer)`, `#rejected(transfer)`, `#cancelled(transfer)`, `#expired(transfer)`.
+- **Files**: `app/mailers/car_transfer_mailer.rb`, `app/views/car_transfer_mailer/*.html.erb`, `*.text.erb`, `test/mailers/car_transfer_mailer_test.rb`
+- **Acceptance Criteria**:
+  - `#requested` includes URL with `transfer.token`
+  - `#approved` goes to to_user (new owner)
+  - `#rejected`, `#cancelled` go to the other party
+  - `#expired` goes to both parties
+
+### Task 85: Hook CarTransferMailer into controllers + expiration job
+- **Description**: Trigger `#requested` in `CarTransfersController#create`. Trigger `#approved`, `#rejected`, `#cancelled` in respective member actions. Trigger `#expired` in `ExpireCarTransfersJob`.
+- **Files**: `app/controllers/car_transfers_controller.rb`, `app/jobs/expire_car_transfers_job.rb`, test files
+- **Acceptance Criteria**:
+  - Each action enqueues the correct mailer
+  - Expiration job sends email alongside status change
+  - Tests assert email delivery
+
+### Task 86: QueueMailer — queue_called
+- **Description**: Create `QueueMailer#called(queue_entry)` — tells driver it is their turn. Short, urgent subject line ("Ваша черга! / Your turn!"). Body includes workshop name, address, map link.
+- **Files**: `app/mailers/queue_mailer.rb`, `app/views/queue_mailer/called.html.erb`, `*.text.erb`, `test/mailers/queue_mailer_test.rb`
+- **Acceptance Criteria**:
+  - Sent to `queue_entry.user`
+  - Body includes workshop address + queue position
+  - Tests pass
+
+### Task 87: Hook QueueMailer into WM::QueueEntriesController#call
+- **Description**: After `entry.called!`, enqueue `QueueMailer.with(queue_entry: entry).called.deliver_later`.
+- **Files**: `app/controllers/workshop_management/queue_entries_controller.rb`, test file
+- **Acceptance Criteria**:
+  - Call action enqueues email
+  - Other transitions (serve, complete, no_show) do not send this email
+
+### Task 88: Create Notification model + migration
+- **Description**: Create `notifications` table: `user_id` (fk), `notifiable_type` + `notifiable_id` (polymorphic: ServiceRequest, CarTransfer, Workshop, QueueEntry), `event` (int enum), `read_at` (datetime, nullable), `created_at`. Index on `[user_id, read_at]`.
+- **Files**: `db/migrate/xxx_create_notifications.rb`, `app/models/notification.rb`, `test/models/notification_test.rb`, `test/fixtures/notifications.yml`
+- **Acceptance Criteria**:
+  - Enum covers all events matching mailers above
+  - `belongs_to :notifiable, polymorphic: true`
+  - `scope :unread, -> { where(read_at: nil) }`
+  - Tests pass
+
+### Task 89: NotificationsController + inbox view + unread bell
+- **Description**: Add `NotificationsController` with `index` (inbox, paginated), `update` (mark as read), `update_all` (mark all read). Add bell icon with unread count badge to application layout nav. Ensure notifications are created alongside every mailer enqueue.
+- **Files**: `app/controllers/notifications_controller.rb`, `app/views/notifications/index.html.erb`, `app/views/layouts/application.html.erb`, `config/routes.rb`, `test/controllers/notifications_controller_test.rb`
+- **Acceptance Criteria**:
+  - Bell shows correct unread count
+  - Clicking notification marks it read + redirects to target
+  - "Mark all read" bulk action works
+  - Tests pass
+
 ---
 
-## Dependency Graph
+## Phase 15 — Real-time Turbo Streams [P0] [Done]
 
-```
-Phase 1 (Tasks 1-6): User Roles + Admin
-    ↓
-Phase 2 (Tasks 7-11): Workshop Operators + Status
-    ↓
-Phase 3 (Tasks 12-20): Service Categories + Pricing
-    ↓
-Phase 4 (Tasks 21-26): Admin Workshop Management ←── depends on Phase 1 + 2
-    ↓
-Phase 5 (Tasks 27-32): Workshop Self-Registration ←── depends on Phase 2 + 3
-    ↓
-Phase 6 (Tasks 33-36): Workshop Management Layout ←── depends on Phase 2
-    ↓
-Phase 7 (Tasks 37-42): Car Model ←── depends on Phase 1
-    ↓
-Phase 8 (Tasks 43-50): Car Transfers ←── depends on Phase 7
-    ↓
-Phase 9 (Tasks 51-56): Service Requests (Driver) ←── depends on Phase 3 + 7
-    ↓
-Phase 10 (Tasks 57-59): WM Request Handling ←── depends on Phase 6 + 9
-    ↓
-Phase 11 (Tasks 60-63): Service Records ←── depends on Phase 10
-    ↓
-Phase 12 (Tasks 64-74): Queue System ←── depends on Phase 6
-    ↓
-Phase 13 (Tasks 75-77): Dashboard + Nav ←── depends on all above
-```
+> The product's #1 differentiator — live queue position updates — has broadcast stubs but no end-to-end wiring. Fix it so drivers actually see position updates without refreshing.
 
-### Parallelizable Phases
-- **Phase 4 + Phase 5 + Phase 6** can run in parallel (all depend on Phase 2)
-- **Phase 7** can start as soon as Phase 1 is done (parallel with Phase 3-6)
-- **Phase 8** can run in parallel with Phase 9 (both depend on Phase 7, but not on each other)
-- **Phase 12** can start as soon as Phase 6 is done (parallel with Phase 9-11)
+### Task 90: Configure ActionCable for production
+- **Description**: Update `config/cable.yml`: dev uses `async`, test uses `test`, production uses `redis` (or `solid_cable`). Add `redis` gem if missing. Set `ENV["REDIS_URL"]` in production config.
+- **Files**: `config/cable.yml`, `Gemfile`, `config/environments/production.rb`
+- **Acceptance Criteria**:
+  - `bin/rails cable:info` works in dev
+  - Production config references Redis via ENV
+  - No errors on boot in any env
+
+### Task 91: Verify QueueEntry broadcast callbacks
+- **Description**: Audit existing `QueueEntry` broadcast callbacks. Ensure `after_create_commit` does `broadcast_append_to "queue_#{queue_id}"`, `after_update_commit` does `broadcast_replace_to`, `after_destroy_commit` does `broadcast_remove_to`. Use `dom_id(self)` targets.
+- **Files**: `app/models/queue_entry.rb`, `test/models/queue_entry_test.rb`
+- **Acceptance Criteria**:
+  - Broadcasts hit the correct stream name
+  - Tests assert broadcast via `ActionCable::TestHelper`
+
+### Task 92: Driver-facing queue entry show — live subscription
+- **Description**: Update `app/views/queue_entries/show.html.erb` with `turbo_stream_from "queue_#{@queue_entry.queue_id}"`. Render position, status badge, estimated wait, "You are up!" banner when status is `called`. Extract entry into `_queue_entry.html.erb` partial with matching `dom_id`.
+- **Files**: `app/views/queue_entries/show.html.erb`, `app/views/queue_entries/_queue_entry.html.erb`
+- **Acceptance Criteria**:
+  - Subscribing client sees replace on status change
+  - "Called" banner appears without reload
+  - Partial matches broadcast target id
+
+### Task 93: Workshop management queue show — live subscription
+- **Description**: Update `app/views/workshop_management/queues/show.html.erb` with `turbo_stream_from "queue_#{@queue.id}"`. Operator sees entries append/replace/remove in real time as drivers join and transition.
+- **Files**: `app/views/workshop_management/queues/show.html.erb`
+- **Acceptance Criteria**:
+  - New driver joining appears without refresh
+  - Status changes replace the entry row
+  - No layout jank (smooth morph)
+
+### Task 94: ServiceRequest broadcasts
+- **Description**: Add `after_update_commit :broadcast_status_change` on `ServiceRequest`. Broadcasts to `"user_#{car.user_id}_requests"` and `"workshop_#{workshop_id}_requests"`. Driver's request show subscribes to the user stream; workshop management request index subscribes to the workshop stream.
+- **Files**: `app/models/service_request.rb`, `app/views/service_requests/show.html.erb`, `app/views/workshop_management/service_requests/index.html.erb`
+- **Acceptance Criteria**:
+  - Driver sees status badge update without reload
+  - Workshop index shows new requests appearing live
+  - Tests assert broadcasts
+
+### Task 95: System test — live queue end-to-end
+- **Description**: Create `test/system/live_queue_test.rb`. Open two sessions (operator + driver), operator calls next, assert driver page shows "called" status without manual reload (use `assert_selector` with appropriate wait).
+- **Files**: `test/system/live_queue_test.rb`
+- **Acceptance Criteria**:
+  - Test passes headlessly in CI
+  - Uses `using_session` or multiple sessions
+  - Proves Turbo Stream delivery end-to-end
+
+---
+
+## Phase 16 — Reviews & Ratings [P1] [Done]
+
+> Core marketplace trust signal, explicitly called out in the product vision but missing from the original plan.
+
+### Task 96: Create Review model + migration
+- **Description**: Create `reviews` table: `user_id` (fk), `workshop_id` (fk), `service_request_id` (fk, unique), `rating` (int, not null), `body` (text, nullable), `status` (int, default 0). Enum `{ published: 0, hidden: 1, flagged: 2 }`. Unique index on `service_request_id`. Index on `[workshop_id, status]`.
+- **Files**: `db/migrate/xxx_create_reviews.rb`, `app/models/review.rb`, `test/models/review_test.rb`, `test/fixtures/reviews.yml`
+- **Acceptance Criteria**:
+  - `rating` validated in range 1..5
+  - `service_request` must belong to `user` and be completed
+  - One review per completed service (DB-level unique)
+  - Tests pass
+
+### Task 97: Add cached rating fields to Workshop
+- **Description**: Migration to add `avg_rating` (decimal 3,2, nullable) and `review_count` (int, default 0) to workshops. Add `recompute_rating!` method on Workshop. Call from Review `after_save` + `after_destroy`.
+- **Files**: `db/migrate/xxx_add_rating_cache_to_workshops.rb`, `app/models/workshop.rb`, `app/models/review.rb`, `test/models/workshop_test.rb`
+- **Acceptance Criteria**:
+  - Creating a review updates cached fields
+  - Hiding a review re-excludes it from aggregate
+  - Values match manual avg calculation in tests
+
+### Task 98: ReviewsController — new + create
+- **Description**: Nested route: `resources :service_requests do resource :review, only: [:new, :create] end`. Only allowed if request is completed and belongs to `current_user`. Redirects to workshop show after success.
+- **Files**: `app/controllers/reviews_controller.rb`, `app/views/reviews/new.html.erb`, `config/routes.rb`, `test/controllers/reviews_controller_test.rb`
+- **Acceptance Criteria**:
+  - Only driver of completed request can submit
+  - Cannot submit twice for same request
+  - Redirects with flash on success
+  - Tests pass
+
+### Task 99: Display reviews on workshop show
+- **Description**: Add a reviews section to `app/views/workshops/show.html.erb`. Shows list of published reviews (newest first), with star rating, date, body, reviewer first name. Displays aggregate rating header ("4.7 / 5 — 124 відгуків").
+- **Files**: `app/views/workshops/show.html.erb`, `app/views/reviews/_review.html.erb`
+- **Acceptance Criteria**:
+  - Aggregate rating renders
+  - List paginates (reuse pagy from Phase 17 once available, otherwise limit to 10)
+  - Hidden reviews not shown
+
+### Task 100: Display star rating on workshop index
+- **Description**: Update workshop index cards to show star rating + review count badge. Render star icons proportional to `avg_rating`. Show "No reviews yet" if `review_count == 0`.
+- **Files**: `app/views/workshops/index.html.erb`, `app/views/workshops/_workshop.html.erb`
+- **Acceptance Criteria**:
+  - Star rating visible on every card
+  - Correct rendering for half stars (or rounded)
+  - Empty state for no reviews
+
+### Task 101: "Leave a review" CTA on completed request
+- **Description**: On `service_requests#show`, if status is `completed` and no review yet, show prominent "Leave a review" button linking to `new_service_request_review_path(@service_request)`.
+- **Files**: `app/views/service_requests/show.html.erb`
+- **Acceptance Criteria**:
+  - Button only visible for completed requests with no review
+  - Hidden after review submitted
+  - Links correctly
+
+### Task 102: Admin::ReviewsController — moderation
+- **Description**: Add admin-only `Admin::ReviewsController` with `index`, `update` (hide/unhide). Link from admin nav. Hidden reviews excluded from workshop aggregate.
+- **Files**: `app/controllers/admin/reviews_controller.rb`, `app/views/admin/reviews/index.html.erb`, `config/routes.rb`, `test/controllers/admin/reviews_controller_test.rb`
+- **Acceptance Criteria**:
+  - Admin can hide/unhide reviews
+  - Hiding recomputes workshop rating
+  - Tests pass
+
+---
+
+## Phase 17 — Search, Sort, Pagination [P1] [Done]
+
+> Real discovery UX. Text search, true distance sort, and pagination on every index.
+
+### Task 103: Enable pg_trgm extension
+- **Description**: Migration to enable `pg_trgm` extension on the database: `enable_extension "pg_trgm"`.
+- **Files**: `db/migrate/xxx_enable_pg_trgm.rb`
+- **Acceptance Criteria**:
+  - Extension enabled in dev + test
+  - `bin/rails db:reset` works
+
+### Task 104: Add trigram indexes on workshops
+- **Description**: Migration to add GIN trigram indexes on `workshops.name` and `workshops.address` for fast fuzzy search.
+- **Files**: `db/migrate/xxx_add_trigram_indexes_to_workshops.rb`
+- **Acceptance Criteria**:
+  - `EXPLAIN` shows index use on ILIKE queries
+  - Migration is reversible
+
+### Task 105: Workshop text_search scope
+- **Description**: Add `scope :text_search, ->(q) { where("name ILIKE :q OR address ILIKE :q", q: "%#{q}%") }` on Workshop. Falls back to `all` when `q` is blank.
+- **Files**: `app/models/workshop.rb`, `test/models/workshop_test.rb`
+- **Acceptance Criteria**:
+  - Returns matches by name or address
+  - Blank query returns all
+  - Case-insensitive
+  - Tests pass
+
+### Task 106: Add ?q= to workshops index
+- **Description**: `WorkshopsController#index` applies `text_search(params[:q])` when present. Search box in index header with Ukrainian placeholder "Пошук...".
+- **Files**: `app/controllers/workshops_controller.rb`, `app/views/workshops/index.html.erb`
+- **Acceptance Criteria**:
+  - Searching narrows results
+  - Works combined with other filters
+  - Persists query in search input on submit
+
+### Task 107: Sort by distance when ?near= provided
+- **Description**: Add `scope :sorted_by_distance, ->(lat, lng) { ... ORDER BY distance ASC }` using Haversine or PostGIS-style expression. When `params[:near]` is present on index, apply sort.
+- **Files**: `app/models/workshop.rb`, `app/controllers/workshops_controller.rb`, `test/models/workshop_test.rb`
+- **Acceptance Criteria**:
+  - Results sorted by proximity
+  - Workshops without lat/lng come last
+  - Tests pass
+
+### Task 108: Add pagy gem
+- **Description**: Add `gem "pagy"` to Gemfile. Create `config/initializers/pagy.rb`. Include `Pagy::Backend` in `ApplicationController` and `Pagy::Frontend` in `ApplicationHelper`. Create shared `app/views/shared/_pagy_nav.html.erb` partial styled with Tailwind.
+- **Files**: `Gemfile`, `config/initializers/pagy.rb`, `app/controllers/application_controller.rb`, `app/helpers/application_helper.rb`, `app/views/shared/_pagy_nav.html.erb`
+- **Acceptance Criteria**:
+  - `pagy` helper available in all controllers/views
+  - Nav partial renders with Tailwind classes
+  - No CSS conflicts
+
+### Task 109: Paginate driver indexes
+- **Description**: Apply `@pagy, @workshops = pagy(Workshop.active.filtered(...), items: 20)` to `WorkshopsController#index`. Same for `CarsController#index` (items: 10), `ServiceRequestsController#index` (items: 20). Render `_pagy_nav` at bottom of each.
+- **Files**: `app/controllers/workshops_controller.rb`, `app/controllers/cars_controller.rb`, `app/controllers/service_requests_controller.rb`, view files
+- **Acceptance Criteria**:
+  - Each index paginates at threshold
+  - Page 2+ navigable
+  - Filters preserved across page links
+
+### Task 110: Paginate admin + workshop management indexes
+- **Description**: Paginate `Admin::WorkshopsController#index` (items: 50), `Admin::UsersController#index` (items: 50), `WorkshopManagement::ServiceRequestsController#index` (items: 20).
+- **Files**: `app/controllers/admin/workshops_controller.rb`, `app/controllers/admin/users_controller.rb`, `app/controllers/workshop_management/service_requests_controller.rb`, view files
+- **Acceptance Criteria**:
+  - All listed indexes paginate
+  - Nav renders in all admin + workshop layouts
+
+---
+
+## Phase 18 — Onboarding & Empty States [P2] [Done]
+
+> First-visit activation. New users must see a clear next step.
+
+### Task 111: Dashboard empty state for new users
+- **Description**: If `current_user.cars.empty? && current_user.workshops.empty?`, dashboard renders a welcome hero with three cards: "Add your first car", "Find a workshop", "Register your workshop".
+- **Files**: `app/controllers/dashboard_controller.rb`, `app/views/dashboard/index.html.erb`
+- **Acceptance Criteria**:
+  - Brand-new user lands on welcome state
+  - Cards link to correct actions
+  - State hidden after user takes any action
+
+### Task 112: Shared empty state partial + apply to indexes
+- **Description**: Create `app/views/shared/_empty_state.html.erb` taking locals `title`, `body`, `cta_text`, `cta_url`, `icon`. Apply to `cars#index`, `service_requests#index`, `my_workshops#index` empty cases.
+- **Files**: `app/views/shared/_empty_state.html.erb`, view files for the three indexes
+- **Acceptance Criteria**:
+  - Empty states render consistently
+  - Each has a relevant primary CTA
+  - Ukrainian text
+
+### Task 113: Dismissible welcome banner after sign-up
+- **Description**: Add `onboarding_flags` (jsonb, default `{}`) to users. After sign-up, show dismissible welcome banner on dashboard until user dismisses or after 7 days. Dismissal stores flag.
+- **Files**: `db/migrate/xxx_add_onboarding_flags_to_users.rb`, `app/models/user.rb`, `app/views/dashboard/index.html.erb`, `app/javascript/controllers/dismissable_controller.js`
+- **Acceptance Criteria**:
+  - Banner visible on first visit
+  - Dismiss hides it permanently
+  - Stimulus handles dismiss + PATCH to user endpoint
+
+### Task 114: First-run checklist on dashboard
+- **Description**: Show a 3-step checklist on dashboard until all complete: (1) Add a car, (2) Browse workshops, (3) Submit your first service request. Each item has a check state derived from DB (has cars, has visited workshops index, has any service_requests).
+- **Files**: `app/views/dashboard/index.html.erb`, `app/controllers/dashboard_controller.rb`
+- **Acceptance Criteria**:
+  - Items check off as user progresses
+  - Checklist hidden once all three complete
+  - No server-side state tracking visit count — use existence checks
+
+---
+
+## Phase 19 — Workshop Photo Gallery [P2][Done]
+
+> Trust signal. ActiveStorage is wired up but photos are not surfaced in the UI.
+
+### Task 115: Verify multi-photo upload in workshop form
+- **Description**: Confirm `has_many_attached :photos` works in `WorkshopsController#create/update`. Add `file_field :photos, multiple: true` to workshop form with drag-drop zone styling. Permit `photos: []` in params.
+- **Files**: `app/models/workshop.rb`, `app/views/workshops/_form.html.erb`, `app/controllers/workshops_controller.rb`, `test/controllers/workshops_controller_test.rb`
+- **Acceptance Criteria**:
+  - Multiple photos upload in one submit
+  - Photos persist after update (not replaced)
+  - Tests assert attachments
+
+### Task 116: Photo gallery grid on workshop show
+- **Description**: Render photos as a responsive grid on `workshops/show.html.erb`. Use Active Storage variants (card size, ~400x300). First photo serves as hero. Empty state icon when no photos.
+- **Files**: `app/views/workshops/show.html.erb`, `config/initializers/active_storage_variants.rb` (if needed)
+- **Acceptance Criteria**:
+  - Grid renders correctly on mobile + desktop
+  - Variants served (not full-size)
+  - No photos = placeholder
+
+### Task 117: Cover photo on workshop index cards
+- **Description**: Update workshop index card partial to show first photo as cover (aspect ratio 16:9) with rating badge overlay. Fallback to category icon if no photo.
+- **Files**: `app/views/workshops/_workshop.html.erb`
+- **Acceptance Criteria**:
+  - Card has cover image
+  - Rating badge overlayed
+  - Fallback renders cleanly
+
+### Task 118: Lightbox Stimulus controller
+- **Description**: Create `lightbox_controller.js` that opens a fullscreen modal when a gallery photo is clicked. Support keyboard navigation (← →, Esc). Use fixed positioning + backdrop blur, no external library.
+- **Files**: `app/javascript/controllers/lightbox_controller.js`, `app/views/workshops/show.html.erb`
+- **Acceptance Criteria**:
+  - Click opens lightbox
+  - Arrow keys navigate
+  - Esc closes
+  - No external JS dependency
+
+---
+
+## Phase 20 — System Tests & Mobile Polish [P2] [Done]
+
+> End-to-end coverage before shipping. Every critical flow needs a Capybara test and a mobile audit.
+
+### Task 119: System test — full driver flow
+- **Description**: Create `test/system/driver_flow_test.rb`: sign up → add car → browse workshops → request service → (switch to operator session) accept → start → complete → (back to driver) view car history with service record.
+- **Files**: `test/system/driver_flow_test.rb`
+- **Acceptance Criteria**:
+  - Test passes headlessly
+  - Asserts visible service record in car history
+  - Uses `using_session` for multi-user
+
+### Task 120: System test — car transfer flow
+- **Description**: Create `test/system/car_transfer_test.rb`: user A has car → user B enters same VIN → transfer requested → mail delivered → user A clicks token link → approves → car.user_id changes → ownership records updated.
+- **Files**: `test/system/car_transfer_test.rb`
+- **Acceptance Criteria**:
+  - Asserts email delivered
+  - Follows token link
+  - Final state: new ownership + full audit trail
+  - Test passes headlessly
+
+### Task 121: System test — queue flow
+- **Description**: Create `test/system/queue_flow_test.rb`: operator opens today's queue → driver (different session) joins from workshop show → operator calls → driver sees "Called" status update without manual reload → serve → complete → queue entry marked completed.
+- **Files**: `test/system/queue_flow_test.rb`
+- **Acceptance Criteria**:
+  - Proves Turbo Stream live update works
+  - Multi-session test
+  - Test passes headlessly
+
+### Task 122: System test — concurrent operator optimistic locking
+- **Description**: Create `test/system/concurrent_operators_test.rb`: two operator sessions load the same pending request → both click Accept → first succeeds, second sees stale-object flash message, no data corruption.
+- **Files**: `test/system/concurrent_operators_test.rb`
+- **Acceptance Criteria**:
+  - Second user sees flash
+  - Request ends in correct state
+  - No duplicate status transitions
+  - Test passes headlessly
+
+### Task 123: Mobile responsive audit — application layout
+- **Description**: Manual and test audit of application layout at viewport < 640px. Nav collapses to hamburger, forms stack, tables scroll horizontally. Fix any overflow or unreachable CTAs on: dashboard, workshops index/show, cars index/show, service_requests index/show.
+- **Files**: `app/views/layouts/application.html.erb`, affected view files, `app/assets/tailwind/application.css`
+- **Acceptance Criteria**:
+  - No horizontal scroll on any page at 375px width
+  - All primary CTAs reachable
+  - Nav usable on mobile
+
+### Task 124: Mobile responsive audit — workshop management layout
+- **Description**: Same audit for `workshop.html.erb`. Sidebar collapses or becomes bottom nav on mobile. Queue show table remains usable. Request tables scroll horizontally rather than overflow.
+- **Files**: `app/views/layouts/workshop.html.erb`, affected WM view files
+- **Acceptance Criteria**:
+  - Operator can accept/reject requests on mobile
+  - Queue management accessible on mobile
+  - No unreachable buttons
+
+### Task 125: Mobile responsive audit — admin layout
+- **Description**: Same audit for `admin.html.erb`. Admin pages are lower priority for mobile but should still render without breakage.
+- **Files**: `app/views/layouts/admin.html.erb`, affected admin view files
+- **Acceptance Criteria**:
+  - Admin can approve/decline workshops on mobile
+  - Tables scroll rather than overflow
+  - No broken layouts
+
+---

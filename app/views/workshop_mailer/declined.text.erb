@@ -1,0 +1,10 @@
+<%= t("mailers.workshop_mailer.declined.heading") %>
+
+<%= t("mailers.workshop_mailer.declined.body", name: @workshop.name) %>
+
+<% if @decline_reason.present? %>
+<%= t("mailers.workshop_mailer.declined.reason_label") %>:
+<%= @decline_reason %>
+<% end %>
+
+<%= t("mailers.workshop_mailer.declined.cta") %>: <%= my_workshops_url %>

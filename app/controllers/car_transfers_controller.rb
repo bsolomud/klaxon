@@ -25,6 +25,7 @@ class CarTransfersController < ApplicationController
       )
     end
 
+    notify_transfer(@transfer, :requested, @transfer.from_user)
     redirect_to car_transfer_path(@transfer), notice: t("car_transfers.create.success")
   end
 
@@ -39,6 +40,7 @@ class CarTransfersController < ApplicationController
     return redirect_to car_transfer_path(@transfer), alert: t("car_transfers.approve.expired") if @transfer.expired?
 
     @transfer.approve!(actor: current_user)
+    notify_transfer(@transfer, :approved, @transfer.to_user)
     redirect_to car_transfer_path(@transfer), notice: t("car_transfers.approve.success")
   end
 
@@ -46,6 +48,7 @@ class CarTransfersController < ApplicationController
     return redirect_to car_transfer_path(@transfer), alert: t("car_transfers.reject.not_authorized") unless @transfer.from_user_id == current_user.id
 
     @transfer.reject!(actor: current_user)
+    notify_transfer(@transfer, :rejected, @transfer.to_user)
     redirect_to car_transfer_path(@transfer), notice: t("car_transfers.reject.success")
   end
 
@@ -53,6 +56,7 @@ class CarTransfersController < ApplicationController
     return redirect_to car_transfer_path(@transfer), alert: t("car_transfers.cancel.not_authorized") unless @transfer.to_user_id == current_user.id
 
     @transfer.cancel!(actor: current_user)
+    notify_transfer(@transfer, :cancelled, @transfer.from_user)
     redirect_to car_transfer_path(@transfer), notice: t("car_transfers.cancel.success")
   end
 
@@ -68,5 +72,14 @@ class CarTransfersController < ApplicationController
 
   def car_transfer_params
     params.require(:car_transfer).permit(:vin)
+  end
+
+  def notify_transfer(transfer, event, recipient)
+    CarTransferMailer.with(transfer: transfer).public_send(event).deliver_later
+    Notification.create!(
+      user: recipient,
+      notifiable: transfer,
+      event: "car_transfer_#{event}"
+    )
   end
 end

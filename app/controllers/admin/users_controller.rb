@@ -2,7 +2,7 @@ class Admin::UsersController < Admin::BaseController
   before_action :set_user, only: :show
 
   def index
-    @users = User.order(created_at: :desc)
+    @pagy, @users = pagy(User.order(created_at: :desc), limit: 50)
   end
 
   def show

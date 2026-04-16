@@ -77,6 +77,31 @@ class Admin::WorkshopsControllerTest < ActionDispatch::IntegrationTest
     assert workshop.active?
   end
 
+  test "approve enqueues approved email to workshop owners" do
+    workshop = workshops(:pending_workshop)
+
+    assert_enqueued_email_with WorkshopMailer, :approved, params: { workshop: workshop } do
+      patch transition_admin_workshop_path(workshop), params: { event: "approve" }
+    end
+  end
+
+  test "approve creates workshop_approved notification for owners" do
+    workshop = workshops(:pending_workshop)
+    owner_id = workshop.workshop_operators.find_by(role: :owner).user_id
+
+    assert_difference -> { Notification.where(user_id: owner_id, event: :workshop_approved).count }, 1 do
+      patch transition_admin_workshop_path(workshop), params: { event: "approve" }
+    end
+  end
+
+  test "approve does not enqueue email when transition is invalid" do
+    workshop = workshops(:one)
+
+    assert_no_enqueued_emails do
+      patch transition_admin_workshop_path(workshop), params: { event: "approve" }
+    end
+  end
+
   test "approve does not change already active workshop" do
     workshop = workshops(:one)
     assert workshop.active?
@@ -101,6 +126,23 @@ class Admin::WorkshopsControllerTest < ActionDispatch::IntegrationTest
     workshop.reload
     assert workshop.declined?
     assert_equal "Incomplete documents", workshop.decline_reason
+  end
+
+  test "decline enqueues declined email" do
+    workshop = workshops(:pending_workshop)
+
+    assert_enqueued_email_with WorkshopMailer, :declined, params: { workshop: workshop } do
+      patch transition_admin_workshop_path(workshop), params: { event: "decline", decline_reason: "Bad" }
+    end
+  end
+
+  test "decline creates workshop_declined notification for owners" do
+    workshop = workshops(:pending_workshop)
+    owner_id = workshop.workshop_operators.find_by(role: :owner).user_id
+
+    assert_difference -> { Notification.where(user_id: owner_id, event: :workshop_declined).count }, 1 do
+      patch transition_admin_workshop_path(workshop), params: { event: "decline" }
+    end
   end
 
   test "decline without reason still works" do

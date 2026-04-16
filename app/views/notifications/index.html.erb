@@ -1,0 +1,56 @@
+<% content_for :title, t("notifications.index.title") %>
+
+<div class="flex items-start justify-between mb-6">
+  <div>
+    <h1 class="text-2xl font-bold tracking-tight"><%= t("notifications.index.title") %></h1>
+    <p class="text-sm text-gray-500 mt-1"><%= t("notifications.index.subtitle") %></p>
+  </div>
+
+  <% if @notifications.any? { |n| n.read_at.nil? } %>
+    <%= button_to t("notifications.index.mark_all_read"),
+                  update_all_notifications_path,
+                  method: :patch,
+                  class: "btn-primary" %>
+  <% end %>
+</div>
+
+<% if @notifications.empty? %>
+  <div class="bg-white border border-gray-200 rounded-lg p-10 text-center text-gray-500">
+    <%= t("notifications.index.empty") %>
+  </div>
+<% else %>
+  <div class="bg-white border border-gray-200 rounded-lg overflow-hidden divide-y divide-gray-100">
+    <% @notifications.each do |notification| %>
+      <div class="flex items-center justify-between px-4 py-3 <%= "bg-gray-50" if notification.read_at.nil? %>">
+        <div class="flex items-center gap-3">
+          <% if notification.read_at.nil? %>
+            <span class="w-2 h-2 bg-black rounded-full" aria-hidden="true"></span>
+          <% else %>
+            <span class="w-2 h-2" aria-hidden="true"></span>
+          <% end %>
+          <div>
+            <div class="text-sm font-medium text-black">
+              <% if notification.target_path %>
+                <%= link_to t("notifications.events.#{notification.event}"),
+                            notification.target_path,
+                            class: "hover:underline" %>
+              <% else %>
+                <%= t("notifications.events.#{notification.event}") %>
+              <% end %>
+            </div>
+            <div class="text-xs text-gray-500">
+              <%= l(notification.created_at, format: :long) %>
+            </div>
+          </div>
+        </div>
+
+        <% if notification.read_at.nil? %>
+          <%= button_to t("notifications.index.view"),
+                        notification_path(notification),
+                        method: :patch,
+                        class: "text-sm text-gray-600 hover:text-black" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% end %>

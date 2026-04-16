@@ -1,0 +1,5 @@
+<%= t("mailers.service_request_mailer.accepted.heading") %>
+
+<%= t("mailers.service_request_mailer.accepted.body", workshop: @workshop.name) %>
+
+<%= t("mailers.service_request_mailer.accepted.cta") %>: <%= service_request_url(@service_request) %>

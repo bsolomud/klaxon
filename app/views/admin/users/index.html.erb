@@ -4,8 +4,8 @@
 </div>
 
 <% if @users.any? %>
-  <div class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
-    <table class="w-full">
+  <div class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-x-auto">
+    <table class="w-full min-w-[600px]">
       <thead>
         <tr class="border-b border-gray-100">
           <th class="px-6 py-3 text-left text-xs text-gray-400 uppercase tracking-wider"><%= t(".col_email") %></th>
@@ -37,3 +37,5 @@
     <p class="text-sm text-gray-500"><%= t(".empty") %></p>
   </div>
 <% end %>
+
+<%= render "shared/pagy_nav", pagy: @pagy %>

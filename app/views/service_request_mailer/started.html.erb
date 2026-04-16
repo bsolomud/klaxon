@@ -1,0 +1,9 @@
+<h1><%= t("mailers.service_request_mailer.started.heading") %></h1>
+
+<p><%= t("mailers.service_request_mailer.started.body", workshop: @workshop.name) %></p>
+
+<p>
+  <%= link_to t("mailers.service_request_mailer.started.cta"),
+              service_request_url(@service_request),
+              class: "btn" %>
+</p>

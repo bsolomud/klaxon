@@ -696,3 +696,173 @@ VERIFICATION
    i. Two operators try to accept the same request simultaneously →
       second gets stale object error → handled gracefully
 6. bin/brakeman --no-pager   — no new warnings
+
+
+==========================================================
+PHASE 14+ — FROM "FEATURE-COMPLETE" TO "SHIPPABLE"
+==========================================================
+
+Phases 1–13 delivered the full data model and business logic for the MVP
+loop. The app builds state changes end-to-end but cannot yet be shipped
+to real users. Seven gaps (below) are addressed in Phases 14–20.
+
+Priorities are P0 (blocks launch), P1 (core marketplace value),
+P2 (activation + quality).
+
+
+PHASE 14 — MAILERS & NOTIFICATIONS (P0)
+----------------------------------------
+The original plan created every async flow (workshop approval, service
+request state machine, car transfer approval link, queue call) but never
+specified how users learn about state changes. Without this:
+  - Car transfers are literally unusable — they rely on an emailed token
+    link that no mailer produces.
+  - Service requests sit unanswered because operators have no inbound
+    trigger to check the workshop dashboard.
+  - "Driver is called from queue" never reaches the driver.
+  - Workshop submitters never learn if they were approved or declined.
+
+Deliverables:
+  - ActionMailer configured (SMTP via ENV, default_url_options for
+    development + production, async delivery via SolidQueue)
+  - ApplicationMailer base + Ukrainian email layout
+  - WorkshopMailer: approved, declined (with reason)
+  - ServiceRequestMailer: created (to workshop operators),
+    status_changed (to driver: accepted / rejected / started / completed)
+  - CarTransferMailer: requested (token link to from_user),
+    status_changed (approved / rejected / cancelled / expired)
+  - QueueMailer: called (driver notified it is their turn)
+  - Notification model + NotificationsController — in-app inbox as a
+    backup channel for users who do not check email
+  - Bell icon in application layout with unread-count badge
+
+Every email delivery runs async via SolidQueue (deliver_later).
+
+
+PHASE 15 — REAL-TIME TURBO STREAMS (P0)
+----------------------------------------
+QueueEntry has broadcast stubs but there is no end-to-end wiring
+verified in production: cable.yml is not configured for Redis, no
+turbo_stream_from tag exists in the driver-facing queue view, and no
+system test proves live updates work. The promise of "see your position
+update live" is this product's single biggest differentiator — it must
+actually work.
+
+Deliverables:
+  - cable.yml configured for Redis (async in dev/test, redis in prod)
+  - ActionCable reachable from import-map Turbo client
+  - turbo_stream_from "queue_#{queue.id}" in queue_entries/show.html.erb
+  - QueueEntry#after_update_commit broadcast_replace_to to the queue
+    stream (position change, status change)
+  - Workshop management queue show subscribes to the same stream
+    (operator sees driver join live, no reload)
+  - ServiceRequest broadcasts status changes to the driver's request
+    show page (status flips live)
+  - End-to-end system test: two browsers, operator calls driver,
+    driver sees status flip "waiting" → "called" without reload
+
+
+PHASE 16 — REVIEWS & RATINGS (P1)
+----------------------------------
+The product vision explicitly lists "reviews, ratings, verified business
+profiles" as a quality bar, but the original plan has no review model.
+For a marketplace this is load-bearing: without it, drivers have no
+trust signal and workshops have no earned reputation.
+
+Data model:
+  - Review belongs_to :user, :workshop, :service_request
+    unique index on service_request_id — one review per completed service
+    rating  integer 1..5, not null
+    body    text, nullable
+  - Workshop caches avg_rating (decimal 3,2) and review_count (integer),
+    updated via after_save on Review
+
+Flow:
+  Driver completes a service → email + in-app prompt "Rate this workshop"
+  → review form (rating + optional body) → submits → workshop rating
+  recalculates. Reviews displayed on workshop show page (list, newest
+  first) and aggregate star rating + count on workshop index cards.
+
+
+PHASE 17 — SEARCH, SORT, PAGINATION (P1)
+-----------------------------------------
+Current discovery: filter by city/category/open_now and a bounding-box
+proximity filter. That does not meet "find a tire shop in under 60
+seconds" from the product vision. Gaps:
+  - No text search on workshop name or address
+  - "Nearby" is a bounding-box FILTER, not an ORDER — closer shops do
+    not come first
+  - No pagination on any index page — every list page will degrade as
+    real data volume grows
+
+Deliverables:
+  - pg_trgm extension + trigram indexes on workshops.name and
+    workshops.address for fuzzy text search
+  - ?q= query parameter on workshops index (fuzzy ILIKE / trigram)
+  - Haversine-based ORDER BY distance when ?near=lat,lng is provided
+  - pagy gem installed + initializer
+  - Pagination on every index: workshops, service_requests, cars, admin
+
+
+PHASE 18 — ONBOARDING & EMPTY STATES (P2)
+------------------------------------------
+A brand-new user lands on an empty dashboard with no guidance.
+Activation will be poor. Contextual first-run UI is needed:
+  - Dashboard empty state with three cards for new users:
+    "Add your first car", "Find a workshop", "Submit your workshop"
+  - Empty states on cars#index, service_requests#index, my_workshops#index
+    — each with a clear primary CTA
+  - Dismissible welcome banner after sign-up
+  - First-run checklist on dashboard until user has completed it
+
+
+PHASE 19 — WORKSHOP PHOTO GALLERY (P2)
+---------------------------------------
+ActiveStorage is wired to Workshop for logo + photos, but the upload
+flow is not verified end-to-end and photos are not surfaced in discovery:
+  - Verify multi-photo upload from the workshop form
+  - Photo gallery (thumbnail grid + lightbox) on workshop show page
+  - Cover photo thumbnail on workshop index cards
+  - Stimulus lightbox controller for gallery navigation
+
+
+PHASE 20 — SYSTEM TESTS & MOBILE POLISH (P2)
+---------------------------------------------
+The original plan defined unit and controller tests per task but no
+end-to-end browser tests. Before shipping, every critical flow needs
+a Capybara system test. In parallel, all three layouts must work on
+mobile — drivers are a mobile-first audience.
+
+Deliverables:
+  - System test: full driver flow (register → add car → request service
+    → operator accepts/starts → operator completes → car history visible)
+  - System test: car transfer flow (two users, VIN claim, approval,
+    ownership records updated)
+  - System test: queue flow (operator opens queue today → driver joins
+    remotely → called → served → completed → wait estimates update)
+  - System test: optimistic locking (two operators accept same request
+    simultaneously → one wins, one sees stale-object flash)
+  - Mobile responsive pass on application, workshop, and admin layouts
+    (viewport < 640px: nav collapses, forms stack, tables scroll)
+
+
+VERIFICATION (Phase 14–20)
+---------------------------
+1. bin/rails test            — all mailer, model, controller tests pass
+2. bin/rails test:system     — full driver, transfer, queue flows pass
+3. Manual:
+   a. Admin approves workshop → owner receives email
+   b. Driver submits request → workshop operator receives email +
+      in-app notification
+   c. Driver registers car with taken VIN → submits transfer → original
+      owner receives email with approval link → clicks → ownership
+      transfers
+   d. Workshop opens queue → driver joins remotely → operator calls
+      driver → driver sees "Called" status update without refreshing
+      (Turbo Stream) AND receives notification
+   e. Driver completes service → prompted to leave review → submits
+      rating → workshop avg_rating + review_count update
+   f. Search "шиномонтаж київ" in workshops index → fuzzy matches
+      return, sorted by distance from current location
+4. bin/rubocop + bin/brakeman — zero new offenses / warnings
+

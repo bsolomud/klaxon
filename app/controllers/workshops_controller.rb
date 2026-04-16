@@ -7,17 +7,27 @@ class WorkshopsController < ApplicationController
   before_action :build_missing_records, only: [:edit]
 
   def index
-    @workshops = Workshop.active.includes(:service_categories, :working_hours).order(:name)
+    @workshops = Workshop.active.includes(:service_categories, :working_hours).with_attached_photos
+    @workshops = @workshops.text_search(params[:q]) if params[:q].present?
     @workshops = @workshops.by_city(params[:city]) if params[:city].present?
     @workshops = @workshops.by_country(params[:country]) if params[:country].present?
     @workshops = @workshops.by_category_slug(params[:category]) if params[:category].present?
     @workshops = @workshops.open_now if params[:open_now].present?
     @workshops = @workshops.near_param(params[:near])
+
+    if (coords = Workshop.parse_near_coords(params[:near]))
+      @workshops = @workshops.sorted_by_distance(*coords)
+    else
+      @workshops = @workshops.order(:name)
+    end
+
+    @pagy, @workshops = pagy(@workshops, limit: 20)
   end
 
   def show
     @working_hours = @workshop.working_hours.order(:day_of_week)
     @open_queues = @workshop.service_queues.open.today
+    @reviews = @workshop.reviews.published.recent.includes(:user).limit(10)
   end
 
   def new
@@ -44,7 +54,11 @@ class WorkshopsController < ApplicationController
   end
 
   def update
-    if @workshop.update(workshop_params)
+    update_params = workshop_params
+    new_photos = update_params.extract!(:photos)[:photos]
+
+    if @workshop.update(update_params)
+      @workshop.photos.attach(new_photos) if new_photos.present?
       redirect_to @workshop, notice: t("workshops.update.success")
     else
       build_missing_records

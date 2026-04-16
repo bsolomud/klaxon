@@ -1,6 +1,8 @@
 require "test_helper"
 
 class QueueEntryTest < ActiveSupport::TestCase
+  include ActionCable::TestHelper
+
   def setup
     @entry = queue_entries(:waiting_entry)
     @queue = service_queues(:open_queue)
@@ -126,5 +128,43 @@ class QueueEntryTest < ActiveSupport::TestCase
 
     assert_equal 0, entry1.reload.estimated_wait_minutes
     assert_equal 30, entry2.reload.estimated_wait_minutes
+  end
+
+  test "broadcasts append on create" do
+    assert_broadcasts("queue_#{@queue.id}_drivers", 1) do
+      assert_broadcasts("queue_#{@queue.id}_operators", 1) do
+        QueueEntry.create!(
+          service_queue: @queue,
+          user: users(:driver_no_workshops),
+          position: @queue.next_position,
+          joined_at: Time.current
+        )
+      end
+    end
+  end
+
+  test "broadcasts replace on status change" do
+    # 1 for the entry itself + 1 for sibling wait estimate update
+    assert_broadcasts("queue_#{@queue.id}_drivers", 2) do
+      assert_broadcasts("queue_#{@queue.id}_operators", 2) do
+        @entry.update!(status: :called)
+      end
+    end
+  end
+
+  test "does not broadcast on non-status update" do
+    assert_no_broadcasts("queue_#{@queue.id}_drivers") do
+      assert_no_broadcasts("queue_#{@queue.id}_operators") do
+        @entry.update!(estimated_wait_minutes: 99)
+      end
+    end
+  end
+
+  test "broadcasts remove on destroy" do
+    assert_broadcasts("queue_#{@queue.id}_drivers", 1) do
+      assert_broadcasts("queue_#{@queue.id}_operators", 1) do
+        @entry.destroy!
+      end
+    end
   end
 end

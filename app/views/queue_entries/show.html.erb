@@ -1,4 +1,4 @@
-<%= turbo_stream_from "queue_#{@queue.id}" %>
+<%= turbo_stream_from "queue_#{@queue.id}_drivers" %>
 
 <%= render partial: "queue_entries/queue_entry", locals: { entry: @entry } %>
 

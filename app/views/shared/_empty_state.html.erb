@@ -1,0 +1,14 @@
+<div class="text-center py-12">
+  <% if local_assigns[:icon] %>
+    <div class="mx-auto mb-4 text-gray-300">
+      <%= icon %>
+    </div>
+  <% end %>
+  <h3 class="text-base font-medium text-gray-900"><%= title %></h3>
+  <p class="mt-1 text-sm text-gray-500"><%= body %></p>
+  <% if local_assigns[:cta_text] && local_assigns[:cta_url] %>
+    <div class="mt-6">
+      <%= link_to cta_text, cta_url, class: "btn-primary !w-auto" %>
+    </div>
+  <% end %>
+</div>

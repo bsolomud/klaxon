@@ -8,8 +8,9 @@ class Admin::WorkshopsController < Admin::BaseController
   }.freeze
 
   def index
-    @workshops = Workshop.order(created_at: :desc)
-    @workshops = @workshops.where(status: params[:status]) if params[:status].present?
+    scope = Workshop.order(created_at: :desc)
+    scope = scope.where(status: params[:status]) if params[:status].present?
+    @pagy, @workshops = pagy(scope, limit: 50)
   end
 
   def show
@@ -30,6 +31,8 @@ class Admin::WorkshopsController < Admin::BaseController
       @workshop.update!(status: rule[:to])
     end
 
+    notify_workshop_owners(event)
+
     redirect_to admin_workshop_path(@workshop), notice: t("admin.workshops.transition.success")
   end
 
@@ -37,5 +40,23 @@ class Admin::WorkshopsController < Admin::BaseController
 
   def set_workshop
     @workshop = Workshop.includes(:service_categories).find(params[:id])
+  end
+
+  def notify_workshop_owners(event)
+    case event
+    when "approve"
+      WorkshopMailer.with(workshop: @workshop).approved.deliver_later
+      notify_owners(:workshop_approved, @workshop)
+    when "decline"
+      WorkshopMailer.with(workshop: @workshop).declined.deliver_later
+      notify_owners(:workshop_declined, @workshop)
+    end
+  end
+
+  def notify_owners(event, notifiable)
+    owner_ids = @workshop.workshop_operators.where(role: :owner).pluck(:user_id)
+    owner_ids.each do |user_id|
+      Notification.create!(user_id: user_id, notifiable: notifiable, event: event)
+    end
   end
 end

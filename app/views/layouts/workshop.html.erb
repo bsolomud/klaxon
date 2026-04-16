@@ -13,9 +13,22 @@
   </head>
 
   <body class="h-full antialiased font-sans">
-    <div class="flex h-full">
-      <%# Sidebar %>
-      <aside class="flex w-64 flex-col border-r border-gray-200 bg-white">
+    <div class="flex h-full" data-controller="toggle">
+      <%# Mobile top bar %>
+      <div class="fixed inset-x-0 top-0 z-30 flex h-14 items-center justify-between border-b border-gray-200 bg-white px-4 md:hidden">
+        <div class="flex items-center gap-3">
+          <button data-action="toggle#toggle" data-toggle-target-value="workshop-sidebar" type="button" class="text-gray-600 hover:text-black" aria-label="Menu">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+          </button>
+          <span class="font-bold tracking-tighter text-lg">AULABS</span>
+        </div>
+        <span class="text-sm font-medium text-gray-700 truncate max-w-[50%]"><%= @workshop.name %></span>
+      </div>
+
+      <%# Sidebar — hidden on mobile by default, toggle via hamburger %>
+      <aside id="workshop-sidebar" class="hidden md:flex w-64 flex-col border-r border-gray-200 bg-white fixed inset-y-0 left-0 z-40 md:static md:z-auto">
         <%# Logo %>
         <div class="flex h-14 items-center border-b border-gray-200 px-4">
           <%= link_to root_path, class: "font-bold tracking-tighter text-lg" do %>
@@ -71,8 +84,8 @@
       </aside>
 
       <%# Main content %>
-      <main class="flex-1 overflow-y-auto">
-        <div class="mx-auto max-w-5xl px-6 py-10">
+      <main class="flex-1 overflow-y-auto pt-14 md:pt-0">
+        <div class="mx-auto max-w-5xl px-4 sm:px-6 py-10">
           <%= yield %>
         </div>
       </main>

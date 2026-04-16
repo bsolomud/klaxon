@@ -17,6 +17,11 @@ en:
               not_owned_by_requestor: "does not belong to you"
             workshop_service_category:
               not_offered_by_workshop: "is not offered by this workshop"
+        review:
+          attributes:
+            service_request:
+              not_completed: "must be completed before reviewing"
+              not_owned_by_reviewer: "does not belong to you"
         workshop_service_category:
           attributes:
             price_max:
@@ -84,6 +89,21 @@ en:
       col_date: "Date"
       no_requests: "No service requests yet."
       find_workshop: "Find a Workshop"
+      checklist_title: "Getting started"
+      checklist_add_car: "Add a car"
+      checklist_browse_workshops: "Browse workshops"
+      checklist_submit_request: "Submit your first service request"
+      banner_title: "Welcome to AULABS!"
+      banner_body: "Start by adding your car or finding a nearby workshop. We are here to make car services easy."
+      banner_dismiss: "Dismiss"
+      welcome_title: "Welcome to AULABS!"
+      welcome_body: "Everything for your car in one place. Start by adding your car, finding a workshop, or registering your own business."
+      welcome_add_car: "Add your first car"
+      welcome_add_car_hint: "Register your vehicle to track service history"
+      welcome_find_workshop: "Find a workshop"
+      welcome_find_workshop_hint: "Browse nearby car services"
+      welcome_register_workshop: "Register your workshop"
+      welcome_register_workshop_hint: "List your business on AULABS"
   layouts:
     application:
       sign_out: "Sign out"
@@ -97,6 +117,7 @@ en:
       nav:
         workshops: "Workshops"
         users: "Users"
+        reviews: "Reviews"
     workshop:
       sign_out: "Sign out"
       status_active: "Active"
@@ -155,6 +176,31 @@ en:
       transition:
         success: "Workshop status updated successfully."
         invalid_status: "Cannot perform this transition from current status."
+    reviews:
+      statuses:
+        published: "Published"
+        hidden: "Hidden"
+        flagged: "Flagged"
+      index:
+        title: "Reviews"
+        subtitle: "Moderate user reviews"
+        filter_all: "All"
+        filter_published: "Published"
+        filter_hidden: "Hidden"
+        filter_flagged: "Flagged"
+        col_workshop: "Workshop"
+        col_user: "User"
+        col_rating: "Rating"
+        col_body: "Review"
+        col_status: "Status"
+        col_date: "Date"
+        col_actions: "Actions"
+        hide: "Hide"
+        unhide: "Unhide"
+        empty: "No reviews found."
+      update:
+        success: "Review status updated."
+        invalid_status: "Invalid status."
     users:
       index:
         title: "Users"
@@ -196,6 +242,7 @@ en:
       subtitle: "Your registered vehicles"
       add_car: "Add car"
       empty: "You haven't added any cars yet."
+      empty_title: "No cars yet"
     show:
       details: "Details"
       make: "Make"
@@ -302,6 +349,7 @@ en:
       car: "Car"
       joined_at: "Joined at"
       back: "Back to workshop"
+      you_are_up: "You are up! Head to the workshop now."
   service_requests:
     price_on_request: "Price on request"
     statuses:
@@ -314,6 +362,8 @@ en:
       title: "My Service Requests"
       subtitle: "Your service requests to workshops"
       empty: "You have no service requests yet."
+      empty_title: "No service requests"
+      find_workshop: "Find a Workshop"
       col_workshop: "Workshop"
       col_service: "Service"
       col_status: "Status"
@@ -330,6 +380,7 @@ en:
       price: "Price"
       status: "Status"
       created_at: "Created"
+      leave_review: "Leave a Review"
       back: "Back to requests"
     new:
       title: "Request Service"
@@ -391,6 +442,7 @@ en:
       decline_reason: "Reason"
       manage: "Manage"
       empty: "You don't have any workshops yet."
+      empty_title: "No workshops"
   workshops:
     index:
       title: "Workshops"
@@ -400,6 +452,9 @@ en:
       open_now_filter: "Open now"
       open_now: "Open now"
       closed_now: "Closed"
+      no_reviews: "No reviews yet"
+      search_placeholder: "Search..."
+      search_button: "Search"
       empty: "No workshops found."
     show:
       open_now: "Open now"
@@ -424,6 +479,13 @@ en:
       service_duration: "Duration"
       request_service: "Request Service"
       join_queue: "Join Queue"
+      reviews: "Reviews"
+      reviews_count:
+        zero: "no reviews"
+        one: "1 review"
+        other: "%{count} reviews"
+      no_photos: "No photos yet"
+      no_reviews: "No reviews yet."
       back: "Back to workshops"
     new:
       title: "New Workshop"
@@ -450,6 +512,8 @@ en:
       media: "Logo & Photos"
       logo: "Logo"
       photos: "Photos"
+      photos_hint: "New photos will be added to existing ones."
+      photos_drop: "Click or drag photos here"
       price_min: "Min price"
       price_max: "Max price"
       price_unit: "Price unit"
@@ -701,3 +765,136 @@ en:
       password_change:
         greeting: "Hello %{email}!"
         message: "We're contacting you to notify you that your password has been changed."
+  mailers:
+    footer:
+      tagline: "AULABS — automotive services, reimagined."
+      disclaimer: "You are receiving this email because you have an account on AULABS. If you believe this was sent in error, please ignore this message."
+    workshop_mailer:
+      approved:
+        subject: "Workshop approved: %{name}"
+        heading: "Your workshop has been approved"
+        body: "Good news! Your workshop %{name} has been approved and is now live on AULABS."
+        body_html: "Good news! Your workshop %{name} has been approved and is now live on AULABS."
+        cta: "Manage my workshop"
+      declined:
+        subject: "Workshop declined: %{name}"
+        heading: "Your workshop submission was declined"
+        body: "Unfortunately, your workshop %{name} could not be approved at this time."
+        body_html: "Unfortunately, your workshop %{name} could not be approved at this time."
+        reason_label: "Reason"
+        cta: "My workshops"
+    service_request_mailer:
+      created:
+        subject: "New service request for %{workshop}"
+        heading: "A new service request was submitted"
+        body: "A driver has submitted a new service request for your workshop."
+        details: "Request details"
+        car: "Car"
+        service: "Service"
+        driver: "Driver"
+        preferred_time: "Preferred time"
+        price: "Price"
+        cta: "View request"
+      accepted:
+        subject: "Your service request was accepted"
+        heading: "Your service request was accepted"
+        body: "%{workshop} has accepted your request. You will be notified when work begins."
+        cta: "View my request"
+      rejected:
+        subject: "Your service request was declined"
+        heading: "Your service request was declined"
+        body: "%{workshop} cannot accept this request at this time."
+        cta: "View my request"
+      started:
+        subject: "Work has started on your service request"
+        heading: "Work has started"
+        body: "%{workshop} has started work on your service request."
+        cta: "View my request"
+      completed:
+        subject: "Your service is complete"
+        heading: "Service complete"
+        body: "%{workshop} has finished working on your car. A full service record is now in your history."
+        cta: "View service record"
+    car_transfer_mailer:
+      requested:
+        subject: "Ownership transfer requested for your car"
+        heading: "A transfer has been requested"
+        body: "Another user is requesting the transfer of ownership for your car."
+        details: "Transfer details"
+        car: "Car"
+        requested_by: "Requested by"
+        expires_at: "Expires at"
+        cta: "Review this request"
+      approved:
+        subject: "Car ownership transferred"
+        heading: "You are now the owner"
+        body: "The ownership transfer has been approved. The car is now in your garage."
+        car: "Car"
+        cta: "View my cars"
+      rejected:
+        subject: "Car transfer was rejected"
+        heading: "Transfer rejected"
+        body: "Your transfer request was rejected by the current owner."
+        car: "Car"
+        cta: "View transfer"
+      cancelled:
+        subject: "Car transfer was cancelled"
+        heading: "Transfer cancelled"
+        body: "The transfer request was cancelled."
+        car: "Car"
+        cta: "View transfer"
+      expired:
+        subject: "Car transfer has expired"
+        heading: "Transfer expired"
+        body: "The transfer request has expired without being acted upon."
+        car: "Car"
+        cta: "View transfer"
+    queue_mailer:
+      called:
+        subject: "Your turn at %{workshop}!"
+        heading: "It is your turn!"
+        body: "Please head to %{workshop} — they are ready to serve you now."
+        position: "Position"
+        address: "Address"
+        cta: "View queue"
+  reviews:
+    new:
+      title: "Leave a Review"
+      rating: "Rating"
+      body: "Your review"
+      body_placeholder: "Share your experience..."
+      submit: "Submit Review"
+      cancel: "Cancel"
+    create:
+      success: "Thank you for your review!"
+      already_reviewed: "You have already reviewed this service."
+  notifications:
+    index:
+      title: "Notifications"
+      subtitle: "Recent activity on your account"
+      empty: "No notifications yet."
+      mark_all_read: "Mark all as read"
+      view: "Open"
+      col_event: "Event"
+      col_date: "Date"
+    update:
+      success: "Notification marked as read."
+    update_all:
+      success: "All notifications marked as read."
+    events:
+      workshop_approved: "Workshop approved"
+      workshop_declined: "Workshop declined"
+      service_request_created: "New service request"
+      service_request_accepted: "Service request accepted"
+      service_request_rejected: "Service request declined"
+      service_request_started: "Service started"
+      service_request_completed: "Service completed"
+      car_transfer_requested: "Car transfer requested"
+      car_transfer_approved: "Car transfer approved"
+      car_transfer_rejected: "Car transfer rejected"
+      car_transfer_cancelled: "Car transfer cancelled"
+      car_transfer_expired: "Car transfer expired"
+      queue_called: "Your turn in the queue"
+    bell:
+      label: "Notifications"
+      unread_title: "%{count} unread notifications"

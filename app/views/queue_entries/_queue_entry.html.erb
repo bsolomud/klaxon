@@ -1,4 +1,10 @@
 <div id="<%= dom_id(entry) %>" class="max-w-lg mx-auto">
+  <% if entry.called? %>
+    <div class="mb-6 rounded-2xl bg-green-50 border border-green-200 p-6 text-center" data-testid="called-banner">
+      <p class="text-lg font-bold text-green-800"><%= t("queue_entries.show.you_are_up") %></p>
+    </div>
+  <% end %>
+
   <div class="bg-white border border-gray-100 rounded-2xl p-8 shadow-sm text-center">
     <h1 class="text-2xl font-bold tracking-tight text-gray-900 mb-2"><%= t("queue_entries.show.title") %></h1>
     <p class="text-sm text-gray-500 mb-8"><%= entry.service_queue.workshop.name %></p>

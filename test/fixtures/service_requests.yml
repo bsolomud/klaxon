@@ -57,3 +57,13 @@ other_user_request:
   description: "Повна мийка авто"
   preferred_time: "<%= 1.day.from_now.change(hour: 9) %>"
   lock_version: 0
+
+other_user_completed:
+  car: leaf
+  workshop: two
+  workshop_service_category: car_wash_basic
+  price_snapshot: { "min": 200, "max": 200, "unit": "послуга", "currency": "UAH" }
+  status: 4
+  description: "Мийка кузова"
+  preferred_time: "<%= 2.days.ago.change(hour: 10) %>"
+  lock_version: 0
