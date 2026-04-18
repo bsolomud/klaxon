@@ -8,6 +8,10 @@ class ServiceQueue < ApplicationRecord
 
   enum :status, { open: 0, paused: 1, closed: 2 }
 
+  STATUS_COLORS = {
+    "open" => "green", "paused" => "yellow", "closed" => "gray"
+  }.freeze
+
   validates :date, presence: true
   validates :workshop_id, uniqueness: { scope: [:service_category_id, :date] }
 

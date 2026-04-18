@@ -46,16 +46,16 @@
 
         <%# Navigation %>
         <nav class="flex-1 space-y-1 px-3 py-4">
-          <%= link_to t("layouts.workshop.nav.dashboard"),
+          <%= link_to t("layouts.operator.nav.dashboard"),
                 workshop_management_workshop_dashboard_path(@workshop),
                 class: "flex items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors" %>
-          <%= link_to t("layouts.workshop.nav.requests"),
+          <%= link_to t("layouts.operator.nav.requests"),
                 workshop_management_workshop_service_requests_path(@workshop),
                 class: "flex items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors" %>
-          <%= link_to t("layouts.workshop.nav.queue"),
+          <%= link_to t("layouts.operator.nav.queue"),
                 workshop_management_workshop_queues_path(@workshop),
                 class: "flex items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors" %>
-          <%= link_to t("layouts.workshop.nav.settings"),
+          <%= link_to t("layouts.operator.nav.settings"),
                 "#",
                 class: "flex items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors" %>
         </nav>
@@ -63,7 +63,7 @@
         <%# Workshop switcher %>
         <% if @other_workshops.any? %>
           <div class="border-t border-gray-200 px-4 py-4">
-            <p class="mb-2 text-[10px] font-medium uppercase tracking-wider text-gray-400"><%= t("layouts.workshop.switch_workshop") %></p>
+            <p class="mb-2 text-[10px] font-medium uppercase tracking-wider text-gray-400"><%= t("layouts.operator.switch_workshop") %></p>
             <div class="space-y-1">
               <% @other_workshops.each do |workshop| %>
                 <%= link_to workshop.name,
@@ -78,7 +78,7 @@
         <div class="border-t border-gray-200 px-4 py-3">
           <div class="flex items-center justify-between">
             <span class="truncate text-xs text-gray-500"><%= current_user.email %></span>
-            <%= button_to t("layouts.workshop.sign_out"), destroy_user_session_path, method: :delete, class: "text-xs text-gray-400 hover:text-gray-700 transition-colors cursor-pointer" %>
+            <%= button_to t("layouts.operator.sign_out"), destroy_user_session_path, method: :delete, class: "text-xs text-gray-400 hover:text-gray-700 transition-colors cursor-pointer" %>
           </div>
         </div>
       </aside>

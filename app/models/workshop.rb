@@ -26,6 +26,11 @@ class Workshop < ApplicationRecord
 
   enum :status, { pending: 0, active: 1, declined: 2, suspended: 3 }
 
+  STATUS_COLORS = {
+    "active" => "green", "pending" => "yellow",
+    "suspended" => "red", "declined" => "gray"
+  }.freeze
+
   ALLOWED_IMAGE_TYPES = %w[image/png image/jpeg image/webp].freeze
   MAX_PHOTO_SIZE = 10.megabytes
   MAX_LOGO_SIZE = 5.megabytes
@@ -128,6 +133,14 @@ class Workshop < ApplicationRecord
   def recompute_rating!
     stats = reviews.published.pick(Arel.sql("AVG(rating), COUNT(*)"))
     update_columns(avg_rating: stats[0]&.round(2), review_count: stats[1].to_i)
+  end
+
+  def operator_emails
+    workshop_operators.includes(:user).map { |op| op.user.email }
+  end
+
+  def owner_emails
+    workshop_operators.where(role: :owner).includes(:user).map { |op| op.user.email }
   end
 
   def full_address

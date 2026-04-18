@@ -5,6 +5,11 @@ class QueueEntry < ApplicationRecord
 
   enum :status, { waiting: 0, called: 1, in_service: 2, completed: 3, no_show: 4 }
 
+  STATUS_COLORS = {
+    "waiting" => "yellow", "called" => "blue", "in_service" => "indigo",
+    "completed" => "green", "no_show" => "red"
+  }.freeze
+
   validates :position, presence: true,
             uniqueness: { scope: :queue_id }
   validates :joined_at, presence: true

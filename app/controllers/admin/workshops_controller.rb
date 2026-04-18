@@ -1,4 +1,5 @@
 class Admin::WorkshopsController < Admin::BaseController
+  include NotificationDispatch
   before_action :set_workshop, only: %i[show transition]
 
   TRANSITIONS = {
@@ -43,20 +44,23 @@ class Admin::WorkshopsController < Admin::BaseController
   end
 
   def notify_workshop_owners(event)
+    owner_ids = @workshop.workshop_operators.where(role: :owner).pluck(:user_id)
+
     case event
     when "approve"
-      WorkshopMailer.with(workshop: @workshop).approved.deliver_later
-      notify_owners(:workshop_approved, @workshop)
+      dispatch_notification(
+        recipients: owner_ids,
+        notifiable: @workshop,
+        event: :workshop_approved,
+        mailer: WorkshopMailer.with(workshop: @workshop).approved
+      )
     when "decline"
-      WorkshopMailer.with(workshop: @workshop).declined.deliver_later
-      notify_owners(:workshop_declined, @workshop)
-    end
-  end
-
-  def notify_owners(event, notifiable)
-    owner_ids = @workshop.workshop_operators.where(role: :owner).pluck(:user_id)
-    owner_ids.each do |user_id|
-      Notification.create!(user_id: user_id, notifiable: notifiable, event: event)
+      dispatch_notification(
+        recipients: owner_ids,
+        notifiable: @workshop,
+        event: :workshop_declined,
+        mailer: WorkshopMailer.with(workshop: @workshop).declined
+      )
     end
   end
 end

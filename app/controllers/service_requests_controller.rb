@@ -1,4 +1,5 @@
 class ServiceRequestsController < ApplicationController
+  include NotificationDispatch
   before_action :set_service_request, only: [:show]
 
   def index
@@ -27,7 +28,12 @@ class ServiceRequestsController < ApplicationController
     @service_request.workshop = @workshop
 
     if @service_request.save
-      notify_workshop_operators(@service_request)
+      dispatch_notification(
+        recipients: @service_request.workshop.workshop_operators.pluck(:user_id),
+        notifiable: @service_request,
+        event: :service_request_created,
+        mailer: ServiceRequestMailer.with(service_request: @service_request).created
+      )
       redirect_to @service_request, notice: t("service_requests.create.success")
     else
       @cars = current_user.cars.order(:make, :model)
@@ -47,16 +53,5 @@ class ServiceRequestsController < ApplicationController
       :car_id, :workshop_id, :workshop_service_category_id,
       :description, :preferred_time
     )
-  end
-
-  def notify_workshop_operators(service_request)
-    ServiceRequestMailer.with(service_request: service_request).created.deliver_later
-    service_request.workshop.workshop_operators.pluck(:user_id).each do |user_id|
-      Notification.create!(
-        user_id: user_id,
-        notifiable: service_request,
-        event: :service_request_created
-      )
-    end
   end
 end

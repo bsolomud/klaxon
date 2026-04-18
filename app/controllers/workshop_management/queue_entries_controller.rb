@@ -1,5 +1,6 @@
 class WorkshopManagement::QueueEntriesController < WorkshopManagement::BaseController
   include StateTransitionable
+  include NotificationDispatch
 
   before_action :set_queue
   before_action :set_entry
@@ -8,7 +9,14 @@ class WorkshopManagement::QueueEntriesController < WorkshopManagement::BaseContr
     transition_queue_entry(
       :waiting,
       :called!,
-      after_success: ->(entry) { notify_driver_called(entry) }
+      after_success: ->(entry) {
+        dispatch_notification(
+          recipients: entry.user,
+          notifiable: entry,
+          event: :queue_called,
+          mailer: QueueMailer.with(queue_entry: entry).called
+        )
+      }
     ) do |entry|
       entry.called_at = Time.current
     end
@@ -50,15 +58,6 @@ class WorkshopManagement::QueueEntriesController < WorkshopManagement::BaseContr
       invalid_message: t("workshop_management.queue_entries.invalid_transition"),
       after_success: after_success,
       &block
-    )
-  end
-
-  def notify_driver_called(entry)
-    QueueMailer.with(queue_entry: entry).called.deliver_later
-    Notification.create!(
-      user: entry.user,
-      notifiable: entry,
-      event: :queue_called
     )
   end
 end

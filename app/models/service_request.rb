@@ -10,6 +10,11 @@ class ServiceRequest < ApplicationRecord
 
   enum :status, { pending: 0, accepted: 1, rejected: 2, in_progress: 3, completed: 4 }
 
+  STATUS_COLORS = {
+    "pending" => "yellow", "accepted" => "blue", "rejected" => "red",
+    "in_progress" => "indigo", "completed" => "green"
+  }.freeze
+
   validates :description, presence: true
   validates :preferred_time, presence: true
 

@@ -118,7 +118,7 @@ en:
         workshops: "Workshops"
         users: "Users"
         reviews: "Reviews"
-    workshop:
+    operator:
       sign_out: "Sign out"
       status_active: "Active"
       status_pending: "Pending"

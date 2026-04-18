@@ -2,7 +2,7 @@ class ServiceRequestMailer < ApplicationMailer
   def created
     @service_request = params[:service_request]
     @workshop = @service_request.workshop
-    @recipients = workshop_operator_emails(@workshop)
+    @recipients = @workshop.operator_emails
     return if @recipients.empty?
 
     mail(
@@ -54,11 +54,5 @@ class ServiceRequestMailer < ApplicationMailer
       to: @driver.email,
       subject: t("mailers.service_request_mailer.completed.subject")
     )
-  end
-
-  private
-
-  def workshop_operator_emails(workshop)
-    workshop.workshop_operators.includes(:user).map { |op| op.user.email }
   end
 end

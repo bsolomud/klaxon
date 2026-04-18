@@ -118,7 +118,7 @@ uk:
         workshops: "Майстерні"
         users: "Користувачі"
         reviews: "Відгуки"
-    workshop:
+    operator:
       sign_out: "Вихід"
       status_active: "Активна"
       status_pending: "На розгляді"

@@ -1,4 +1,5 @@
 class WorkshopManagement::ServiceRecordsController < WorkshopManagement::BaseController
+  include NotificationDispatch
   before_action :set_service_request
 
   def new
@@ -15,7 +16,12 @@ class WorkshopManagement::ServiceRecordsController < WorkshopManagement::BaseCon
       @service_request.completed!
     end
 
-    notify_driver_completed(@service_request)
+    dispatch_notification(
+      recipients: @service_request.car.user,
+      notifiable: @service_request,
+      event: :service_request_completed,
+      mailer: ServiceRequestMailer.with(service_request: @service_request).completed
+    )
 
     redirect_to workshop_management_workshop_service_request_path(@workshop, @service_request),
                 notice: t(".success")
@@ -34,15 +40,6 @@ class WorkshopManagement::ServiceRecordsController < WorkshopManagement::BaseCon
       :summary, :recommendations, :performed_by,
       :odometer_at_service, :labor_cost, :parts_cost,
       :next_service_at_km, :next_service_at_date
-    )
-  end
-
-  def notify_driver_completed(service_request)
-    ServiceRequestMailer.with(service_request: service_request).completed.deliver_later
-    Notification.create!(
-      user: service_request.car.user,
-      notifiable: service_request,
-      event: :service_request_completed
     )
   end
 end

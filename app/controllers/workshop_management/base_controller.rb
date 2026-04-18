@@ -1,5 +1,5 @@
 class WorkshopManagement::BaseController < ApplicationController
-  layout "workshop"
+  layout "operator"
   before_action :set_current_workshop
   before_action :require_workshop_access!
 

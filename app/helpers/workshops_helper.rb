@@ -1,9 +1,4 @@
 module WorkshopsHelper
-  WORKSHOP_STATUS_COLORS = {
-    "active" => "green", "pending" => "yellow",
-    "suspended" => "red", "declined" => "gray"
-  }.freeze
-
   def day_name(day_of_week)
     I18n.t("date.day_names")[day_of_week]
   end
@@ -20,6 +15,6 @@ module WorkshopsHelper
   end
 
   def workshop_status_badge(status)
-    status_badge(status, WORKSHOP_STATUS_COLORS, "layouts.workshop.status_#{status}")
+    status_badge(status, Workshop::STATUS_COLORS, "layouts.operator.status_#{status}")
   end
 end
