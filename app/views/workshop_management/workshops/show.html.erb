@@ -1,1 +1,36 @@
-<h1 class="text-2xl font-bold tracking-tight text-gray-900"><%= @workshop.name %></h1>
+<div class="mb-8">
+  <h1 class="text-2xl font-bold tracking-tight text-gray-900"><%= t(".title") %></h1>
+  <p class="mt-1 text-sm text-gray-500"><%= t(".subtitle") %></p>
+</div>
+
+<div class="space-y-6">
+  <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-sm font-medium text-gray-900 uppercase tracking-wider"><%= t(".general") %></h2>
+      <%= link_to t(".edit"), edit_workshop_path(@workshop), class: "text-sm font-medium text-gray-500 hover:text-black transition-colors" %>
+    </div>
+    <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+      <div>
+        <dt class="text-gray-500"><%= t(".name") %></dt>
+        <dd class="mt-0.5 font-medium text-gray-900"><%= @workshop.name %></dd>
+      </div>
+      <div>
+        <dt class="text-gray-500"><%= t(".phone") %></dt>
+        <dd class="mt-0.5 font-medium text-gray-900"><%= @workshop.phone %></dd>
+      </div>
+      <div>
+        <dt class="text-gray-500"><%= t(".email") %></dt>
+        <dd class="mt-0.5 font-medium text-gray-900"><%= @workshop.email.presence || "—" %></dd>
+      </div>
+      <div>
+        <dt class="text-gray-500"><%= t(".address") %></dt>
+        <dd class="mt-0.5 font-medium text-gray-900"><%= @workshop.full_address %></dd>
+      </div>
+    </dl>
+  </div>
+
+  <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+    <h2 class="text-sm font-medium text-gray-900 uppercase tracking-wider mb-4"><%= t(".public_page") %></h2>
+    <%= link_to t(".view_public"), workshop_path(@workshop), class: "text-sm font-medium text-gray-500 hover:text-black transition-colors", target: "_blank" %>
+  </div>
+</div>

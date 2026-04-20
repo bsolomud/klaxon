@@ -68,7 +68,7 @@ Rails.application.routes.draw do
       patch :cancel
     end
   end
-  resources :service_categories
+  resources :service_categories, only: [:index, :show]
   resources :workshops
   resources :my_workshops, only: [:index]
   resource :onboarding, only: [:update], controller: "onboarding"

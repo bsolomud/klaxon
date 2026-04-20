@@ -34,13 +34,10 @@ class QueueEntry < ApplicationRecord
                     &.find_by(workshop_id: queue.workshop_id)
                     &.estimated_duration_minutes || 30
 
-    waiting_ids = queue.queue_entries.waiting.order(:position).pluck(:id)
-    return if waiting_ids.empty?
-
-    cases = waiting_ids.each_with_index.map { |id, i| "WHEN #{id} THEN #{i * duration}" }
-    queue.queue_entries.where(id: waiting_ids).update_all(
-      "estimated_wait_minutes = CASE id #{cases.join(' ')} END"
-    )
+    waiting_entries = queue.queue_entries.waiting.order(:position)
+    waiting_entries.each_with_index do |entry, i|
+      entry.update_column(:estimated_wait_minutes, i * duration) # rubocop:disable Rails/SkipsModelValidations
+    end
   end
 
   private

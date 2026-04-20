@@ -4,9 +4,6 @@
     <p class="mt-1 text-sm text-gray-500"><%= t(".subtitle") %></p>
   </div>
 
-  <% if user_signed_in? %>
-    <%= link_to t(".new_category"), new_service_category_path, class: "btn-primary !w-auto" %>
-  <% end %>
 </div>
 
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -26,6 +26,10 @@ uk:
           attributes:
             price_max:
               greater_than_or_equal_to_price_min: "повинна бути більшою або рівною мінімальній ціні"
+        service_record:
+          attributes:
+            odometer_at_service:
+              less_than_current: "не може бути менше поточного показника одометра автомобіля"
     models:
       user: "Користувач"
       service_category: "Категорія послуг"
@@ -385,6 +389,8 @@ uk:
     new:
       title: "Замовити послугу"
       back: "Назад до майстерні"
+      no_cars_html: "Потрібно додати авто перед замовленням послуги. %{link}"
+      add_car: "Додати авто"
     form:
       car: "Автомобіль"
       car_blank: "— оберіть авто —"
@@ -542,7 +548,20 @@ uk:
       success: "Майстерню успішно оновлено."
     destroy:
       success: "Майстерню успішно видалено."
+      has_requests: "Неможливо видалити майстерню, яка має запити на обслуговування."
   workshop_management:
+    workshops:
+      show:
+        title: "Налаштування"
+        subtitle: "Керування налаштуваннями майстерні"
+        general: "Загальна інформація"
+        edit: "Редагувати"
+        name: "Назва"
+        phone: "Телефон"
+        email: "Електронна пошта"
+        address: "Адреса"
+        public_page: "Публічна сторінка"
+        view_public: "Переглянути публічну сторінку"
     service_requests:
       invalid_transition: "Ця дія недоступна для поточного статусу запиту."
       index:

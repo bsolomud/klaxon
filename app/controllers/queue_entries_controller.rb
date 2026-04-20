@@ -14,7 +14,8 @@ class QueueEntriesController < ApplicationController
     end
 
     redirect_to queue_entry_path(@entry), notice: t(".success")
-  rescue ActiveRecord::RecordNotUnique
+  rescue ActiveRecord::RecordNotUnique => e
+    raise unless e.message.include?("position")
     retry
   rescue ActiveRecord::RecordInvalid
     redirect_to workshop_path(@queue.workshop), alert: @entry.errors.full_messages.to_sentence

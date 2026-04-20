@@ -69,6 +69,8 @@ class WorkshopsController < ApplicationController
   def destroy
     @workshop.destroy!
     redirect_to workshops_path, notice: t("workshops.destroy.success")
+  rescue ActiveRecord::DeleteRestrictionError
+    redirect_to @workshop, alert: t("workshops.destroy.has_requests")
   end
 
   private

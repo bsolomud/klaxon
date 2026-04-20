@@ -4,7 +4,15 @@
 </div>
 
 <div class="max-w-2xl">
-  <%= render "form", service_request: @service_request, workshop: @workshop, cars: @cars, categories: @categories %>
+  <% if @cars.empty? %>
+    <div class="rounded-lg border border-yellow-200 bg-yellow-50 p-4 mb-6">
+      <p class="text-sm text-yellow-800">
+        <%= t(".no_cars_html", link: link_to(t(".add_car"), new_car_path, class: "font-medium underline hover:text-yellow-900")) %>
+      </p>
+    </div>
+  <% else %>
+    <%= render "form", service_request: @service_request, workshop: @workshop, cars: @cars, categories: @categories %>
+  <% end %>
 </div>
 
 <div class="mt-6">

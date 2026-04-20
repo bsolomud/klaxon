@@ -45,19 +45,22 @@
         </div>
 
         <%# Navigation %>
+        <% nav_base = "flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors" %>
+        <% nav_active = "#{nav_base} bg-gray-100 text-gray-900" %>
+        <% nav_inactive = "#{nav_base} text-gray-700 hover:bg-gray-100 hover:text-gray-900" %>
         <nav class="flex-1 space-y-1 px-3 py-4">
           <%= link_to t("layouts.operator.nav.dashboard"),
                 workshop_management_workshop_dashboard_path(@workshop),
-                class: "flex items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors" %>
+                class: controller_name == "dashboards" ? nav_active : nav_inactive %>
           <%= link_to t("layouts.operator.nav.requests"),
                 workshop_management_workshop_service_requests_path(@workshop),
-                class: "flex items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors" %>
+                class: controller_name.in?(%w[service_requests service_records]) ? nav_active : nav_inactive %>
           <%= link_to t("layouts.operator.nav.queue"),
                 workshop_management_workshop_queues_path(@workshop),
-                class: "flex items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors" %>
+                class: controller_name.in?(%w[queues queue_entries]) ? nav_active : nav_inactive %>
           <%= link_to t("layouts.operator.nav.settings"),
-                "#",
-                class: "flex items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors" %>
+                workshop_management_workshop_path(@workshop),
+                class: (controller_name == "workshops" && action_name == "show") ? nav_active : nav_inactive %>
         </nav>
 
         <%# Workshop switcher %>

@@ -7,6 +7,7 @@ class ServiceRecord < ApplicationRecord
 
   validates :summary, presence: true
   validates :completed_at, presence: true
+  validate :odometer_not_backwards
 
   before_validation :set_completed_at, on: :create
 
@@ -20,6 +21,14 @@ class ServiceRecord < ApplicationRecord
 
   def set_completed_at
     self.completed_at ||= Time.current
+  end
+
+  def odometer_not_backwards
+    return if odometer_at_service.blank?
+    return unless car&.odometer.present?
+    return if odometer_at_service >= car.odometer
+
+    errors.add(:odometer_at_service, :less_than_current)
   end
 
   def update_car_odometer

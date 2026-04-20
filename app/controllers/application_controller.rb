@@ -8,8 +8,13 @@ class ApplicationController < ActionController::Base
   stale_when_importmap_changes
 
   before_action :authenticate_user!
+  before_action :set_unread_notifications_count
 
   private
+
+  def set_unread_notifications_count
+    @unread_notifications_count = current_user.notifications.unread.count if user_signed_in?
+  end
 
   def require_workshop_access!(workshop = @workshop)
     redirect_to root_path, alert: t("authorization.access_denied") unless current_user.manages_workshop?(workshop)

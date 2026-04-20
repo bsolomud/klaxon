@@ -26,6 +26,10 @@ en:
           attributes:
             price_max:
               greater_than_or_equal_to_price_min: "must be greater than or equal to minimum price"
+        service_record:
+          attributes:
+            odometer_at_service:
+              less_than_current: "cannot be less than the car's current odometer reading"
     models:
       user: "User"
       service_category: "Service category"
@@ -385,6 +389,8 @@ en:
     new:
       title: "Request Service"
       back: "Back to workshop"
+      no_cars_html: "You need to add a car before requesting a service. %{link}"
+      add_car: "Add a car"
     form:
       car: "Car"
       car_blank: "— select car —"
@@ -538,7 +544,20 @@ en:
       success: "Workshop was successfully updated."
     destroy:
       success: "Workshop was successfully deleted."
+      has_requests: "Cannot delete workshop that has service requests."
   workshop_management:
+    workshops:
+      show:
+        title: "Settings"
+        subtitle: "Manage your workshop settings"
+        general: "General Information"
+        edit: "Edit"
+        name: "Name"
+        phone: "Phone"
+        email: "Email"
+        address: "Address"
+        public_page: "Public Page"
+        view_public: "View public workshop page"
     service_requests:
       invalid_transition: "This action is not available for the current request status."
       index:

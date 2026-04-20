@@ -30,6 +30,8 @@ class Notification < ApplicationRecord
   end
 
   def target_path
+    return unless notifiable
+
     case notifiable_type
     when "ServiceRequest"
       Rails.application.routes.url_helpers.service_request_path(notifiable_id)
