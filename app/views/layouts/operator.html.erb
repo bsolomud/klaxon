@@ -13,11 +13,11 @@
   </head>
 
   <body class="h-full antialiased font-sans">
-    <div class="flex h-full" data-controller="toggle">
+    <div class="flex h-full" data-controller="toggle" data-toggle-target-value="workshop-sidebar">
       <%# Mobile top bar %>
       <div class="fixed inset-x-0 top-0 z-30 flex h-14 items-center justify-between border-b border-gray-200 bg-white px-4 md:hidden">
         <div class="flex items-center gap-3">
-          <button data-action="toggle#toggle" data-toggle-target-value="workshop-sidebar" type="button" class="text-gray-600 hover:text-black" aria-label="Menu">
+          <button data-action="toggle#toggle" type="button" class="text-gray-600 hover:text-black" aria-label="Menu">
             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
             </svg>

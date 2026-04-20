@@ -32,7 +32,7 @@
       </main>
     <% else %>
       <%# Для внутрішніх сторінок: стандартна сітка %>
-      <header class="bg-white border-b border-gray-200" data-controller="toggle">
+      <header class="bg-white border-b border-gray-200" data-controller="toggle" data-toggle-target-value="mobile-nav">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between">
           <div class="font-bold tracking-tighter text-xl">
             <%= link_to "AULABS", root_path, class: "text-black no-underline" %>
@@ -53,7 +53,7 @@
             <%# Mobile hamburger + bell %>
             <div class="flex sm:hidden items-center gap-3">
               <%= render "shared/notifications_bell" %>
-              <button data-action="toggle#toggle" data-toggle-target-value="mobile-nav" type="button" class="text-gray-600 hover:text-black" aria-label="Menu">
+              <button data-action="toggle#toggle" type="button" class="text-gray-600 hover:text-black" aria-label="Menu">
                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                 </svg>
