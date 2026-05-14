@@ -1,0 +1,17 @@
+camry:
+  car_make: toyota
+  name: Camry
+  status: 1
+  submitted_by: null
+
+corolla:
+  car_make: toyota
+  name: Corolla
+  status: 1
+  submitted_by: null
+
+pending_model:
+  car_make: toyota
+  name: NewModel
+  status: 0
+  submitted_by: one

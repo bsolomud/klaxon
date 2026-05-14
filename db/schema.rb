@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_14_194219) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_20_190406) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -52,6 +52,28 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_14_194219) do
     t.index ["email"], name: "index_admins_on_email", unique: true
   end
 
+  create_table "car_makes", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.integer "status", default: 0, null: false
+    t.bigint "submitted_by_id"
+    t.datetime "updated_at", null: false
+    t.index "lower((name)::text)", name: "index_car_makes_on_lower_name", unique: true
+    t.index ["submitted_by_id"], name: "index_car_makes_on_submitted_by_id"
+  end
+
+  create_table "car_models", force: :cascade do |t|
+    t.bigint "car_make_id", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.integer "status", default: 0, null: false
+    t.bigint "submitted_by_id"
+    t.datetime "updated_at", null: false
+    t.index "car_make_id, lower((name)::text)", name: "index_car_models_on_make_and_lower_name", unique: true
+    t.index ["car_make_id"], name: "index_car_models_on_car_make_id"
+    t.index ["submitted_by_id"], name: "index_car_models_on_submitted_by_id"
+  end
+
   create_table "car_ownership_records", force: :cascade do |t|
     t.bigint "car_id", null: false
     t.bigint "car_transfer_id"
@@ -91,6 +113,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_14_194219) do
   end
 
   create_table "cars", force: :cascade do |t|
+    t.bigint "car_make_id"
+    t.bigint "car_model_id"
     t.datetime "created_at", null: false
     t.decimal "engine_volume", precision: 3, scale: 1
     t.integer "fuel_type", default: 0, null: false
@@ -104,6 +128,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_14_194219) do
     t.string "vin"
     t.integer "year", null: false
     t.index "lower((license_plate)::text)", name: "index_cars_on_lower_license_plate", unique: true
+    t.index ["car_make_id"], name: "index_cars_on_car_make_id"
+    t.index ["car_model_id"], name: "index_cars_on_car_model_id"
     t.index ["user_id"], name: "index_cars_on_user_id"
     t.index ["vin"], name: "index_cars_on_vin", unique: true
   end
@@ -307,6 +333,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_14_194219) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "car_makes", "users", column: "submitted_by_id"
+  add_foreign_key "car_models", "car_makes"
+  add_foreign_key "car_models", "users", column: "submitted_by_id"
   add_foreign_key "car_ownership_records", "car_transfers"
   add_foreign_key "car_ownership_records", "cars"
   add_foreign_key "car_ownership_records", "users"
@@ -315,6 +344,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_14_194219) do
   add_foreign_key "car_transfers", "cars"
   add_foreign_key "car_transfers", "users", column: "from_user_id"
   add_foreign_key "car_transfers", "users", column: "to_user_id"
+  add_foreign_key "cars", "car_makes"
+  add_foreign_key "cars", "car_models"
   add_foreign_key "cars", "users"
   add_foreign_key "notifications", "users"
   add_foreign_key "queue_entries", "cars"

@@ -13,6 +13,16 @@ class AuFormBuilder < ActionView::Helpers::FormBuilder
     end
   end
 
+  def select(name, choices = nil, options = {}, html_options = {}, &block)
+    if object.errors[name].any?
+      html_options[:class] = Array(html_options[:class]).join(" ") + " !border-red-500 !focus:ring-red-500"
+    end
+
+    @template.content_tag(:div, class: "mb-4") do
+      super(name, choices, options, html_options, &block) + error_message_for(name)
+    end
+  end
+
   def check_box(name, options = {}, checked_value = "1", unchecked_value = "0")
     # Витягуємо текст лейбла, щоб він не потрапив у атрибути самого інпуту
     label_text = options.delete(:label_text)

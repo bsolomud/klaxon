@@ -122,6 +122,7 @@ en:
         workshops: "Workshops"
         users: "Users"
         reviews: "Reviews"
+        car_makes: "Makes/Models"
     operator:
       sign_out: "Sign out"
       status_active: "Active"
@@ -232,6 +233,29 @@ en:
         last_sign_in: "Last sign in"
         sign_in_count: "Sign in count"
         back: "Back to users"
+    car_makes:
+      statuses:
+        pending: "Pending"
+        approved: "Approved"
+        rejected: "Rejected"
+      index:
+        title: "Car Makes & Models"
+        subtitle: "Approve or reject user-submitted car makes and models"
+        filter_all: "All"
+        filter_pending: "Pending"
+        filter_approved: "Approved"
+        filter_rejected: "Rejected"
+        col_name: "Make"
+        col_models: "Models"
+        col_status: "Status"
+        col_submitted_by: "Submitted by"
+        col_created: "Created"
+        approve: "Approve"
+        reject: "Reject"
+        empty: "No car makes found."
+      transition:
+        success: "Car make status updated successfully."
+        invalid_status: "Cannot perform this transition from current status."
   cars:
     fuel_types:
       gasoline: "Gasoline"
@@ -485,6 +509,7 @@ en:
       service_duration: "Duration"
       request_service: "Request Service"
       join_queue: "Join Queue"
+      join_queue_for: "Join Queue — %{service}"
       reviews: "Reviews"
       reviews_count:
         zero: "no reviews"

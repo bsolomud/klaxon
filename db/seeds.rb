@@ -118,3 +118,21 @@ Admin.find_or_create_by!(email: "admin@aulabs.dev") do |admin|
 end
 
 puts "Seeded admin: admin@aulabs.dev"
+
+# ============================================================
+# Car Makes & Models
+# ============================================================
+
+car_makes_data = YAML.load_file(Rails.root.join("db/seeds/car_makes_models.yml"))
+car_makes_data.each do |make_name, models|
+  car_make = CarMake.find_or_create_by!(name: make_name) do |m|
+    m.status = :approved
+  end
+  models.each do |model_name|
+    car_make.car_models.find_or_create_by!(name: model_name) do |m|
+      m.status = :approved
+    end
+  end
+end
+
+puts "Seeded #{CarMake.count} car makes with #{CarModel.count} models"

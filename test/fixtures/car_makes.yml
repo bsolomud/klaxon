@@ -1,0 +1,14 @@
+toyota:
+  name: Toyota
+  status: 1
+  submitted_by: null
+
+pending_make:
+  name: NewBrand
+  status: 0
+  submitted_by: one
+
+rejected_make:
+  name: FakeBrand
+  status: 2
+  submitted_by: one

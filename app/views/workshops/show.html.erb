@@ -16,7 +16,7 @@
       <div class="flex flex-wrap items-center gap-2">
         <% if @workshop.active? %>
           <% @open_queues.each do |queue| %>
-            <%= button_to t(".join_queue"),
+            <%= button_to queue.service_category ? t(".join_queue_for", service: queue.service_category.name) : t(".join_queue"),
                   queue_entries_path(queue_id: queue.id, car_id: current_user.cars.first&.id),
                   method: :post,
                   class: "btn-primary cursor-pointer" %>

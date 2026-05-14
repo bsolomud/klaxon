@@ -19,6 +19,7 @@ class CarsController < ApplicationController
     @car = current_user.cars.build(car_params)
 
     if @car.save
+      resolve_car_make_model(@car)
       redirect_to @car, notice: t("cars.create.success")
     else
       render :new, status: :unprocessable_entity
@@ -30,6 +31,7 @@ class CarsController < ApplicationController
 
   def update
     if @car.update(car_params)
+      resolve_car_make_model(@car)
       redirect_to @car, notice: t("cars.update.success")
     else
       render :edit, status: :unprocessable_entity
@@ -50,7 +52,23 @@ class CarsController < ApplicationController
   def car_params
     params.require(:car).permit(
       :make, :model, :year, :license_plate, :vin,
-      :fuel_type, :engine_volume, :transmission
+      :fuel_type, :engine_volume, :transmission,
+      :car_make_id, :car_model_id
     )
+  end
+
+  def resolve_car_make_model(car)
+    if car.car_make_id.blank? && car.make.present?
+      car_make = CarMake.find_by("lower(name) = ?", car.make.strip.downcase)
+      car_make ||= CarMake.create(name: car.make.strip, status: :pending, submitted_by: current_user)
+      car.update_columns(car_make_id: car_make.id)
+    end
+
+    resolved_make = car.car_make
+    if resolved_make && car.car_model_id.blank? && car.model.present?
+      car_model = resolved_make.car_models.find_by("lower(name) = ?", car.model.strip.downcase)
+      car_model ||= resolved_make.car_models.create(name: car.model.strip, status: :pending, submitted_by: current_user)
+      car.update_columns(car_model_id: car_model.id)
+    end
   end
 end

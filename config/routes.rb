@@ -15,6 +15,11 @@ Rails.application.routes.draw do
     end
     resources :users, only: %i[index show]
     resources :reviews, only: %i[index update]
+    resources :car_makes, only: [:index] do
+      member do
+        patch :transition
+      end
+    end
   end
 
   get "up" => "rails/health#show", as: :rails_health_check
@@ -56,6 +61,9 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :car_makes, only: [:index] do
+    resources :car_models, only: [:index]
+  end
   resources :cars
   resources :queue_entries, only: [:show, :create]
   resources :service_requests, only: [:index, :show, :new, :create] do

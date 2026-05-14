@@ -1,5 +1,7 @@
 class Car < ApplicationRecord
   belongs_to :user
+  belongs_to :car_make, optional: true
+  belongs_to :car_model, optional: true
 
   has_many :car_ownership_records, dependent: :destroy
   has_many :car_transfers, dependent: :restrict_with_exception

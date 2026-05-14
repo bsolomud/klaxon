@@ -122,6 +122,7 @@ uk:
         workshops: "Майстерні"
         users: "Користувачі"
         reviews: "Відгуки"
+        car_makes: "Марки/Моделі"
     operator:
       sign_out: "Вихід"
       status_active: "Активна"
@@ -232,6 +233,29 @@ uk:
         last_sign_in: "Останній вхід"
         sign_in_count: "Кількість входів"
         back: "Назад до користувачів"
+    car_makes:
+      statuses:
+        pending: "Очікує"
+        approved: "Схвалена"
+        rejected: "Відхилена"
+      index:
+        title: "Марки та моделі авто"
+        subtitle: "Схваліть або відхиліть марки та моделі, додані користувачами"
+        filter_all: "Усі"
+        filter_pending: "Очікують"
+        filter_approved: "Схвалені"
+        filter_rejected: "Відхилені"
+        col_name: "Марка"
+        col_models: "Моделі"
+        col_status: "Статус"
+        col_submitted_by: "Додав"
+        col_created: "Створено"
+        approve: "Схвалити"
+        reject: "Відхилити"
+        empty: "Марок не знайдено."
+      transition:
+        success: "Статус марки оновлено."
+        invalid_status: "Неможливо виконати цю дію з поточним статусом."
   cars:
     fuel_types:
       gasoline: "Бензин"
@@ -487,6 +511,7 @@ uk:
       service_duration: "Тривалість"
       request_service: "Замовити послугу"
       join_queue: "Стати в чергу"
+      join_queue_for: "Стати в чергу — %{service}"
       reviews: "Відгуки"
       reviews_count:
         zero: "відгуків немає"

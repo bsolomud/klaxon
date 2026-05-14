@@ -16,14 +16,32 @@
   <% end %>
 
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
-    <div>
+    <div class="relative mb-4" data-controller="combobox" data-combobox-url-value="<%= car_makes_path(format: :json) %>">
       <%= f.label :make, t("cars.form.make"), class: "label-input" %>
-      <%= f.text_field :make, autofocus: true %>
+      <input type="text" name="car[make]" value="<%= car.make %>"
+             id="car_make_input" autocomplete="off" autofocus
+             data-combobox-target="input"
+             data-action="input->combobox#filter focus->combobox#focusOpen keydown->combobox#keydown"
+             class="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-1 focus:ring-black <%= "!border-red-500 !focus:ring-red-500" if car.errors[:make].any? %>" />
+      <input type="hidden" name="car[car_make_id]" value="<%= car.car_make_id %>" data-combobox-target="hiddenId" />
+      <ul data-combobox-target="list" class="hidden absolute z-10 mt-1 w-full max-h-48 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg"></ul>
+      <% if car.errors[:make].any? %>
+        <p class="mt-1 text-xs font-medium text-red-600"><%= car.errors[:make].first %></p>
+      <% end %>
     </div>
 
-    <div>
+    <div class="relative mb-4" data-controller="combobox" data-combobox-url-value="<%= car_make_car_models_path(':make_id', format: :json) %>" data-combobox-depends-on-id-value="car_make_input">
       <%= f.label :model, t("cars.form.model"), class: "label-input" %>
-      <%= f.text_field :model %>
+      <input type="text" name="car[model]" value="<%= car.model %>"
+             id="car_model_input" autocomplete="off"
+             data-combobox-target="input"
+             data-action="input->combobox#filter focus->combobox#focusOpen keydown->combobox#keydown"
+             class="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-1 focus:ring-black <%= "!border-red-500 !focus:ring-red-500" if car.errors[:model].any? %>" />
+      <input type="hidden" name="car[car_model_id]" value="<%= car.car_model_id %>" data-combobox-target="hiddenId" />
+      <ul data-combobox-target="list" class="hidden absolute z-10 mt-1 w-full max-h-48 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg"></ul>
+      <% if car.errors[:model].any? %>
+        <p class="mt-1 text-xs font-medium text-red-600"><%= car.errors[:model].first %></p>
+      <% end %>
     </div>
   </div>
 
