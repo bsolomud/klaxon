@@ -1,7 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    action_text-trix (2.1.15)
+    action_text-trix (2.1.19)
       railties
     actioncable (8.1.1)
       actionpack (= 8.1.1)
@@ -85,7 +85,7 @@ GEM
     bindex (0.8.1)
     bootsnap (1.20.1)
       msgpack (~> 1.2)
-    brakeman (7.1.2)
+    brakeman (8.0.5)
       racc
     builder (3.3.0)
     bundler-audit (0.9.3)
