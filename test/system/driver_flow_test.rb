@@ -33,7 +33,14 @@ class DriverFlowTest < ApplicationSystemTestCase
       find("#service_request_car_id").find(:option, text: /Volkswagen Golf/).select_option
       find("#service_request_workshop_service_category_id").find(:option, text: /#{Regexp.escape(@wsc.service_category.name)}/).select_option
       fill_in "service_request_description", with: "Потрібна заміна шин"
-      find("#service_request_preferred_time").set(3.days.from_now.change(hour: 10).strftime("%Y-%m-%dT%H:%M"))
+      # datetime-local: setting the value via the browser is reliable across
+      # Chrome locales (Capybara #set sends locale-dependent keystrokes that
+      # don't register on CI's headless Chrome).
+      preferred_time = 3.days.from_now.change(hour: 10).strftime("%Y-%m-%dT%H:%M")
+      page.execute_script(
+        "document.getElementById('service_request_preferred_time').value = arguments[0]",
+        preferred_time
+      )
       find('input[type="submit"]').click
 
       assert_text I18n.t("service_requests.create.success")
