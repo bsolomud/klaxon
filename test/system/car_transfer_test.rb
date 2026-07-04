@@ -18,8 +18,8 @@ class CarTransferTest < ApplicationSystemTestCase
       sign_in_user(@user_b)
 
       visit new_car_path
-      fill_in "car_make", with: "Toyota"
-      fill_in "car_model", with: "Camry"
+      fill_in "car_make_input", with: "Toyota"
+      fill_in "car_model_input", with: "Camry"
       fill_in "car_year", with: "2020"
       fill_in "car_license_plate", with: "XX1234YY"
       fill_in "car_vin", with: @car.vin

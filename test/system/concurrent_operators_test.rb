@@ -38,7 +38,12 @@ class ConcurrentOperatorsTest < ApplicationSystemTestCase
     # acceptable safeguard; the key assertion is that the second click never
     # silently succeeds.
     using_session(:operator_b) do
-      click_button I18n.t("workshop_management.service_requests.show.accept")
+      # Operator B's browser is a second, backgrounded Capybara session whose
+      # page still shows the (now stale) Accept form. click_button does not
+      # reliably fire Turbo's form submission from a background session, so
+      # submit the still-present accept form directly.
+      assert_button I18n.t("workshop_management.service_requests.show.accept")
+      page.execute_script("document.querySelector('form[action$=\"/accept\"]').requestSubmit()")
       stale    = I18n.t("workshop_management.service_requests.accept.stale")
       invalid  = I18n.t("workshop_management.service_requests.invalid_transition")
       assert page.has_text?(stale) || page.has_text?(invalid),

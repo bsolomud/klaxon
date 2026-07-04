@@ -14,8 +14,8 @@ class DriverFlowTest < ApplicationSystemTestCase
       sign_in_user(@driver)
 
       visit new_car_path
-      fill_in "car_make", with: "Volkswagen"
-      fill_in "car_model", with: "Golf"
+      fill_in "car_make_input", with: "Volkswagen"
+      fill_in "car_model_input", with: "Golf"
       fill_in "car_year", with: "2021"
       fill_in "car_license_plate", with: "ZZ9999AA"
       find("#car_fuel_type").select(I18n.t("cars.fuel_types.gasoline"))
