@@ -64,6 +64,23 @@ class ServiceRequestTest < ActiveSupport::TestCase
     assert_equal @wsc.price_unit, sr.price_snapshot["unit"]
   end
 
+  test "display_price reads the snapshot on an unsaved record (string keys)" do
+    sr = ServiceRequest.new(
+      car: @car,
+      workshop: @workshop,
+      workshop_service_category: @wsc,
+      description: "Test",
+      preferred_time: 1.day.from_now
+    )
+    sr.send(:snapshot_price)
+
+    # String keys must match what display_price reads, even before the record
+    # is persisted and reloaded from jsonb.
+    assert_equal @wsc.price_min.to_f, sr.price_snapshot["min"].to_f
+    assert_includes sr.display_price, @wsc.price_min.to_i.to_s
+    assert_not_equal I18n.t("service_requests.price_on_request"), sr.display_price
+  end
+
   test "changing WSC pricing after creation does not affect existing requests" do
     sr = ServiceRequest.create!(
       car: @car,

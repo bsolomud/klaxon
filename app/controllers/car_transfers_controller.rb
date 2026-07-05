@@ -11,6 +11,9 @@ class CarTransfersController < ApplicationController
   def create
     @car = Car.find_by!(vin: car_transfer_params[:vin]&.upcase)
     return redirect_to cars_path, alert: t("car_transfers.new.own_car") if @car.user_id == current_user.id
+
+    # Supersede any timed-out request so a dangling transfer never locks the car.
+    @car.car_transfers.requested.where("expires_at < ?", Time.current).find_each(&:expire!)
     return redirect_to cars_path, alert: t("car_transfers.create.already_active") if @car.car_transfers.active.exists?
 
     ActiveRecord::Base.transaction do
@@ -33,6 +36,10 @@ class CarTransfersController < ApplicationController
       mailer: CarTransferMailer.with(transfer: @transfer).requested
     )
     redirect_to car_transfer_path(@transfer), notice: t("car_transfers.create.success")
+  rescue ActiveRecord::RecordNotUnique
+    # Lost a race against a concurrent request for the same car (partial unique
+    # index on status = requested). Show the friendly message instead of a 500.
+    redirect_to cars_path, alert: t("car_transfers.create.already_active")
   end
 
   def show

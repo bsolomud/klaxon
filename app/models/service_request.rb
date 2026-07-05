@@ -40,12 +40,14 @@ class ServiceRequest < ApplicationRecord
   def snapshot_price
     return unless workshop_service_category
 
+    # Store string keys so an in-request render of an unsaved record reads the
+    # same shape that display_price expects (jsonb round-trips as strings).
     self.price_snapshot = {
       min: workshop_service_category.price_min,
       max: workshop_service_category.price_max,
       unit: workshop_service_category.price_unit,
       currency: workshop_service_category.currency
-    }.compact
+    }.compact.deep_stringify_keys
   end
 
   def service_offered_by_workshop

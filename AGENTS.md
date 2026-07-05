@@ -75,6 +75,8 @@ Always use these terms consistently in code, UI, and discussions:
 - **WorkingHour** — when a workshop is open each day of the week
 
 > There is **one `User` model**. Driver is role, not separate models. Always think in terms of `user.role` or similar, never separate tables.
+>
+> **Sanctioned exception — `Admin`:** Platform administrators are a separate Devise model/table (`Admin`, `devise_for :admins`) **by design**, to isolate privileged admin credentials from the driver/operator user pool. This is the *only* permitted separate identity table; `Driver` and `Operator` remain roles/join records on `User`.
 
 ---
 

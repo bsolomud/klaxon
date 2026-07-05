@@ -1,4 +1,6 @@
 class Admin::ReviewsController < Admin::BaseController
+  include StateTransitionable
+
   before_action :set_review, only: [:update]
 
   ALLOWED_STATUSES = %w[published hidden].freeze
@@ -12,12 +14,15 @@ class Admin::ReviewsController < Admin::BaseController
     status = params.require(:status)
 
     unless status.in?(ALLOWED_STATUSES)
-      redirect_to admin_reviews_path, alert: t("admin.reviews.update.invalid_status")
-      return
+      return redirect_to admin_reviews_path, alert: t("admin.reviews.update.invalid_status")
     end
 
-    @review.update!(status: status)
-    redirect_to admin_reviews_path, notice: t("admin.reviews.update.success")
+    transition_status(
+      @review,
+      transition: "#{status}!".to_sym,
+      redirect_path: admin_reviews_path,
+      invalid_message: t("admin.reviews.update.invalid_status")
+    )
   end
 
   private

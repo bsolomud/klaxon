@@ -1,5 +1,7 @@
 class Admin::WorkshopsController < Admin::BaseController
   include NotificationDispatch
+  include StateTransitionable
+
   before_action :set_workshop, only: %i[show transition]
 
   TRANSITIONS = {
@@ -10,7 +12,7 @@ class Admin::WorkshopsController < Admin::BaseController
 
   def index
     scope = Workshop.order(created_at: :desc)
-    scope = scope.where(status: params[:status]) if params[:status].present?
+    scope = scope.where(status: params[:status]) if valid_status_filter?
     @pagy, @workshops = pagy(scope, limit: 50)
   end
 
@@ -21,23 +23,27 @@ class Admin::WorkshopsController < Admin::BaseController
   def transition
     event = params[:event]
     rule = TRANSITIONS[event]
-
-    unless rule && @workshop.status.to_sym == rule[:from]
+    unless rule
       return redirect_to admin_workshop_path(@workshop), alert: t("admin.workshops.transition.invalid_status")
     end
 
-    if event == "decline"
-      @workshop.update!(status: rule[:to], decline_reason: params[:decline_reason])
-    else
-      @workshop.update!(status: rule[:to])
+    transition_status(
+      @workshop,
+      required_status: rule[:from],
+      transition: "#{rule[:to]}!".to_sym,
+      redirect_path: admin_workshop_path(@workshop),
+      invalid_message: t("admin.workshops.transition.invalid_status"),
+      after_success: ->(_workshop) { notify_workshop_owners(event) }
+    ) do |workshop|
+      workshop.decline_reason = params[:decline_reason] if event == "decline"
     end
-
-    notify_workshop_owners(event)
-
-    redirect_to admin_workshop_path(@workshop), notice: t("admin.workshops.transition.success")
   end
 
   private
+
+  def valid_status_filter?
+    params[:status].present? && params[:status].in?(Workshop.statuses.keys)
+  end
 
   def set_workshop
     @workshop = Workshop.includes(:service_categories).find(params[:id])

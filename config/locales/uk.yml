@@ -181,6 +181,7 @@ uk:
       transition:
         success: "Статус майстерні оновлено."
         invalid_status: "Неможливо виконати цю дію з поточним статусом."
+        stale: "Цю майстерню вже оновлено іншою дією."
     reviews:
       statuses:
         published: "Опубліковано"
@@ -206,6 +207,7 @@ uk:
       update:
         success: "Статус відгуку оновлено."
         invalid_status: "Недопустимий статус."
+        stale: "Цей відгук вже оновлено іншою дією."
     users:
       index:
         title: "Користувачі"
@@ -256,6 +258,7 @@ uk:
       transition:
         success: "Статус марки оновлено."
         invalid_status: "Неможливо виконати цю дію з поточним статусом."
+        stale: "Цю марку вже оновлено іншою дією."
   cars:
     fuel_types:
       gasoline: "Бензин"
@@ -368,6 +371,7 @@ uk:
       no_show: "Не з'явився"
     create:
       success: "Ви стали в чергу."
+      already_in_queue: "Ви вже перебуваєте в цій черзі."
     show:
       title: "Ваша позиція в черзі"
       your_position: "Ваша позиція"
@@ -494,6 +498,9 @@ uk:
       edit: "Редагувати"
       delete: "Видалити"
       delete_confirm: "Ви впевнені? Це остаточно видалить цю майстерню."
+      lightbox_close: "Закрити"
+      lightbox_prev: "Попереднє зображення"
+      lightbox_next: "Наступне зображення"
       description: "Опис"
       working_hours: "Години роботи"
       day_closed: "Зачинено"

@@ -1,10 +1,13 @@
 class QueueEntriesController < ApplicationController
   def create
     @queue = ServiceQueue.open.find(params[:queue_id])
+    # Resolve the car through the current user's own cars so a driver cannot
+    # join a queue with (and leak) another driver's vehicle.
+    car = current_user.cars.find_by(id: queue_entry_params[:car_id])
 
     @entry = @queue.queue_entries.new(
       user: current_user,
-      car_id: queue_entry_params[:car_id],
+      car: car,
       joined_at: Time.current
     )
 
@@ -15,8 +18,13 @@ class QueueEntriesController < ApplicationController
 
     redirect_to queue_entry_path(@entry), notice: t(".success")
   rescue ActiveRecord::RecordNotUnique => e
-    raise unless e.message.include?("position")
-    retry
+    if e.message.include?("index_queue_entries_active_user_per_queue")
+      redirect_to workshop_path(@queue.workshop), alert: t(".already_in_queue")
+    elsif e.message.include?("position")
+      retry
+    else
+      raise
+    end
   rescue ActiveRecord::RecordInvalid
     redirect_to workshop_path(@queue.workshop), alert: @entry.errors.full_messages.to_sentence
   end

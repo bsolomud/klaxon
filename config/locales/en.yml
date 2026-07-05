@@ -181,6 +181,7 @@ en:
       transition:
         success: "Workshop status updated successfully."
         invalid_status: "Cannot perform this transition from current status."
+        stale: "This workshop was already updated by another action."
     reviews:
       statuses:
         published: "Published"
@@ -206,6 +207,7 @@ en:
       update:
         success: "Review status updated."
         invalid_status: "Invalid status."
+        stale: "This review was already updated by another action."
     users:
       index:
         title: "Users"
@@ -256,6 +258,7 @@ en:
       transition:
         success: "Car make status updated successfully."
         invalid_status: "Cannot perform this transition from current status."
+        stale: "This car make was already updated by another action."
   cars:
     fuel_types:
       gasoline: "Gasoline"
@@ -368,6 +371,7 @@ en:
       no_show: "No Show"
     create:
       success: "You have joined the queue."
+      already_in_queue: "You are already in this queue."
     show:
       title: "Your Queue Position"
       your_position: "Your position"
@@ -492,6 +496,9 @@ en:
       edit: "Edit"
       delete: "Delete"
       delete_confirm: "Are you sure? This will permanently delete this workshop."
+      lightbox_close: "Close"
+      lightbox_prev: "Previous image"
+      lightbox_next: "Next image"
       description: "Description"
       working_hours: "Working Hours"
       day_closed: "Closed"

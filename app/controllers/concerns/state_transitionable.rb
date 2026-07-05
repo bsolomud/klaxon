@@ -3,8 +3,8 @@ module StateTransitionable
 
   private
 
-  def transition_status(record, required_status:, transition:, redirect_path:, invalid_message:, after_success: nil)
-    unless record.status == required_status.to_s
+  def transition_status(record, transition:, redirect_path:, required_status: nil, invalid_message: nil, after_success: nil)
+    if required_status && record.status != required_status.to_s
       redirect_to redirect_path, alert: invalid_message
       return
     end

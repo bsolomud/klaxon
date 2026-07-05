@@ -90,6 +90,21 @@ class CarTransfersControllerTest < ActionDispatch::IntegrationTest
     assert_equal I18n.t("car_transfers.create.already_active"), flash[:alert]
   end
 
+  test "create supersedes an expired requested transfer" do
+    @transfer.update_column(:expires_at, 1.day.ago) # times out the existing request
+    assert @transfer.requested?
+
+    assert_difference "CarTransfer.count", 1 do
+      post car_transfers_path, params: { car_transfer: { vin: @car_with_vin.vin } }
+    end
+
+    assert @transfer.reload.expired?
+    new_transfer = CarTransfer.last
+    assert new_transfer.requested?
+    assert_equal @user, new_transfer.to_user
+    assert_redirected_to car_transfer_path(new_transfer)
+  end
+
   test "create requires authentication" do
     sign_out @user
     post car_transfers_path, params: { car_transfer: { vin: @car_with_vin.vin } }
@@ -139,8 +154,8 @@ class CarTransfersControllerTest < ActionDispatch::IntegrationTest
   test "approve transfers car ownership" do
     sign_in @other_user # from_user
 
-    @car_with_vin.car_ownership_records.create!(user: @other_user, started_at: 6.months.ago)
-
+    # leaf already has an active ownership record (leaf_ownership fixture owned
+    # by @other_user); approving ends it and creates one for the new owner.
     assert_difference "CarOwnershipRecord.count", 1 do
       assert_difference "Notification.count", 1 do
         assert_enqueued_emails 1 do

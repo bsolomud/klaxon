@@ -122,8 +122,8 @@ class CarTransferTest < ActiveSupport::TestCase
     from_user = @transfer.from_user
     to_user = @transfer.to_user
 
-    car.car_ownership_records.create!(user: from_user, started_at: 6.months.ago)
-
+    # leaf already has an active ownership record via the leaf_ownership fixture
+    # (from_user is its owner); approve! must end it and open a new one.
     @transfer.approve!(actor: from_user)
 
     @transfer.reload
@@ -162,6 +162,47 @@ class CarTransferTest < ActiveSupport::TestCase
     event = @transfer.car_transfer_events.last
     assert event.cancelled?
     assert_equal @transfer.to_user, event.actor
+  end
+
+  # --- State guards ---
+
+  test "approve! raises when transfer is not requested" do
+    @transfer.update_column(:status, CarTransfer.statuses[:rejected])
+    assert_raises(CarTransfer::InvalidTransition) { @transfer.approve!(actor: @transfer.from_user) }
+  end
+
+  test "reject! raises when transfer is not requested" do
+    @transfer.update_column(:status, CarTransfer.statuses[:approved])
+    assert_raises(CarTransfer::InvalidTransition) { @transfer.reject!(actor: @transfer.from_user) }
+  end
+
+  test "cancel! raises when transfer is not requested" do
+    @transfer.update_column(:status, CarTransfer.statuses[:cancelled])
+    assert_raises(CarTransfer::InvalidTransition) { @transfer.cancel!(actor: @transfer.to_user) }
+  end
+
+  # --- expire! ---
+
+  test "expire! marks a requested transfer expired with event and notifications" do
+    assert_difference "CarTransferEvent.count", 1 do
+      assert_difference "Notification.count", 2 do
+        @transfer.expire!
+      end
+    end
+
+    # NB: CarTransfer#expired? is time-based (expires_at), so assert on status.
+    assert_equal "expired", @transfer.reload.status
+    assert @transfer.car_transfer_events.expired.exists?
+  end
+
+  test "expire! is a no-op for a non-requested transfer" do
+    @transfer.update_column(:status, CarTransfer.statuses[:approved])
+
+    assert_no_difference "CarTransferEvent.count" do
+      @transfer.expire!
+    end
+
+    assert @transfer.reload.approved?
   end
 
   # --- dependent: :restrict_with_exception ---

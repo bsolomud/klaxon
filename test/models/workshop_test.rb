@@ -265,4 +265,48 @@ class WorkshopTest < ActiveSupport::TestCase
     assert_equal Workshop.all.count, Workshop.text_search("").count
     assert_equal Workshop.all.count, Workshop.text_search(nil).count
   end
+
+  # open_now / open_now? — overnight shift handling
+
+  test "open_now? and scope count an overnight shift that began yesterday" do
+    workshop = workshops(:one)
+    workshop.working_hours.destroy_all
+
+    travel_to Time.zone.local(2026, 1, 7, 1, 0, 0) do
+      today = Time.current.wday
+      yesterday = (today - 1) % 7
+      workshop.working_hours.create!(day_of_week: yesterday, opens_at: "22:00", closes_at: "02:00", closed: false)
+      workshop.working_hours.create!(day_of_week: today, closed: true)
+
+      assert workshop.open_now?
+      assert_includes Workshop.open_now, workshop
+    end
+  end
+
+  test "open_now? and scope are false after an overnight shift has closed" do
+    workshop = workshops(:one)
+    workshop.working_hours.destroy_all
+
+    travel_to Time.zone.local(2026, 1, 7, 3, 0, 0) do
+      today = Time.current.wday
+      yesterday = (today - 1) % 7
+      workshop.working_hours.create!(day_of_week: yesterday, opens_at: "22:00", closes_at: "02:00", closed: false)
+      workshop.working_hours.create!(day_of_week: today, closed: true)
+
+      assert_not workshop.open_now?
+      assert_not_includes Workshop.open_now, workshop
+    end
+  end
+
+  test "open_now? and scope count a normal same-day shift" do
+    workshop = workshops(:one)
+    workshop.working_hours.destroy_all
+
+    travel_to Time.zone.local(2026, 1, 7, 10, 0, 0) do
+      workshop.working_hours.create!(day_of_week: Time.current.wday, opens_at: "09:00", closes_at: "18:00", closed: false)
+
+      assert workshop.open_now?
+      assert_includes Workshop.open_now, workshop
+    end
+  end
 end

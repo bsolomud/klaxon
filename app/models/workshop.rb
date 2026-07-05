@@ -81,32 +81,51 @@ class Workshop < ApplicationRecord
     joins(:service_categories).where(service_categories: { slug: slug })
   }
 
+  # Uses an IN-subquery (not a join) so it composes with sorted_by_distance's
+  # custom select and pagy without duplicating rows. A workshop is open now if
+  # today's shift covers the time, or an overnight shift that began yesterday
+  # is still running into the early hours.
   scope :open_now, -> {
     now = Time.current
     time = now.strftime(TIME_FORMAT)
     wday = now.wday
+    ywday = (wday - 1) % 7
 
-    joins(:working_hours)
-      .where(working_hours: { day_of_week: wday, closed: false })
-      .where(
-        "(working_hours.opens_at <= working_hours.closes_at " \
-        " AND working_hours.opens_at <= :time AND working_hours.closes_at >= :time) " \
+    where(
+      id: WorkingHour.where(closed: false).where(
+        "(day_of_week = :wday AND " \
+        "  ((opens_at <= closes_at AND opens_at <= :time AND closes_at >= :time) " \
+        "   OR (opens_at > closes_at AND opens_at <= :time))) " \
         "OR " \
-        "(working_hours.opens_at > working_hours.closes_at " \
-        " AND (working_hours.opens_at <= :time OR working_hours.closes_at >= :time))",
-        time: time
-      )
+        "(day_of_week = :ywday AND opens_at > closes_at AND closes_at >= :time)",
+        time: time, wday: wday, ywday: ywday
+      ).select(:workshop_id)
+    )
   }
 
   def open_now?
-    today_hours = today_working_hours
-    return false if today_hours.nil? || today_hours.closed?
+    now = Time.current
+    time = now.strftime(TIME_FORMAT)
 
-    self.class.time_within_range?(
-      Time.current.strftime(TIME_FORMAT),
-      today_hours.opens_at.strftime(TIME_FORMAT),
-      today_hours.closes_at.strftime(TIME_FORMAT)
-    )
+    today = today_working_hours
+    if today && !today.closed?
+      opens = today.opens_at.strftime(TIME_FORMAT)
+      closes = today.closes_at.strftime(TIME_FORMAT)
+      if opens <= closes
+        return true if self.class.time_within_range?(time, opens, closes)
+      elsif time >= opens
+        return true # overnight shift starting today, evening portion
+      end
+    end
+
+    # An overnight shift that began yesterday stays open into today's early
+    # hours, until yesterday's closes_at.
+    yesterday = working_hours.find_by(day_of_week: (now.wday - 1) % 7)
+    return false unless yesterday && !yesterday.closed?
+
+    y_opens = yesterday.opens_at.strftime(TIME_FORMAT)
+    y_closes = yesterday.closes_at.strftime(TIME_FORMAT)
+    y_opens > y_closes && time <= y_closes
   end
 
   def today_working_hours

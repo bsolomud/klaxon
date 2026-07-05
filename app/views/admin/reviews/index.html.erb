@@ -50,11 +50,13 @@
             <% if review.published? || review.flagged? %>
               <%= button_to t(".hide"), admin_review_path(review, status: :hidden),
                     method: :patch,
+                    params: { lock_version: review.lock_version },
                     class: "text-xs font-medium text-red-600 hover:text-red-800 cursor-pointer" %>
             <% end %>
             <% if review.hidden? %>
               <%= button_to t(".unhide"), admin_review_path(review, status: :published),
                     method: :patch,
+                    params: { lock_version: review.lock_version },
                     class: "text-xs font-medium text-green-600 hover:text-green-800 cursor-pointer" %>
             <% end %>
           </td>

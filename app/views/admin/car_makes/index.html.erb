@@ -40,8 +40,8 @@
             <td class="px-6 py-4 text-sm text-gray-500"><%= l(car_make.created_at, format: :short) %></td>
             <td class="px-6 py-4 text-right space-x-2">
               <% if car_make.pending? %>
-                <%= button_to t(".approve"), transition_admin_car_make_path(car_make, event: "approve"), method: :patch, class: "text-xs font-medium text-green-700 hover:text-green-900" %>
-                <%= button_to t(".reject"), transition_admin_car_make_path(car_make, event: "reject"), method: :patch, class: "text-xs font-medium text-red-600 hover:text-red-800" %>
+                <%= button_to t(".approve"), transition_admin_car_make_path(car_make, event: "approve"), method: :patch, params: { lock_version: car_make.lock_version }, class: "text-xs font-medium text-green-700 hover:text-green-900" %>
+                <%= button_to t(".reject"), transition_admin_car_make_path(car_make, event: "reject"), method: :patch, params: { lock_version: car_make.lock_version }, class: "text-xs font-medium text-red-600 hover:text-red-800" %>
               <% end %>
             </td>
           </tr>

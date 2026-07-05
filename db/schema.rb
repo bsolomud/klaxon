@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_20_190406) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_04_120003) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -54,6 +54,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_20_190406) do
 
   create_table "car_makes", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.integer "lock_version", default: 0, null: false
     t.string "name", null: false
     t.integer "status", default: 0, null: false
     t.bigint "submitted_by_id"
@@ -81,6 +82,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_20_190406) do
     t.datetime "ended_at"
     t.datetime "started_at", null: false
     t.bigint "user_id", null: false
+    t.index ["car_id"], name: "index_car_ownership_records_active_owner", unique: true, where: "(ended_at IS NULL)"
     t.index ["car_id"], name: "index_car_ownership_records_on_car_id"
     t.index ["car_transfer_id"], name: "index_car_ownership_records_on_car_transfer_id"
     t.index ["user_id"], name: "index_car_ownership_records_on_user_id"
@@ -174,6 +176,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_20_190406) do
     t.datetime "updated_at", null: false
     t.bigint "workshop_id", null: false
     t.index ["service_category_id"], name: "index_queues_on_service_category_id"
+    t.index ["workshop_id", "date"], name: "index_queues_on_workshop_date_when_category_null", unique: true, where: "(service_category_id IS NULL)"
     t.index ["workshop_id", "service_category_id", "date"], name: "index_queues_on_workshop_category_date", unique: true
     t.index ["workshop_id"], name: "index_queues_on_workshop_id"
   end
@@ -181,6 +184,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_20_190406) do
   create_table "reviews", force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
+    t.integer "lock_version", default: 0, null: false
     t.integer "rating", null: false
     t.bigint "service_request_id", null: false
     t.integer "status", default: 0, null: false
@@ -318,6 +322,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_20_190406) do
     t.text "description"
     t.string "email"
     t.decimal "latitude", precision: 10, scale: 7
+    t.integer "lock_version", default: 0, null: false
     t.decimal "longitude", precision: 10, scale: 7
     t.string "name", null: false
     t.string "phone", null: false

@@ -37,6 +37,17 @@ class QueueEntriesControllerTest < ActionDispatch::IntegrationTest
     assert_equal car.id, entry.car_id
   end
 
+  test "create ignores a car_id the driver does not own" do
+    others_car = cars(:camry) # belongs to users(:one), not @user
+    assert_not_equal @user.id, others_car.user_id
+
+    post queue_entries_path, params: { queue_id: @queue.id, car_id: others_car.id }
+
+    entry = QueueEntry.last
+    assert_equal @user.id, entry.user_id
+    assert_nil entry.car_id
+  end
+
   test "cannot join same queue twice while active" do
     post queue_entries_path, params: { queue_id: @queue.id }
     assert_no_difference "QueueEntry.count" do

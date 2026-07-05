@@ -10,23 +10,19 @@ class WorkshopManagement::QueuesController < WorkshopManagement::BaseController
   end
 
   def open
-    @queue = @workshop.service_queues.find_by(
+    @queue = @workshop.service_queues.find_or_create_by!(
       date: Date.current,
       service_category_id: params[:service_category_id]
-    )
+    ) { |queue| queue.status = :open }
 
-    if @queue.nil?
-      @queue = @workshop.service_queues.create!(
-        date: Date.current,
-        service_category_id: params[:service_category_id],
-        status: :open
-      )
-    elsif @queue.paused?
-      @queue.open!
-    end
+    @queue.open! if @queue.paused?
 
     redirect_to workshop_management_workshop_queue_path(@workshop, @queue),
                 notice: t(".success")
+  rescue ActiveRecord::RecordNotUnique
+    # Lost the create race (unique index on workshop/category/date, including the
+    # partial index for nil categories) — re-run and find the winning queue.
+    retry
   end
 
   def pause

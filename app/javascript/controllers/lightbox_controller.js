@@ -2,6 +2,11 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["template"]
+  static values = {
+    closeLabel: { type: String, default: "Close" },
+    prevLabel: { type: String, default: "Previous" },
+    nextLabel: { type: String, default: "Next" }
+  }
 
   connect() {
     this.currentIndex = 0
@@ -61,17 +66,17 @@ export default class extends Controller {
     this.overlay = document.createElement("div")
     this.overlay.className = "fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
     this.overlay.innerHTML = `
-      <button data-action="click->lightbox#close" class="absolute top-4 right-4 text-white/80 hover:text-white z-10 cursor-pointer" aria-label="Close">
+      <button data-action="click->lightbox#close" class="absolute top-4 right-4 text-white/80 hover:text-white z-10 cursor-pointer" aria-label="${this.closeLabelValue}">
         <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
         </svg>
       </button>
-      <button data-action="click->lightbox#prev" class="absolute left-4 text-white/80 hover:text-white z-10 cursor-pointer" aria-label="Previous">
+      <button data-action="click->lightbox#prev" class="absolute left-4 text-white/80 hover:text-white z-10 cursor-pointer" aria-label="${this.prevLabelValue}">
         <svg class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
         </svg>
       </button>
-      <button data-action="click->lightbox#next" class="absolute right-4 text-white/80 hover:text-white z-10 cursor-pointer" aria-label="Next">
+      <button data-action="click->lightbox#next" class="absolute right-4 text-white/80 hover:text-white z-10 cursor-pointer" aria-label="${this.nextLabelValue}">
         <svg class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
         </svg>

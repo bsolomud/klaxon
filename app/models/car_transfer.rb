@@ -1,4 +1,6 @@
 class CarTransfer < ApplicationRecord
+  class InvalidTransition < StandardError; end
+
   belongs_to :car
   belongs_to :from_user, class_name: "User"
   belongs_to :to_user, class_name: "User"
@@ -24,6 +26,7 @@ class CarTransfer < ApplicationRecord
   end
 
   def approve!(actor:)
+    ensure_requested!
     ActiveRecord::Base.transaction do
       approved!
       car.update!(user_id: to_user_id)
@@ -42,6 +45,7 @@ class CarTransfer < ApplicationRecord
   end
 
   def reject!(actor:)
+    ensure_requested!
     ActiveRecord::Base.transaction do
       rejected!
       car_transfer_events.create!(event_type: :rejected, actor: actor)
@@ -49,13 +53,33 @@ class CarTransfer < ApplicationRecord
   end
 
   def cancel!(actor:)
+    ensure_requested!
     ActiveRecord::Base.transaction do
       cancelled!
       car_transfer_events.create!(event_type: :cancelled, actor: actor)
     end
   end
 
+  # Expire a stale request: mark it expired, log the event, and notify both
+  # parties. Shared by ExpireCarTransfersJob (scheduled) and the create flow,
+  # which supersedes a timed-out request so the car isn't locked forever.
+  def expire!
+    return unless requested?
+
+    ActiveRecord::Base.transaction do
+      expired!
+      car_transfer_events.create!(event_type: :expired)
+      Notification.create!(user: from_user, notifiable: self, event: :car_transfer_expired)
+      Notification.create!(user: to_user, notifiable: self, event: :car_transfer_expired)
+    end
+    CarTransferMailer.with(transfer: self).expired.deliver_later
+  end
+
   private
+
+  def ensure_requested!
+    raise InvalidTransition, "Car transfer ##{id} is #{status}, expected requested" unless requested?
+  end
 
   def generate_token
     self.token ||= SecureRandom.urlsafe_base64(32)

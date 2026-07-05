@@ -59,16 +59,31 @@ class CarsController < ApplicationController
 
   def resolve_car_make_model(car)
     if car.car_make_id.blank? && car.make.present?
-      car_make = CarMake.find_by("lower(name) = ?", car.make.strip.downcase)
-      car_make ||= CarMake.create(name: car.make.strip, status: :pending, submitted_by: current_user)
-      car.update_columns(car_make_id: car_make.id)
+      car_make = find_or_create_car_make(car.make.strip)
+      car.update_columns(car_make_id: car_make.id) if car_make
     end
 
     resolved_make = car.car_make
     if resolved_make && car.car_model_id.blank? && car.model.present?
-      car_model = resolved_make.car_models.find_by("lower(name) = ?", car.model.strip.downcase)
-      car_model ||= resolved_make.car_models.create(name: car.model.strip, status: :pending, submitted_by: current_user)
-      car.update_columns(car_model_id: car_model.id)
+      car_model = find_or_create_car_model(resolved_make, car.model.strip)
+      car.update_columns(car_model_id: car_model.id) if car_model
     end
+  end
+
+  # Find-or-create that tolerates a concurrent insert of the same name: the
+  # DB has a unique index on lower(name), so a race raises RecordNotUnique (or
+  # the uniqueness validation raises RecordInvalid) — re-find the winner.
+  def find_or_create_car_make(name)
+    CarMake.find_by("lower(name) = ?", name.downcase) ||
+      CarMake.create!(name: name, status: :pending, submitted_by: current_user)
+  rescue ActiveRecord::RecordNotUnique, ActiveRecord::RecordInvalid
+    CarMake.find_by("lower(name) = ?", name.downcase)
+  end
+
+  def find_or_create_car_model(make, name)
+    make.car_models.find_by("lower(name) = ?", name.downcase) ||
+      make.car_models.create!(name: name, status: :pending, submitted_by: current_user)
+  rescue ActiveRecord::RecordNotUnique, ActiveRecord::RecordInvalid
+    make.car_models.find_by("lower(name) = ?", name.downcase)
   end
 end
