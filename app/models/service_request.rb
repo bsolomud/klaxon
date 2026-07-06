@@ -22,6 +22,8 @@ class ServiceRequest < ApplicationRecord
   after_update_commit :broadcast_status_change, if: :saved_change_to_status?
 
   validate :service_offered_by_workshop
+  validate :preferred_time_within_working_hours
+  validate :preferred_time_not_in_past, on: :create
 
   scope :recent, -> { order(created_at: :desc) }
 
@@ -56,6 +58,34 @@ class ServiceRequest < ApplicationRecord
     if workshop_service_category.workshop_id != workshop_id
       errors.add(:workshop_service_category, :not_offered_by_workshop)
     end
+  end
+
+  # Rule 8 (ai/patterns/service_requests.md): preferred_time must fall within the
+  # workshop's hours for that weekday. When the workshop has not configured that
+  # day at all, we don't block the request (nothing to validate against).
+  def preferred_time_within_working_hours
+    return if preferred_time.blank? || workshop.blank?
+
+    hours = workshop.working_hours.find_by(day_of_week: preferred_time.wday)
+    return if hours.nil?
+
+    if hours.closed?
+      errors.add(:preferred_time, :workshop_closed)
+      return
+    end
+
+    time = preferred_time.strftime(Workshop::TIME_FORMAT)
+    opens = hours.opens_at.strftime(Workshop::TIME_FORMAT)
+    closes = hours.closes_at.strftime(Workshop::TIME_FORMAT)
+    return if Workshop.time_within_range?(time, opens, closes)
+
+    errors.add(:preferred_time, :outside_working_hours)
+  end
+
+  def preferred_time_not_in_past
+    return if preferred_time.blank?
+
+    errors.add(:preferred_time, :in_the_past) if preferred_time < Time.current
   end
 
   def broadcast_status_change

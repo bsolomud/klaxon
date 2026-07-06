@@ -120,7 +120,7 @@ class Workshop < ApplicationRecord
 
     # An overnight shift that began yesterday stays open into today's early
     # hours, until yesterday's closes_at.
-    yesterday = working_hours.find_by(day_of_week: (now.wday - 1) % 7)
+    yesterday = working_hours.find { |wh| wh.day_of_week == (now.wday - 1) % 7 }
     return false unless yesterday && !yesterday.closed?
 
     y_opens = yesterday.opens_at.strftime(TIME_FORMAT)
@@ -129,7 +129,9 @@ class Workshop < ApplicationRecord
   end
 
   def today_working_hours
-    working_hours.find_by(day_of_week: Time.current.wday)
+    # Enumerable#find so an eager-loaded :working_hours association is reused
+    # (find_by would fire SQL per card on the workshops index).
+    working_hours.find { |wh| wh.day_of_week == Time.current.wday }
   end
 
   def build_missing_working_hours

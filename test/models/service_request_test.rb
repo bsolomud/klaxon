@@ -114,6 +114,50 @@ class ServiceRequestTest < ActiveSupport::TestCase
     assert sr.errors[:workshop_service_category].any?
   end
 
+  # Rule 8: preferred_time within working hours
+
+  test "valid when preferred_time falls within working hours" do
+    day = 1.day.from_now.wday
+    @workshop.working_hours.create!(day_of_week: day, opens_at: "08:00", closes_at: "18:00")
+    @request.preferred_time = 1.day.from_now.change(hour: 10)
+    assert @request.valid?
+  end
+
+  test "invalid when preferred_time is outside working hours" do
+    day = 1.day.from_now.wday
+    @workshop.working_hours.create!(day_of_week: day, opens_at: "08:00", closes_at: "18:00")
+    @request.preferred_time = 1.day.from_now.change(hour: 20)
+    assert_not @request.valid?
+    assert @request.errors[:preferred_time].any?
+  end
+
+  test "invalid when preferred_time is on a day the workshop is closed" do
+    day = 1.day.from_now.wday
+    @workshop.working_hours.create!(day_of_week: day, closed: true)
+    @request.preferred_time = 1.day.from_now.change(hour: 10)
+    assert_not @request.valid?
+    assert @request.errors[:preferred_time].any?
+  end
+
+  test "valid when the workshop has no hours configured for that day" do
+    # No working_hours records exist for this workshop, so there is nothing to
+    # validate preferred_time against — the request is allowed.
+    @request.preferred_time = 1.day.from_now.change(hour: 3)
+    assert @request.valid?
+  end
+
+  test "invalid when preferred_time is in the past on create" do
+    sr = ServiceRequest.new(
+      car: @car,
+      workshop: @workshop,
+      workshop_service_category: @wsc,
+      description: "Past time",
+      preferred_time: 1.day.ago
+    )
+    assert_not sr.valid?
+    assert sr.errors[:preferred_time].any?
+  end
+
   test "display_price with min and max" do
     assert_equal "500\u20131500 UAH", @request.display_price
   end

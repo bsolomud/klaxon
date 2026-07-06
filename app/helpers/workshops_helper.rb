@@ -15,6 +15,6 @@ module WorkshopsHelper
   end
 
   def workshop_status_badge(status)
-    status_badge(status, Workshop::STATUS_COLORS, "layouts.operator.status_#{status}")
+    status_badge(status, Workshop::STATUS_COLORS, "layouts.workshop.status_#{status}")
   end
 end

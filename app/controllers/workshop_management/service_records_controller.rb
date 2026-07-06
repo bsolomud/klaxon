@@ -27,6 +27,12 @@ class WorkshopManagement::ServiceRecordsController < WorkshopManagement::BaseCon
                 notice: t(".success")
   rescue ActiveRecord::RecordInvalid
     render :new, status: :unprocessable_entity
+  rescue ActiveRecord::RecordNotUnique
+    # Concurrent double-submit: the service_records.service_request_id unique
+    # index rejected the second save. The record already exists, so treat it as
+    # already completed rather than 500ing.
+    redirect_to workshop_management_workshop_service_request_path(@workshop, @service_request),
+                alert: t(".already_recorded")
   end
 
   private

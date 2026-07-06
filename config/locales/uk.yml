@@ -17,6 +17,10 @@ uk:
               not_owned_by_requestor: "не належить вам"
             workshop_service_category:
               not_offered_by_workshop: "не пропонується цією майстернею"
+            preferred_time:
+              workshop_closed: "припадає на день, коли майстерня зачинена"
+              outside_working_hours: "поза робочими годинами майстерні"
+              in_the_past: "не може бути в минулому"
         review:
           attributes:
             service_request:
@@ -123,7 +127,7 @@ uk:
         users: "Користувачі"
         reviews: "Відгуки"
         car_makes: "Марки/Моделі"
-    operator:
+    workshop:
       sign_out: "Вихід"
       status_active: "Активна"
       status_pending: "На розгляді"
@@ -646,6 +650,7 @@ uk:
         back: "Назад до запиту"
       create:
         success: "Роботу завершено. Запис обслуговування створено."
+        already_recorded: "Цей запит вже було завершено іншою дією."
     queues:
       invalid_transition: "Ця дія недоступна для поточного статусу черги."
       statuses:

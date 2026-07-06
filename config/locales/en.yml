@@ -17,6 +17,10 @@ en:
               not_owned_by_requestor: "does not belong to you"
             workshop_service_category:
               not_offered_by_workshop: "is not offered by this workshop"
+            preferred_time:
+              workshop_closed: "falls on a day the workshop is closed"
+              outside_working_hours: "is outside the workshop's working hours"
+              in_the_past: "can't be in the past"
         review:
           attributes:
             service_request:
@@ -123,7 +127,7 @@ en:
         users: "Users"
         reviews: "Reviews"
         car_makes: "Makes/Models"
-    operator:
+    workshop:
       sign_out: "Sign out"
       status_active: "Active"
       status_pending: "Pending"
@@ -642,6 +646,7 @@ en:
         back: "Back to request"
       create:
         success: "Work completed. Service record created."
+        already_recorded: "This request was already completed by another action."
     queues:
       invalid_transition: "This action is not available for the current queue status."
       statuses:
