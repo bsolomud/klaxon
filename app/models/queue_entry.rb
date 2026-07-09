@@ -29,10 +29,7 @@ class QueueEntry < ApplicationRecord
 
   def recompute_wait_estimates
     queue = service_queue
-    duration = queue.service_category
-                    &.workshop_service_categories
-                    &.find_by(workshop_id: queue.workshop_id)
-                    &.estimated_duration_minutes || 30
+    duration = queue.entry_duration_minutes
 
     waiting_entries = queue.queue_entries.waiting.order(:position)
     waiting_entries.each_with_index do |entry, i|

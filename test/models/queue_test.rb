@@ -60,4 +60,23 @@ class ServiceQueueTest < ActiveSupport::TestCase
   test "next_position returns max position + 1" do
     assert_equal (@queue.queue_entries.maximum(:position) || 0) + 1, @queue.next_position
   end
+
+  test "waiting_count counts only waiting entries" do
+    # open_queue fixture has two waiting entries
+    assert_equal 2, @queue.waiting_count
+  end
+
+  test "entry_duration_minutes uses the workshop's service-category duration" do
+    # workshop one offers tire_service via WSC tire_express (45 min)
+    assert_equal 45, @queue.entry_duration_minutes
+  end
+
+  test "entry_duration_minutes falls back to 30 without a category" do
+    @queue.update_column(:service_category_id, nil) # rubocop:disable Rails/SkipsModelValidations
+    assert_equal 30, @queue.entry_duration_minutes
+  end
+
+  test "prospective_wait_minutes is waiting_count times duration" do
+    assert_equal 90, @queue.prospective_wait_minutes
+  end
 end
