@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_04_120003) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_08_120001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -163,8 +163,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_04_120003) do
     t.bigint "user_id", null: false
     t.index ["car_id"], name: "index_queue_entries_on_car_id"
     t.index ["queue_id", "position"], name: "index_queue_entries_on_queue_id_and_position", unique: true
-    t.index ["queue_id", "user_id"], name: "index_queue_entries_active_user_per_queue", unique: true, where: "(status = ANY (ARRAY[0, 1, 2]))"
     t.index ["queue_id"], name: "index_queue_entries_on_queue_id"
+    t.index ["user_id"], name: "index_queue_entries_active_user", unique: true, where: "(status = ANY (ARRAY[0, 1, 2]))"
     t.index ["user_id"], name: "index_queue_entries_on_user_id"
   end
 

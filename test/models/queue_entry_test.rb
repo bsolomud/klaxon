@@ -110,7 +110,11 @@ class QueueEntryTest < ActiveSupport::TestCase
     # paused_queue has car_wash category, workshop two has car_wash_basic WSC with 30 min
     queue = service_queues(:paused_queue)
     # Use a queue without matching WSC duration
-    queue.update_column(:service_category_id, nil)
+    queue.update_column(:service_category_id, nil) # rubocop:disable Rails/SkipsModelValidations
+
+    # The global one-active-entry-per-user index means users :one and :two
+    # cannot hold their fixture entries and these new ones at the same time.
+    QueueEntry.delete_all
 
     entry1 = QueueEntry.create!(
       service_queue: queue,
