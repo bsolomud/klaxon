@@ -171,4 +171,37 @@ class QueueEntryTest < ActiveSupport::TestCase
       end
     end
   end
+
+  test "user cannot be active in two different queues" do
+    QueueEntry.create!(
+      service_queue: @queue,
+      user: users(:driver_no_workshops),
+      position: @queue.next_position,
+      joined_at: Time.current
+    )
+    other = QueueEntry.new(
+      service_queue: service_queues(:paused_queue),
+      user: users(:driver_no_workshops),
+      position: 1,
+      joined_at: Time.current
+    )
+    assert_not other.valid?
+  end
+
+  test "user can join again after leaving (destroying) previous entry" do
+    first = QueueEntry.create!(
+      service_queue: @queue,
+      user: users(:driver_no_workshops),
+      position: @queue.next_position,
+      joined_at: Time.current
+    )
+    first.destroy!
+    second = QueueEntry.new(
+      service_queue: service_queues(:paused_queue),
+      user: users(:driver_no_workshops),
+      position: 1,
+      joined_at: Time.current
+    )
+    assert second.valid?
+  end
 end

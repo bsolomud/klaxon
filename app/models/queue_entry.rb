@@ -13,8 +13,9 @@ class QueueEntry < ApplicationRecord
   validates :position, presence: true,
             uniqueness: { scope: :queue_id }
   validates :joined_at, presence: true
-  validates :queue_id, uniqueness: {
-    scope: :user_id,
+  # One active entry per user across ALL queues (platform-wide). Rails excludes
+  # the current record on update, so operator status transitions still validate.
+  validates :user_id, uniqueness: {
     conditions: -> { where(status: [:waiting, :called, :in_service]) },
     message: :already_in_queue
   }
