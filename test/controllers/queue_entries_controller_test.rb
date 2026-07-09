@@ -48,12 +48,45 @@ class QueueEntriesControllerTest < ActionDispatch::IntegrationTest
     assert_nil entry.car_id
   end
 
-  test "cannot join same queue twice while active" do
+  test "joining again while active redirects to the existing entry" do
     post queue_entries_path, params: { queue_id: @queue.id }
+    existing = QueueEntry.last
     assert_no_difference "QueueEntry.count" do
       post queue_entries_path, params: { queue_id: @queue.id }
     end
+    assert_redirected_to queue_entry_path(existing)
+  end
+
+  test "cannot join a second, different queue while active" do
+    post queue_entries_path, params: { queue_id: @queue.id }
+    existing = QueueEntry.last
+    other = ServiceQueue.create!(
+      workshop: @queue.workshop,
+      service_category: service_categories(:diagnostics),
+      date: Date.current,
+      status: :open
+    )
+    assert_no_difference "QueueEntry.count" do
+      post queue_entries_path, params: { queue_id: other.id }
+    end
+    assert_redirected_to queue_entry_path(existing)
+  end
+
+  test "destroy lets the driver leave their own queue entry" do
+    post queue_entries_path, params: { queue_id: @queue.id }
+    entry = QueueEntry.last
+    assert_difference "QueueEntry.count", -1 do
+      delete queue_entry_path(entry)
+    end
     assert_redirected_to workshop_path(@queue.workshop)
+  end
+
+  test "destroy cannot remove another driver's entry" do
+    entry = queue_entries(:waiting_entry) # belongs to user :one, not @user
+    assert_no_difference "QueueEntry.count" do
+      delete queue_entry_path(entry)
+    end
+    assert_response :not_found
   end
 
   test "cannot join non-open queue" do
