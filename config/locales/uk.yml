@@ -375,7 +375,7 @@ uk:
       no_show: "Не з'явився"
     create:
       success: "Ви стали в чергу."
-      already_in_queue: "Ви вже перебуваєте в цій черзі."
+      already_in_queue: "Ви вже стоїте в черзі. Спершу покиньте її, щоб стати в іншу."
     show:
       title: "Ваша позиція в черзі"
       your_position: "Ваша позиція"
@@ -386,6 +386,10 @@ uk:
       joined_at: "Час приєднання"
       back: "Назад до майстерні"
       you_are_up: "Ваша черга! Прямуйте до майстерні."
+      leave: "Покинути чергу"
+      leave_confirm: "Покинути чергу?"
+    destroy:
+      success: "Ви покинули чергу."
   service_requests:
     price_on_request: "Ціна за запитом"
     statuses:
@@ -523,6 +527,20 @@ uk:
       request_service: "Замовити послугу"
       join_queue: "Стати в чергу"
       join_queue_for: "Стати в чергу — %{service}"
+      queue_select_title: "Оберіть чергу"
+      queue_close: "Закрити"
+      queue_none_waiting: "вільно"
+      queue_now: "зараз"
+      queue_wait: "~%{minutes} хв"
+      queue_waiting:
+        zero: "нікого"
+        one: "1 в черзі"
+        few: "%{count} в черзі"
+        many: "%{count} в черзі"
+        other: "%{count} в черзі"
+      car_label: "Авто"
+      already_in_queue: "Ви вже стоїте в черзі — %{workshop}"
+      view_my_position: "Переглянути позицію"
       reviews: "Відгуки"
       reviews_count:
         zero: "відгуків немає"
@@ -653,6 +671,7 @@ uk:
         already_recorded: "Цей запит вже було завершено іншою дією."
     queues:
       invalid_transition: "Ця дія недоступна для поточного статусу черги."
+      invalid_category: "Ця послуга не надається цією майстернею."
       statuses:
         open: "Відкрита"
         paused: "Призупинена"
@@ -670,6 +689,7 @@ uk:
         view: "Переглянути"
         empty: "Сьогодні черг немає."
         open_queue: "Відкрити чергу"
+        not_open: "Не відкрито"
       show:
         general_queue: "Загальна черга"
         col_position: "#"
