@@ -2,7 +2,10 @@ class WorkshopManagement::QueuesController < WorkshopManagement::BaseController
   before_action :set_queue, only: [:show, :pause, :close]
 
   def index
-    @queues = @workshop.service_queues.today.includes(:service_category)
+    @queues_by_category = @workshop.service_queues.today
+                                   .includes(:service_category)
+                                   .index_by(&:service_category_id)
+    @service_categories = @workshop.service_categories.order(:name)
   end
 
   def show
@@ -10,9 +13,17 @@ class WorkshopManagement::QueuesController < WorkshopManagement::BaseController
   end
 
   def open
+    category_id = params[:service_category_id].presence
+
+    if category_id && !@workshop.service_category_ids.include?(category_id.to_i)
+      redirect_to workshop_management_workshop_queues_path(@workshop),
+                  alert: t("workshop_management.queues.invalid_category")
+      return
+    end
+
     @queue = @workshop.service_queues.find_or_create_by!(
       date: Date.current,
-      service_category_id: params[:service_category_id]
+      service_category_id: category_id
     ) { |queue| queue.status = :open }
 
     @queue.open! if @queue.paused?

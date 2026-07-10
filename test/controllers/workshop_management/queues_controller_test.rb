@@ -73,6 +73,14 @@ class WorkshopManagement::QueuesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to workshop_management_workshop_queue_path(@workshop, new_queue)
   end
 
+  test "open rejects a category the workshop does not offer" do
+    assert_no_difference "ServiceQueue.count" do
+      patch open_workshop_management_workshop_queues_path(@workshop),
+            params: { service_category_id: 999_999 }
+    end
+    assert_redirected_to workshop_management_workshop_queues_path(@workshop)
+  end
+
   # --- Pause ---
 
   test "pause pauses an open queue" do
