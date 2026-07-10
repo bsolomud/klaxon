@@ -2,9 +2,7 @@ class WorkshopManagement::QueuesController < WorkshopManagement::BaseController
   before_action :set_queue, only: [:show, :pause, :close]
 
   def index
-    @queues_by_category = @workshop.service_queues.today
-                                   .includes(:service_category)
-                                   .index_by(&:service_category_id)
+    @queues_by_category = @workshop.service_queues.today.index_by(&:service_category_id)
     @service_categories = @workshop.service_categories.order(:name)
   end
 

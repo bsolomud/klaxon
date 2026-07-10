@@ -687,7 +687,6 @@ uk:
           many: "%{count} записів"
           other: "%{count} записів"
         view: "Переглянути"
-        empty: "Сьогодні черг немає."
         open_queue: "Відкрити чергу"
         not_open: "Не відкрито"
       show:

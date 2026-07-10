@@ -74,9 +74,12 @@ class WorkshopManagement::QueuesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "open rejects a category the workshop does not offer" do
+    # car_wash is offered by workshops(:two), not workshops(:one)
+    foreign_category = service_categories(:car_wash)
+    assert_not_includes @workshop.service_category_ids, foreign_category.id
     assert_no_difference "ServiceQueue.count" do
       patch open_workshop_management_workshop_queues_path(@workshop),
-            params: { service_category_id: 999_999 }
+            params: { service_category_id: foreign_category.id }
     end
     assert_redirected_to workshop_management_workshop_queues_path(@workshop)
   end

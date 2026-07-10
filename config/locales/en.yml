@@ -679,7 +679,6 @@ en:
           one: "1 entry"
           other: "%{count} entries"
         view: "View"
-        empty: "No queues open today."
         open_queue: "Open Queue"
         not_open: "Not open"
       show:
