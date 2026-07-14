@@ -15,11 +15,21 @@
     <% if user_signed_in? %>
       <div class="flex flex-wrap items-center gap-2">
         <% if @workshop.active? %>
-          <% @open_queues.each do |queue| %>
-            <%= button_to queue.service_category ? t(".join_queue_for", service: queue.service_category.name) : t(".join_queue"),
-                  queue_entries_path(queue_id: queue.id, car_id: current_user.cars.first&.id),
-                  method: :post,
-                  class: "btn-primary cursor-pointer" %>
+          <% if @current_entry %>
+            <div class="flex flex-wrap items-center gap-3 rounded-xl bg-yellow-50 border border-yellow-200 px-4 py-2">
+              <span class="text-sm text-yellow-800">
+                <%= t(".already_in_queue", workshop: @current_entry.service_queue.workshop.name) %>
+              </span>
+              <%= link_to t(".view_my_position"), queue_entry_path(@current_entry),
+                    class: "text-sm font-semibold text-yellow-900 underline" %>
+            </div>
+          <% elsif @open_queues.any? %>
+            <div data-controller="dialog" class="inline-block">
+              <button type="button" data-action="dialog#open" class="btn-primary cursor-pointer">
+                <%= t(".join_queue") %>
+              </button>
+              <%= render "workshops/queue_modal", open_queues: @open_queues, cars: current_user.cars %>
+            </div>
           <% end %>
           <%= link_to t(".request_service"), new_service_request_path(workshop_id: @workshop.id),
                 class: "btn-primary" %>

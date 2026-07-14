@@ -26,7 +26,8 @@ class WorkshopsController < ApplicationController
 
   def show
     @working_hours = @workshop.working_hours.order(:day_of_week)
-    @open_queues = @workshop.service_queues.open.today
+    @open_queues = @workshop.service_queues.open.today.includes(:service_category)
+    @current_entry = current_user.queue_entries.active.includes(service_queue: :workshop).first if user_signed_in?
     @reviews = @workshop.reviews.published.recent.includes(:user).limit(10)
   end
 
