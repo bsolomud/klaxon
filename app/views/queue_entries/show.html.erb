@@ -4,6 +4,15 @@
 
 <div class="max-w-lg mx-auto mt-8 text-center">
   <p class="text-xs text-gray-400 mb-4"><%= t(".joined_at") %>: <%= l(@entry.joined_at, format: :short) %></p>
+
+  <% if @entry.waiting? || @entry.called? %>
+    <div class="mb-4">
+      <%= button_to t(".leave"), queue_entry_path(@entry), method: :delete,
+            class: "text-sm font-medium text-red-500 hover:text-red-700 transition-colors cursor-pointer",
+            data: { turbo_confirm: t(".leave_confirm") } %>
+    </div>
+  <% end %>
+
   <%= link_to t(".back"), workshop_path(@queue.workshop),
         class: "text-sm font-medium text-gray-500 hover:text-black transition-colors" %>
 </div>
