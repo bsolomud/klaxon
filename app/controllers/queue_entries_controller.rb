@@ -37,7 +37,13 @@ class QueueEntriesController < ApplicationController
       raise
     end
   rescue ActiveRecord::RecordInvalid
-    redirect_to workshop_path(@queue.workshop), alert: @entry.errors.full_messages.to_sentence
+    # A concurrent request may have created the driver's active entry between the
+    # pre-flight check and save; route them to it with the same friendly message.
+    if (existing = current_user.queue_entries.active.first)
+      redirect_to queue_entry_path(existing), alert: t(".already_in_queue")
+    else
+      redirect_to workshop_path(@queue.workshop), alert: @entry.errors.full_messages.to_sentence
+    end
   end
 
   def show
@@ -46,7 +52,9 @@ class QueueEntriesController < ApplicationController
   end
 
   def destroy
-    @entry = current_user.queue_entries.find(params[:id])
+    # Only active entries can be left; a request to remove a completed/no-show
+    # entry (not offered in the UI) 404s rather than deleting queue history.
+    @entry = current_user.queue_entries.active.find(params[:id])
     workshop = @entry.service_queue.workshop
     @entry.destroy!
     redirect_to workshop_path(workshop), notice: t(".success")

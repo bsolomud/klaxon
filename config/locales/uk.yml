@@ -526,7 +526,6 @@ uk:
       service_duration: "Тривалість"
       request_service: "Замовити послугу"
       join_queue: "Стати в чергу"
-      join_queue_for: "Стати в чергу — %{service}"
       queue_select_title: "Оберіть чергу"
       queue_close: "Закрити"
       queue_none_waiting: "вільно"

@@ -524,7 +524,6 @@ en:
       service_duration: "Duration"
       request_service: "Request Service"
       join_queue: "Join Queue"
-      join_queue_for: "Join Queue — %{service}"
       queue_select_title: "Choose a queue"
       queue_close: "Close"
       queue_none_waiting: "free"

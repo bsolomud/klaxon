@@ -89,6 +89,16 @@ class QueueEntriesControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "destroy cannot remove a non-active entry" do
+    post queue_entries_path, params: { queue_id: @queue.id }
+    entry = QueueEntry.last
+    entry.update!(status: :completed)
+    assert_no_difference "QueueEntry.count" do
+      delete queue_entry_path(entry)
+    end
+    assert_response :not_found
+  end
+
   test "cannot join non-open queue" do
     paused = service_queues(:paused_queue)
     assert_no_difference "QueueEntry.count" do
