@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_08_120001) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_18_120100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -254,6 +254,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_08_120001) do
     t.string "last_name"
     t.datetime "last_sign_in_at"
     t.string "last_sign_in_ip"
+    t.string "locale"
     t.datetime "locked_at"
     t.string "middle_name"
     t.jsonb "onboarding_flags", default: {}, null: false

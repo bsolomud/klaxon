@@ -19,16 +19,16 @@ class ServiceCategoryTest < ActiveSupport::TestCase
   test "validates presence of name" do
     category = ServiceCategory.new(slug: "test")
     assert_not category.valid?
-    assert_includes category.errors[:name], "can't be blank"
+    assert_includes category.errors.details[:name].map { |e| e[:error] }, :blank
   end
 
   test "validates presence and uniqueness of slug" do
     category = ServiceCategory.new(name: "Test")
     assert_not category.valid?
-    assert_includes category.errors[:slug], "can't be blank"
+    assert_includes category.errors.details[:slug].map { |e| e[:error] }, :blank
 
     duplicate = ServiceCategory.new(name: "Duplicate", slug: @tire_service.slug)
     assert_not duplicate.valid?
-    assert_includes duplicate.errors[:slug], "has already been taken"
+    assert_includes duplicate.errors.details[:slug].map { |e| e[:error] }, :taken
   end
 end

@@ -12,13 +12,13 @@ class CarMakeTest < ActiveSupport::TestCase
   test "requires name" do
     @car_make.name = nil
     assert_not @car_make.valid?
-    assert_includes @car_make.errors[:name], "can't be blank"
+    assert_includes @car_make.errors.details[:name].map { |e| e[:error] }, :blank
   end
 
   test "name must be unique case-insensitively" do
     duplicate = CarMake.new(name: "toyota", status: :approved)
     assert_not duplicate.valid?
-    assert_includes duplicate.errors[:name], "has already been taken"
+    assert_includes duplicate.errors.details[:name].map { |e| e[:error] }, :taken
   end
 
   test "normalizes name by stripping whitespace" do

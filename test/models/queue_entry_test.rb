@@ -58,7 +58,7 @@ class QueueEntryTest < ActiveSupport::TestCase
       joined_at: Time.current
     )
     assert_not duplicate.valid?
-    assert_includes duplicate.errors[:position], I18n.t("errors.messages.taken")
+    assert_includes duplicate.errors.details[:position].map { |e| e[:error] }, :taken
   end
 
   test "no duplicate active entries per user per queue" do

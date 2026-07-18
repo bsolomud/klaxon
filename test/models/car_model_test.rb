@@ -12,7 +12,7 @@ class CarModelTest < ActiveSupport::TestCase
   test "requires name" do
     @car_model.name = nil
     assert_not @car_model.valid?
-    assert_includes @car_model.errors[:name], "can't be blank"
+    assert_includes @car_model.errors.details[:name].map { |e| e[:error] }, :blank
   end
 
   test "requires car_make" do
@@ -23,7 +23,7 @@ class CarModelTest < ActiveSupport::TestCase
   test "name must be unique within same car make" do
     duplicate = CarModel.new(name: "Camry", car_make: car_makes(:toyota), status: :approved)
     assert_not duplicate.valid?
-    assert_includes duplicate.errors[:name], "has already been taken"
+    assert_includes duplicate.errors.details[:name].map { |e| e[:error] }, :taken
   end
 
   test "same model name allowed for different makes" do

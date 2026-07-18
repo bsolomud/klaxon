@@ -1,0 +1,7 @@
+<div class="flex items-center gap-1 text-xs text-gray-400" aria-label="Language">
+  <%= link_to "UA", "#{request.path}?#{request.query_parameters.merge(locale: "uk").to_query}",
+        class: (I18n.locale == :uk ? "text-black font-medium" : "hover:text-black") %>
+  <span aria-hidden="true">·</span>
+  <%= link_to "EN", "#{request.path}?#{request.query_parameters.merge(locale: "en").to_query}",
+        class: (I18n.locale == :en ? "text-black font-medium" : "hover:text-black") %>
+</div>

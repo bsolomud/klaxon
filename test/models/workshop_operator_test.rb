@@ -34,7 +34,7 @@ class WorkshopOperatorTest < ActiveSupport::TestCase
       role: :staff
     )
     assert_not duplicate.valid?
-    assert_includes duplicate.errors[:user_id], "has already been taken"
+    assert_includes duplicate.errors.details[:user_id].map { |e| e[:error] }, :taken
   end
 
   test "duplicate user_id and workshop_id violates unique index" do

@@ -26,7 +26,7 @@ class WorkshopServiceCategoryTest < ActiveSupport::TestCase
       currency: "UAH"
     )
     assert_not duplicate.valid?
-    assert_includes duplicate.errors[:workshop_id], "has already been taken"
+    assert_includes duplicate.errors.details[:workshop_id].map { |e| e[:error] }, :taken
   end
 
   test "enforces uniqueness at DB level" do
@@ -43,20 +43,20 @@ class WorkshopServiceCategoryTest < ActiveSupport::TestCase
   test "price_min must be non-negative" do
     @wsc.price_min = -1
     assert_not @wsc.valid?
-    assert_includes @wsc.errors[:price_min], "must be greater than or equal to 0"
+    assert_includes @wsc.errors.details[:price_min].map { |e| e[:error] }, :greater_than_or_equal_to
   end
 
   test "price_max must be non-negative" do
     @wsc.price_max = -1
     assert_not @wsc.valid?
-    assert_includes @wsc.errors[:price_max], "must be greater than or equal to 0"
+    assert_includes @wsc.errors.details[:price_max].map { |e| e[:error] }, :greater_than_or_equal_to
   end
 
   test "price_max must be >= price_min" do
     @wsc.price_min = 1000
     @wsc.price_max = 500
     assert_not @wsc.valid?
-    assert_includes @wsc.errors[:price_max], "must be greater than or equal to minimum price"
+    assert_includes @wsc.errors.details[:price_max].map { |e| e[:error] }, :greater_than_or_equal_to_price_min
   end
 
   test "estimated_duration_minutes must be positive integer" do
@@ -98,17 +98,17 @@ class WorkshopServiceCategoryTest < ActiveSupport::TestCase
 
   test "display_price with only min" do
     @wsc.price_max = nil
-    assert_equal "from 500 UAH / послуга", @wsc.display_price
+    assert_equal "від 500 UAH / послуга", @wsc.display_price
   end
 
   test "display_price with only max" do
     @wsc.price_min = nil
-    assert_equal "up to 1500 UAH / послуга", @wsc.display_price
+    assert_equal "до 1500 UAH / послуга", @wsc.display_price
   end
 
   test "display_price with no prices" do
     wsc = workshop_service_categories(:no_price)
-    assert_equal "Price on request", wsc.display_price
+    assert_equal "Ціна за запитом", wsc.display_price
   end
 
   test "display_price with prices but no price_unit" do
@@ -117,7 +117,7 @@ class WorkshopServiceCategoryTest < ActiveSupport::TestCase
   end
 
   test "display_duration with minutes" do
-    assert_equal "~45 min", @wsc.display_duration
+    assert_equal "~45 хв", @wsc.display_duration
   end
 
   test "display_duration returns nil when no duration" do
