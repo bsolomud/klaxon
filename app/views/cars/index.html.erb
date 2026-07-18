@@ -3,7 +3,7 @@
     <h1 class="text-2xl font-bold tracking-tight text-gray-900"><%= t(".title") %></h1>
     <p class="mt-1 text-sm text-gray-500"><%= t(".subtitle") %></p>
   </div>
-  <%= link_to t(".add_car"), new_car_path, class: "btn-primary" %>
+  <%= link_to t(".add_car"), new_car_path, class: "btn-primary !w-auto" %>
 </div>
 
 <% if @cars.any? %>
