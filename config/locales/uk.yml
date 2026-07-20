@@ -767,6 +767,7 @@ uk:
         passwords: "Відновлення паролю"
         confirmations: "Підтвердження пошти"
         unlocks: "Розблокування акаунту"
+        tagline: "Знайдіть автосервіс поруч"
       links:
         sign_in: "Увійти"
         sign_up: "Створити профіль"
@@ -786,11 +787,21 @@ uk:
     registrations:
       new:
         corporate_email: "Корпоративна пошта"
+        email: "Електронна пошта"
+        first_name: "Ім'я"
+        last_name: "Прізвище"
+        phone_number: "Номер телефону"
+        phone_optional: "необов'язково"
+        intent_label: "Як ви користуватиметесь AULABS?"
+        intent_driver: "Я водій"
+        intent_driver_hint: "Шукати майстерні та ставати в чергу"
+        intent_operator: "Я власник сервісу"
+        intent_operator_hint: "Керувати запитами та чергами"
         password: "Пароль"
         min_chars: "від %{count} символів"
-        sign_up: "Увійти в систему"
-        have_account: "Уже є аккаунту?"
-        sign_in: "Увійти в систему"
+        sign_up: "Зареєструватися"
+        have_account: "Вже маєте акаунт?"
+        sign_in: "Увійти"
       edit:
         first_name: "Ім'я"
         last_name: "Прізвище"

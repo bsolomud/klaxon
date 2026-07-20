@@ -759,6 +759,7 @@ en:
         passwords: "Password recovery"
         confirmations: "Email confirmation"
         unlocks: "Account unlock"
+        tagline: "Find car services near you"
       links:
         sign_in: "Sign in"
         sign_up: "Create account"
@@ -778,6 +779,16 @@ en:
     registrations:
       new:
         corporate_email: "Corporate email"
+        email: "Email"
+        first_name: "First name"
+        last_name: "Last name"
+        phone_number: "Phone number"
+        phone_optional: "optional"
+        intent_label: "How will you use AULABS?"
+        intent_driver: "I'm a driver"
+        intent_driver_hint: "Find workshops and join queues"
+        intent_operator: "I run a workshop"
+        intent_operator_hint: "Manage requests and queues"
         password: "Password"
         min_chars: "min %{count} characters"
         sign_up: "Create account"

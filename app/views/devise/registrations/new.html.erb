@@ -6,9 +6,28 @@
       <%= render "devise/shared/error_messages", resource: resource %>
 
       <%= form_with(builder: AuFormBuilder, model: resource, scope: resource_name, url: registration_path(resource_name)) do |f| %>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <%= f.label :first_name, t(".first_name"), class: "label-input" %>
+            <%= f.text_field :first_name, autofocus: true, autocomplete: "given-name" %>
+          </div>
+          <div>
+            <%= f.label :last_name, t(".last_name"), class: "label-input" %>
+            <%= f.text_field :last_name, autocomplete: "family-name" %>
+          </div>
+        </div>
+
         <div>
-          <%= f.label :email, t(".corporate_email"), class: "label-input" %>
-          <%= f.email_field :email, autofocus: true, autocomplete: "email", placeholder: "name@aulabs.io" %>
+          <%= f.label :email, t(".email"), class: "label-input" %>
+          <%= f.email_field :email, autocomplete: "email", placeholder: "you@example.com" %>
+        </div>
+
+        <div>
+          <%= f.label :phone_number, class: "label-input inline-flex items-center gap-1" do %>
+            <%= t(".phone_number") %>
+            <span class="text-[11px] lowercase font-normal text-gray-500 tracking-normal">(<%= t(".phone_optional") %>)</span>
+          <% end %>
+          <%= f.telephone_field :phone_number, autocomplete: "tel", placeholder: "+380..." %>
         </div>
 
         <div>
@@ -22,8 +41,28 @@
         </div>
 
         <div>
-          <%= f.label :password_confirmation, class: 'label-input' %>
+          <%= f.label :password_confirmation, class: "label-input" %>
           <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
+        </div>
+
+        <div>
+          <span class="label-input"><%= t(".intent_label") %></span>
+          <div class="mt-2 space-y-2">
+            <label class="flex items-start gap-3 rounded-xl border border-gray-200 p-3 cursor-pointer has-[:checked]:border-black has-[:checked]:ring-1 has-[:checked]:ring-black">
+              <%= radio_button_tag "intent", "driver", true, class: "mt-1" %>
+              <span>
+                <span class="block text-sm font-medium text-gray-900"><%= t(".intent_driver") %></span>
+                <span class="block text-xs text-gray-500"><%= t(".intent_driver_hint") %></span>
+              </span>
+            </label>
+            <label class="flex items-start gap-3 rounded-xl border border-gray-200 p-3 cursor-pointer has-[:checked]:border-black has-[:checked]:ring-1 has-[:checked]:ring-black">
+              <%= radio_button_tag "intent", "operator", false, class: "mt-1" %>
+              <span>
+                <span class="block text-sm font-medium text-gray-900"><%= t(".intent_operator") %></span>
+                <span class="block text-xs text-gray-500"><%= t(".intent_operator_hint") %></span>
+              </span>
+            </label>
+          </div>
         </div>
 
         <div>

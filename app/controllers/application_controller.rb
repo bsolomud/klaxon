@@ -46,4 +46,14 @@ class ApplicationController < ActionController::Base
   def require_workshop_access!(workshop = @workshop)
     redirect_to root_path, alert: t("authorization.access_denied") unless current_user.manages_workshop?(workshop)
   end
+
+  # Operators who signed up with that intent but have not created a workshop yet
+  # are sent straight to the workshop creation form on sign in.
+  def after_sign_in_path_for(resource)
+    if resource.is_a?(User) && resource.onboarding_flags["intent"] == "operator" && !resource.workshops.exists?
+      new_workshop_path
+    else
+      super
+    end
+  end
 end
