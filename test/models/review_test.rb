@@ -12,6 +12,31 @@ class ReviewTest < ActiveSupport::TestCase
     assert @review.valid?
   end
 
+  test "accepts image attachments" do
+    @review.images.attach(io: file_fixture("test_photo.png").open, filename: "p.png", content_type: "image/png")
+    assert @review.valid?
+  end
+
+  test "rejects non-image attachments" do
+    @review.images.attach(io: StringIO.new("hello"), filename: "notes.txt", content_type: "text/plain")
+    assert_not @review.valid?
+    assert @review.errors[:images].any?
+  end
+
+  test "rejects more than MAX_IMAGES" do
+    (Review::MAX_IMAGES + 1).times do |i|
+      @review.images.attach(io: file_fixture("test_photo.png").open, filename: "p#{i}.png", content_type: "image/png")
+    end
+    assert_not @review.valid?
+    assert @review.errors[:images].any?
+  end
+
+  test "responded? reflects response presence" do
+    assert_not @review.responded?
+    @review.response = "Дякуємо за відгук"
+    assert @review.responded?
+  end
+
   test "requires rating" do
     @review.rating = nil
     assert_not @review.valid?

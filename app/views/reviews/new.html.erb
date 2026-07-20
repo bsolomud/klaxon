@@ -38,6 +38,12 @@
             placeholder: t(".body_placeholder") %>
     </div>
 
+    <div>
+      <label class="label-input" for="review_images"><%= t(".images") %></label>
+      <%= f.file_field :images, multiple: true, accept: "image/png,image/jpeg,image/webp",
+            class: "mt-1 block w-full text-sm text-gray-600 file:mr-4 file:rounded-lg file:border-0 file:bg-gray-900 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-black" %>
+    </div>
+
     <div class="flex items-center gap-4">
       <%= f.submit t(".submit"), class: "btn-primary cursor-pointer" %>
       <%= link_to t(".cancel"), service_request_path(@service_request),

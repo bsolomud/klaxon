@@ -58,6 +58,9 @@
           <%= link_to t("layouts.workshop.nav.queue"),
                 workshop_management_workshop_queues_path(@workshop),
                 class: controller_name.in?(%w[queues queue_entries]) ? nav_active : nav_inactive %>
+          <%= link_to t("layouts.workshop.nav.reviews"),
+                workshop_management_workshop_reviews_path(@workshop),
+                class: controller_name == "reviews" ? nav_active : nav_inactive %>
           <%= link_to t("layouts.workshop.nav.settings"),
                 workshop_management_workshop_path(@workshop),
                 class: (controller_name == "workshops" && action_name == "show") ? nav_active : nav_inactive %>

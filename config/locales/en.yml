@@ -138,6 +138,7 @@ en:
         requests: "Requests"
         queue: "Queue"
         settings: "Settings"
+        reviews: "Reviews"
   admin:
     dashboard:
       index:
@@ -524,6 +525,7 @@ en:
       service_price: "Price"
       service_duration: "Duration"
       request_service: "Request Service"
+      verified: "Verified"
       join_queue: "Join Queue"
       queue_select_title: "Choose a queue"
       queue_close: "Close"
@@ -598,6 +600,15 @@ en:
       success: "Workshop was successfully deleted."
       has_requests: "Cannot delete workshop that has service requests."
   workshop_management:
+    reviews:
+      title: "Reviews"
+      subtitle: "What customers say about your workshop"
+      empty: "No reviews yet."
+      response_placeholder: "Reply to this review..."
+      respond_button: "Reply"
+      respond:
+        success: "Your response has been posted."
+        error: "Could not save your response."
     workshops:
       show:
         title: "Settings"
@@ -936,11 +947,14 @@ en:
       rating: "Rating"
       body: "Your review"
       body_placeholder: "Share your experience..."
+      images: "Photos (optional)"
       submit: "Submit Review"
       cancel: "Cancel"
     create:
       success: "Thank you for your review!"
       already_reviewed: "You have already reviewed this service."
+    response:
+      label: "Owner's response"
   notifications:
     index:
       title: "Notifications"

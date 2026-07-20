@@ -164,6 +164,10 @@ class Workshop < ApplicationRecord
     workshop_operators.where(role: :owner).includes(:user).map { |op| op.user.email }
   end
 
+  def verified?
+    active?
+  end
+
   def full_address
     [address, city, country].compact_blank.join(", ")
   end

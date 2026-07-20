@@ -9,6 +9,12 @@
                       class: "inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700 hover:bg-gray-200 transition-colors" %>
         <% end %>
         <%= workshop_status_indicator(@workshop, open_key: "workshops.show.open_now", closed_key: "workshops.show.closed_now") %>
+        <% if @workshop.verified? %>
+          <span class="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700">
+            <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" /></svg>
+            <%= t(".verified") %>
+          </span>
+        <% end %>
       </div>
     </div>
 
