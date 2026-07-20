@@ -497,6 +497,7 @@ en:
       no_reviews: "No reviews yet"
       search_placeholder: "Search..."
       search_button: "Search"
+      near_me: "Near me"
       empty: "No workshops found."
     show:
       open_now: "Open now"

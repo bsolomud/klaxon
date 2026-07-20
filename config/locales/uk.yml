@@ -499,6 +499,7 @@ uk:
       no_reviews: "Відгуків ще немає"
       search_placeholder: "Пошук..."
       search_button: "Знайти"
+      near_me: "Поруч зі мною"
       empty: "Майстерень не знайдено."
     show:
       open_now: "Зараз відчинено"

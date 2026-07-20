@@ -222,10 +222,12 @@
         </div>
 
         <% if @workshop.latitude.present? && @workshop.longitude.present? %>
-          <div>
-            <dt class="text-xs text-gray-400 uppercase tracking-wider"><%= t(".coordinates") %></dt>
-            <dd class="mt-0.5 text-xs font-mono text-gray-500"><%= @workshop.latitude %>, <%= @workshop.longitude %></dd>
-          </div>
+          <div data-controller="map"
+               data-map-lat-value="<%= @workshop.latitude %>"
+               data-map-lng-value="<%= @workshop.longitude %>"
+               data-map-zoom-value="15"
+               data-map-points-value="<%= [{ lat: @workshop.latitude.to_f, lng: @workshop.longitude.to_f, name: @workshop.name }].to_json %>"
+               class="h-48 rounded-xl overflow-hidden border border-gray-100"></div>
         <% end %>
       </dl>
     </div>
