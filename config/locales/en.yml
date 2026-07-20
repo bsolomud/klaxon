@@ -387,6 +387,7 @@ en:
       joined_at: "Joined at"
       back: "Back to workshop"
       you_are_up: "You are up! Head to the workshop now."
+      you_are_next: "You're next — head over now."
       leave: "Leave queue"
       leave_confirm: "Leave this queue?"
     destroy:

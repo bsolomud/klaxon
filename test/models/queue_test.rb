@@ -9,6 +9,16 @@ class ServiceQueueTest < ActiveSupport::TestCase
     assert @queue.valid?
   end
 
+  test "concurrency defaults to 1" do
+    assert_equal 1, ServiceQueue.new.concurrency
+  end
+
+  test "serving_count counts in-service entries" do
+    assert_equal 0, @queue.serving_count
+    queue_entries(:waiting_entry).update!(status: :in_service)
+    assert_equal 1, @queue.serving_count
+  end
+
   test "requires workshop" do
     @queue.workshop = nil
     assert_not @queue.valid?

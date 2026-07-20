@@ -89,6 +89,25 @@ class QueueEntryTest < ActiveSupport::TestCase
     end
   end
 
+  test "waiting entry waits a full slot when the only bay is busy" do
+    # open_queue: 1 bay, tire_service duration 45. Put entry 1 into service;
+    # entry 2 is then first-in-line but must wait for the busy bay to clear.
+    queue_entries(:waiting_entry).update!(status: :in_service)
+    assert_equal 45, queue_entries(:waiting_entry_two).reload.estimated_wait_minutes
+  end
+
+  test "leaving the queue recomputes remaining estimates" do
+    queue_entries(:waiting_entry).destroy!
+    assert_equal 0, queue_entries(:waiting_entry_two).reload.estimated_wait_minutes
+  end
+
+  test "estimates account for multiple bays" do
+    @queue.update!(concurrency: 2)
+    queue_entries(:waiting_entry).recompute_wait_estimates
+    assert_equal 0, queue_entries(:waiting_entry).reload.estimated_wait_minutes
+    assert_equal 0, queue_entries(:waiting_entry_two).reload.estimated_wait_minutes
+  end
+
   test "recompute_wait_estimates uses service category duration" do
     # open_queue has tire_service category, workshop one has tire_express WSC with 45 min duration
     entry = QueueEntry.create!(
@@ -164,9 +183,10 @@ class QueueEntryTest < ActiveSupport::TestCase
     end
   end
 
-  test "broadcasts remove on destroy" do
-    assert_broadcasts("queue_#{@queue.id}_drivers", 1) do
-      assert_broadcasts("queue_#{@queue.id}_operators", 1) do
+  test "broadcasts remove and sibling estimate refresh on destroy" do
+    # 1 removal + 1 sibling estimate refresh (remaining drivers move up)
+    assert_broadcasts("queue_#{@queue.id}_drivers", 2) do
+      assert_broadcasts("queue_#{@queue.id}_operators", 2) do
         @entry.destroy!
       end
     end

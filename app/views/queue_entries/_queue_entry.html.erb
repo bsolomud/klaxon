@@ -19,10 +19,14 @@
       <p class="text-lg font-semibold"><%= t("queue_entries.statuses.#{entry.status}") %></p>
     </div>
 
-    <% if entry.waiting? && entry.estimated_wait_minutes.present? %>
+    <% if entry.waiting? %>
       <div class="mb-6">
-        <p class="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1"><%= t("queue_entries.show.estimated_wait") %></p>
-        <p class="text-lg font-semibold text-gray-700">~<%= entry.estimated_wait_minutes %> <%= t("queue_entries.show.minutes") %></p>
+        <% if entry.estimated_wait_minutes.to_i.zero? %>
+          <p class="text-lg font-semibold text-green-700"><%= t("queue_entries.show.you_are_next") %></p>
+        <% else %>
+          <p class="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1"><%= t("queue_entries.show.estimated_wait") %></p>
+          <p class="text-lg font-semibold text-gray-700">~<%= entry.estimated_wait_minutes %> <%= t("queue_entries.show.minutes") %></p>
+        <% end %>
       </div>
     <% end %>
 

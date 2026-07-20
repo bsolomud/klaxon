@@ -25,6 +25,10 @@ class ServiceQueue < ApplicationRecord
     queue_entries.waiting.count
   end
 
+  def serving_count
+    queue_entries.in_service.count
+  end
+
   # Minutes each waiting driver represents, used for wait estimates. Reuses the
   # per-service duration the workshop configured; 30-minute default for the
   # general (category-less) queue or when the workshop set no duration.

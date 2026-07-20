@@ -25,20 +25,45 @@ class QueueEntry < ApplicationRecord
   after_create :recompute_wait_estimates
   after_create_commit :broadcast_entry_created
   after_update_commit :broadcast_entry_updated, if: :saved_change_to_status?
-  after_update_commit :broadcast_sibling_wait_estimates, if: :saved_change_to_status?
+  after_update_commit :refresh_siblings_after_status_change, if: :saved_change_to_status?
+  after_destroy_commit :refresh_siblings_after_leave
   after_destroy_commit :broadcast_entry_removed
 
+  # Capacity-aware wait estimate. A waiting entry that has a free bay available
+  # right now waits ~0 min ("go now"); otherwise it waits for the jobs ahead of
+  # it to clear across the available bays, including anyone currently in service.
   def recompute_wait_estimates
     queue = service_queue
-    duration = queue.entry_duration_minutes
+    return if queue.nil? # queue was destroyed (cascade); nothing to recompute
 
-    waiting_entries = queue.queue_entries.waiting.order(:position)
-    waiting_entries.each_with_index do |entry, i|
-      entry.update_column(:estimated_wait_minutes, i * duration) # rubocop:disable Rails/SkipsModelValidations
+    duration = queue.entry_duration_minutes
+    bays = [queue.concurrency, 1].max
+    free = [bays - queue.serving_count, 0].max
+
+    queue.queue_entries.waiting.order(:position).each_with_index do |entry, i|
+      wait = i < free ? 0 : (((i - free) / bays) + 1) * duration
+      entry.update_column(:estimated_wait_minutes, wait) # rubocop:disable Rails/SkipsModelValidations
     end
   end
 
   private
+
+  # after_*_commit callbacks are keyed by method name, so the update and destroy
+  # variants must use distinct method names or one silently overrides the other.
+  def refresh_siblings_after_status_change
+    refresh_sibling_estimates
+  end
+
+  def refresh_siblings_after_leave
+    refresh_sibling_estimates
+  end
+
+  def refresh_sibling_estimates
+    return if service_queue.nil? # queue was destroyed (cascade)
+
+    recompute_wait_estimates
+    broadcast_sibling_wait_estimates
+  end
 
   def broadcast_entry_created
     broadcast_append_to(
