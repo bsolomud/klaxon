@@ -70,6 +70,8 @@
         </div>
       <% end %>
 
+      <%= render "devise/shared/oauth" %>
+
       <div class="mt-6 border-t border-gray-100 pt-6 text-center text-sm text-gray-500">
         <%= t(".have_account") %>
         <%= link_to t(".sign_in"), new_user_session_path, class: "font-medium text-black hover:underline" %>

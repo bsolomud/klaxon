@@ -5,8 +5,8 @@
     <div class="bg-white py-8 px-4 shadow-sm border border-gray-100 sm:rounded-2xl sm:px-10">
       <%= form_with(builder: AuFormBuilder, model: resource, scope: resource_name, url: session_path(resource_name), local: true, class: "space-y-6") do |f| %>
         <div>
-          <%= f.label :email, t(".corporate_email"), class: "label-input" %>
-          <%= f.email_field :email, autofocus: true, autocomplete: "email", placeholder: "name@aulabs.io" %>
+          <%= f.label :email, t(".email"), class: "label-input" %>
+          <%= f.email_field :email, autofocus: true, autocomplete: "email", placeholder: "you@example.com" %>
         </div>
 
         <div>
@@ -28,6 +28,8 @@
           <%= f.submit t(".sign_in"), class: "btn-primary" %>
         </div>
       <% end %>
+
+      <%= render "devise/shared/oauth" %>
 
       <div class="mt-6 border-t border-gray-100 pt-6 text-center text-sm text-gray-500">
         <%= t(".no_account") %>

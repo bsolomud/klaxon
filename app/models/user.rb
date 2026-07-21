@@ -1,6 +1,9 @@
 class User < ApplicationRecord
+  include OmniauthableUser
+
   devise :database_authenticatable, :registerable, :confirmable, :lockable,
-         :trackable, :recoverable, :rememberable, :validatable, :omniauthable
+         :trackable, :recoverable, :rememberable, :validatable,
+         :omniauthable, omniauth_providers: [:google_oauth2]
 
   enum :role, { driver: 0 }
 

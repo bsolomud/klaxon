@@ -795,9 +795,14 @@ uk:
         no_confirmation: "Не отримали лист підтвердження?"
         no_unlock: "Не отримали інструкції розблокування?"
         sign_in_with: "Увійти через %{provider}"
+      oauth:
+        or: "або"
+        google: "Продовжити з Google"
+        failure: "Не вдалося увійти через Google. Спробуйте ще раз."
     sessions:
       new:
         corporate_email: "Корпоративна пошта"
+        email: "Електронна пошта"
         password: "Пароль"
         remember_me: "Запам'ятати мене"
         forgot_password: "Забули пароль?"
