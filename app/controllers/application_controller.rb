@@ -19,13 +19,12 @@ class ApplicationController < ActionController::Base
     I18n.with_locale(locale, &action)
   end
 
+  # Ukrainian is the product default; only an explicit choice (the switcher or a
+  # signed-in user's saved preference) changes it. We deliberately do not follow
+  # the browser's Accept-Language, which would flip Ukrainian users to English.
   def resolved_locale
-    candidate = params[:locale].presence || current_user&.locale.presence || locale_from_header
+    candidate = params[:locale].presence || current_user&.locale.presence
     valid_locale?(candidate) ? candidate.to_s : I18n.default_locale.to_s
-  end
-
-  def locale_from_header
-    request.env["HTTP_ACCEPT_LANGUAGE"].to_s.scan(/[a-zA-Z]{2}/).map(&:downcase).find { |code| valid_locale?(code) }
   end
 
   def valid_locale?(code)

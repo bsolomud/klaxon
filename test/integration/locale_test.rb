@@ -8,13 +8,13 @@ class LocaleTest < ActionDispatch::IntegrationTest
     assert_select "html[lang=?]", "uk"
   end
 
-  test "honors Accept-Language header when no preference set" do
+  test "ignores browser Accept-Language and stays Ukrainian by default" do
     get workshops_path, headers: { "HTTP_ACCEPT_LANGUAGE" => "en-US,en;q=0.9" }
-    assert_select "html[lang=?]", "en"
+    assert_select "html[lang=?]", "uk"
   end
 
-  test "explicit locale param overrides header" do
-    get workshops_path(locale: "en"), headers: { "HTTP_ACCEPT_LANGUAGE" => "uk" }
+  test "explicit locale param switches language" do
+    get workshops_path(locale: "en")
     assert_select "html[lang=?]", "en"
   end
 
