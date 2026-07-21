@@ -139,6 +139,7 @@ uk:
         queue: "Черга"
         settings: "Налаштування"
         reviews: "Відгуки"
+        slots: "Час запису"
   admin:
     dashboard:
       index:
@@ -437,8 +438,12 @@ uk:
       description: "Опис"
       description_hint: "Опишіть, що вам потрібно"
       preferred_time: "Бажаний час"
+      slot: "Або оберіть вільний час"
+      slot_blank: "— без конкретного часу —"
+      slot_hint: "Обравши час, ви бронюєте конкретний слот — послугу й час буде встановлено автоматично."
     create:
       success: "Запит на обслуговування надіслано."
+      slot_taken: "На жаль, цей час уже зайнятий. Оберіть інший."
   service_categories:
     index:
       title: "Категорії послуг"
@@ -616,6 +621,20 @@ uk:
       respond:
         success: "Відповідь опубліковано."
         error: "Не вдалося зберегти відповідь."
+    appointment_slots:
+      title: "Час запису"
+      subtitle: "Створюйте вільні слоти для запису клієнтів"
+      prev_day: "← Попередній день"
+      next_day: "Наступний день →"
+      generate_title: "Створити слоти"
+      service: "Послуга"
+      generate_button: "Створити"
+      time: "Час"
+      booked: "Заброньовано"
+      empty: "На цей день слотів немає."
+      generate:
+        done: "Доступно слотів: %{count}."
+        no_service: "Оберіть послугу."
     workshops:
       show:
         title: "Налаштування"

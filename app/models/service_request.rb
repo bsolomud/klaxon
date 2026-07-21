@@ -4,6 +4,7 @@ class ServiceRequest < ApplicationRecord
   belongs_to :car
   belongs_to :workshop
   belongs_to :workshop_service_category
+  belongs_to :appointment_slot, optional: true
 
   has_one :service_record, dependent: :destroy
   has_one :review, dependent: :destroy

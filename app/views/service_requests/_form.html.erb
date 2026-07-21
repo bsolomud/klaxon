@@ -29,6 +29,17 @@
     <%= f.datetime_local_field :preferred_time %>
   </div>
 
+  <% if available_slots.present? %>
+    <div>
+      <%= f.label :appointment_slot_id, t("service_requests.form.slot"), class: "label-input" %>
+      <%= f.select :appointment_slot_id,
+            available_slots.map { |s| ["#{s.workshop_service_category.service_category.name} — #{l(s.starts_at, format: :short)}", s.id] },
+            { include_blank: t("service_requests.form.slot_blank") },
+            {} %>
+      <p class="mt-1 text-xs text-gray-400"><%= t("service_requests.form.slot_hint") %></p>
+    </div>
+  <% end %>
+
   <div>
     <%= f.submit class: "btn-primary" %>
   </div>

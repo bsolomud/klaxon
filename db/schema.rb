@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_18_120300) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_18_120401) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -50,6 +50,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_18_120300) do
     t.datetime "remember_created_at"
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_admins_on_email", unique: true
+  end
+
+  create_table "appointment_slots", force: :cascade do |t|
+    t.integer "booked_count", default: 0, null: false
+    t.integer "capacity", default: 1, null: false
+    t.datetime "created_at", null: false
+    t.datetime "ends_at", null: false
+    t.integer "lock_version", default: 0, null: false
+    t.datetime "starts_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "workshop_id", null: false
+    t.bigint "workshop_service_category_id", null: false
+    t.index ["workshop_id", "starts_at"], name: "index_appointment_slots_on_workshop_id_and_starts_at"
+    t.index ["workshop_id"], name: "index_appointment_slots_on_workshop_id"
+    t.index ["workshop_service_category_id", "starts_at"], name: "index_slots_on_wsc_and_start", unique: true
+    t.index ["workshop_service_category_id"], name: "index_appointment_slots_on_workshop_service_category_id"
   end
 
   create_table "car_makes", force: :cascade do |t|
@@ -226,6 +242,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_18_120300) do
   end
 
   create_table "service_requests", force: :cascade do |t|
+    t.bigint "appointment_slot_id"
     t.bigint "car_id", null: false
     t.datetime "created_at", null: false
     t.text "description", null: false
@@ -236,6 +253,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_18_120300) do
     t.datetime "updated_at", null: false
     t.bigint "workshop_id", null: false
     t.bigint "workshop_service_category_id", null: false
+    t.index ["appointment_slot_id"], name: "index_service_requests_on_appointment_slot_id"
     t.index ["car_id", "status"], name: "index_service_requests_on_car_id_and_status"
     t.index ["car_id"], name: "index_service_requests_on_car_id"
     t.index ["workshop_id", "status"], name: "index_service_requests_on_workshop_id_and_status"
@@ -342,6 +360,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_18_120300) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "appointment_slots", "workshop_service_categories"
+  add_foreign_key "appointment_slots", "workshops"
   add_foreign_key "car_makes", "users", column: "submitted_by_id"
   add_foreign_key "car_models", "car_makes"
   add_foreign_key "car_models", "users", column: "submitted_by_id"
@@ -366,6 +386,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_18_120300) do
   add_foreign_key "reviews", "users"
   add_foreign_key "reviews", "workshops"
   add_foreign_key "service_records", "service_requests"
+  add_foreign_key "service_requests", "appointment_slots"
   add_foreign_key "service_requests", "cars"
   add_foreign_key "service_requests", "workshop_service_categories"
   add_foreign_key "service_requests", "workshops"

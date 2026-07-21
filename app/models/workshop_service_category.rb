@@ -5,6 +5,7 @@ class WorkshopServiceCategory < ApplicationRecord
   belongs_to :service_category
 
   has_many :service_requests, dependent: :restrict_with_exception
+  has_many :appointment_slots, dependent: :destroy
 
   validates :workshop_id, uniqueness: { scope: :service_category_id }
   validates :price_min, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true

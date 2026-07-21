@@ -57,6 +57,11 @@ Rails.application.routes.draw do
           patch :respond
         end
       end
+      resources :appointment_slots, only: [:index] do
+        collection do
+          post :generate
+        end
+      end
     end
   end
 
