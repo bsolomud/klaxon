@@ -16,6 +16,7 @@ class WorkshopManagement::AppointmentSlotsControllerTest < ActionDispatch::Integ
     sign_in @owner
     get workshop_management_workshop_appointment_slots_path(@workshop)
     assert_response :success
+    assert_select "h1", text: I18n.t("workshop_management.appointment_slots.index.title")
   end
 
   test "owner generates slots for a service and day" do

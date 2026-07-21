@@ -14,6 +14,7 @@ class WorkshopManagement::ReviewsControllerTest < ActionDispatch::IntegrationTes
     sign_in @owner
     get workshop_management_workshop_reviews_path(@workshop)
     assert_response :success
+    assert_select "h1", text: I18n.t("workshop_management.reviews.index.title")
   end
 
   test "non-manager cannot access the reviews index" do

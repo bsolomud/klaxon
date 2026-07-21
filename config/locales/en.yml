@@ -607,25 +607,27 @@ en:
       has_requests: "Cannot delete workshop that has service requests."
   workshop_management:
     reviews:
-      title: "Reviews"
-      subtitle: "What customers say about your workshop"
-      empty: "No reviews yet."
-      response_placeholder: "Reply to this review..."
-      respond_button: "Reply"
+      index:
+        title: "Reviews"
+        subtitle: "What customers say about your workshop"
+        empty: "No reviews yet."
+        response_placeholder: "Reply to this review..."
+        respond_button: "Reply"
       respond:
         success: "Your response has been posted."
         error: "Could not save your response."
     appointment_slots:
-      title: "Time slots"
-      subtitle: "Open bookable slots for your customers"
-      prev_day: "← Previous day"
-      next_day: "Next day →"
-      generate_title: "Generate slots"
-      service: "Service"
-      generate_button: "Generate"
-      time: "Time"
-      booked: "Booked"
-      empty: "No slots for this day."
+      index:
+        title: "Time slots"
+        subtitle: "Open bookable slots for your customers"
+        prev_day: "← Previous day"
+        next_day: "Next day →"
+        generate_title: "Generate slots"
+        service: "Service"
+        generate_button: "Generate"
+        time: "Time"
+        booked: "Booked"
+        empty: "No slots for this day."
       generate:
         done: "%{count} slots available."
         no_service: "Please choose a service."
