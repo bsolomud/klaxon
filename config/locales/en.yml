@@ -379,6 +379,8 @@ en:
       success: "Transfer request has been cancelled."
       not_authorized: "Only the requester can cancel this transfer."
   queue_entries:
+    service_description: "Walk-in queue service"
+    service_summary: "Queue service: %{category}"
     statuses:
       waiting: "Waiting"
       called: "Called"

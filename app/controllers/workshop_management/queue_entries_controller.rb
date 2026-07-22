@@ -28,7 +28,11 @@ class WorkshopManagement::QueueEntriesController < WorkshopManagement::BaseContr
   end
 
   def complete
-    transition_queue_entry(:in_service, :completed!) do |entry|
+    transition_queue_entry(
+      :in_service,
+      :completed!,
+      after_success: ->(entry) { QueueServiceRecorder.new(entry).call }
+    ) do |entry|
       entry.recompute_wait_estimates
     end
   end

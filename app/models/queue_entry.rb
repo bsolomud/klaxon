@@ -2,6 +2,7 @@ class QueueEntry < ApplicationRecord
   belongs_to :service_queue, foreign_key: :queue_id
   belongs_to :user
   belongs_to :car, optional: true
+  belongs_to :service_request, optional: true
 
   enum :status, { waiting: 0, called: 1, in_service: 2, completed: 3, no_show: 4, cancelled: 5 }
 

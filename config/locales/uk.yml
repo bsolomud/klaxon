@@ -379,6 +379,8 @@ uk:
       success: "Запит на передачу скасовано."
       not_authorized: "Тільки заявник може скасувати цю передачу."
   queue_entries:
+    service_description: "Обслуговування в живій черзі"
+    service_summary: "Обслуговування в черзі: %{category}"
     statuses:
       waiting: "Очікує"
       called: "Викликано"

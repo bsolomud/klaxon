@@ -47,6 +47,12 @@ class ServiceRequest < ApplicationRecord
     accepted? || in_progress?
   end
 
+  # Terminal records (including queue visits recorded after the fact) are not
+  # being scheduled, so time-window rules don't apply to them.
+  def historical?
+    completed? || cancelled? || rejected?
+  end
+
   private
 
   # Frees the reserved slot when a booking falls through, so its capacity is
@@ -82,6 +88,7 @@ class ServiceRequest < ApplicationRecord
   # workshop's hours for that weekday. When the workshop has not configured that
   # day at all, we don't block the request (nothing to validate against).
   def preferred_time_within_working_hours
+    return if historical?
     return if preferred_time.blank? || workshop.blank?
 
     hours = workshop.working_hours.find_by(day_of_week: preferred_time.wday)
@@ -101,6 +108,7 @@ class ServiceRequest < ApplicationRecord
   end
 
   def preferred_time_not_in_past
+    return if historical?
     return if preferred_time.blank?
     return unless preferred_time_changed?
 

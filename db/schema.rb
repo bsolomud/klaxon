@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_23_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_23_120100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -176,12 +176,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_23_120000) do
     t.integer "lock_version", default: 0, null: false
     t.integer "position", null: false
     t.bigint "queue_id", null: false
+    t.bigint "service_request_id"
     t.integer "status", default: 0, null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["car_id"], name: "index_queue_entries_on_car_id"
     t.index ["queue_id", "position"], name: "index_queue_entries_on_queue_id_and_position", unique: true
     t.index ["queue_id"], name: "index_queue_entries_on_queue_id"
+    t.index ["service_request_id"], name: "index_queue_entries_on_service_request_id"
     t.index ["user_id"], name: "index_queue_entries_active_user", unique: true, where: "(status = ANY (ARRAY[0, 1, 2]))"
     t.index ["user_id"], name: "index_queue_entries_on_user_id"
   end
@@ -384,6 +386,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_23_120000) do
   add_foreign_key "notifications", "users"
   add_foreign_key "queue_entries", "cars"
   add_foreign_key "queue_entries", "queues"
+  add_foreign_key "queue_entries", "service_requests"
   add_foreign_key "queue_entries", "users"
   add_foreign_key "queues", "service_categories"
   add_foreign_key "queues", "workshops"
