@@ -1,6 +1,6 @@
 class DashboardController < ApplicationController
   def index
-    @cars = current_user.cars.order(created_at: :desc)
+    @cars = current_user.cars.active.order(created_at: :desc)
     @workshops = current_user.workshops.active
     @new_user = @cars.empty? && @workshops.empty?
     @show_welcome_banner = current_user.show_welcome_banner?

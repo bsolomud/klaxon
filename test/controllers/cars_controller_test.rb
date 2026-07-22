@@ -211,6 +211,44 @@ class CarsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_user_session_path
   end
 
+  test "destroying a car with service history is graceful, not a 500" do
+    # camry has service_requests -> restrict_with_exception
+    assert_no_difference "Car.count" do
+      delete car_path(@car)
+    end
+    assert_redirected_to car_path(@car)
+    assert_equal I18n.t("cars.destroy.has_history"), flash[:alert]
+  end
+
+  # --- Archive ---
+
+  test "archive soft-removes a car but keeps it" do
+    assert_no_difference "Car.count" do
+      patch archive_car_path(@car)
+    end
+    assert @car.reload.archived?
+    assert_redirected_to cars_path
+  end
+
+  test "archived car is excluded from the active list" do
+    @car.archive!
+    get cars_path
+    assert_select "h2", text: @car.display_name, count: 0
+    assert_select "h3", text: @car.display_name
+  end
+
+  test "unarchive restores a car" do
+    @car.archive!
+    patch unarchive_car_path(@car)
+    assert_not @car.reload.archived?
+    assert_redirected_to car_path(@car)
+  end
+
+  test "cannot archive another user's car" do
+    patch archive_car_path(cars(:other_user_car))
+    assert_response :not_found
+  end
+
   # --- VIN duplicate detection (Task 42) ---
 
   test "create blocks duplicate VIN belonging to another user" do

@@ -11,7 +11,7 @@ class QueueEntriesController < ApplicationController
 
     # Resolve the car through the current user's own cars so a driver cannot
     # join a queue with (and leak) another driver's vehicle.
-    car = current_user.cars.find_by(id: queue_entry_params[:car_id])
+    car = current_user.cars.active.find_by(id: queue_entry_params[:car_id])
 
     @entry = @queue.queue_entries.new(
       user: current_user,

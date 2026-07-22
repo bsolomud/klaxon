@@ -14,7 +14,7 @@ class ServiceRequestsController < ApplicationController
   def new
     @workshop = Workshop.active.find(params[:workshop_id])
     @service_request = ServiceRequest.new(workshop: @workshop)
-    @cars = current_user.cars.order(:make, :model)
+    @cars = current_user.cars.active.order(:make, :model)
     @categories = @workshop.workshop_service_categories.includes(:service_category)
     @available_slots = bookable_slots
 
@@ -88,7 +88,7 @@ class ServiceRequestsController < ApplicationController
   end
 
   def load_form_collections
-    @cars = current_user.cars.order(:make, :model)
+    @cars = current_user.cars.active.order(:make, :model)
     @categories = @workshop.workshop_service_categories.includes(:service_category)
     @available_slots = bookable_slots
   end

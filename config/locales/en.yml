@@ -280,6 +280,7 @@ en:
       add_car: "Add car"
       empty: "You haven't added any cars yet."
       empty_title: "No cars yet"
+      archived_title: "Archived cars"
     show:
       details: "Details"
       make: "Make"
@@ -295,6 +296,10 @@ en:
       edit: "Edit"
       delete: "Delete"
       delete_confirm: "Are you sure? This will remove this car."
+      archive: "Archive"
+      unarchive: "Restore"
+      archive_confirm: "Archive this car? Its service history is kept."
+      archived_badge: "Archived"
       service_history: "Service History"
       no_service_history: "No service records yet."
       recommendations: "Recommendations"
@@ -325,6 +330,11 @@ en:
       success: "Car was successfully updated."
     destroy:
       success: "Car was successfully removed."
+      has_history: "You can't delete a car with service history. You can archive it instead."
+    archive:
+      success: "Car moved to archive."
+    unarchive:
+      success: "Car restored."
   car_transfers:
     statuses:
       requested: "Requested"

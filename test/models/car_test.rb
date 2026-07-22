@@ -5,6 +5,22 @@ class CarTest < ActiveSupport::TestCase
     @car = cars(:camry)
   end
 
+  # --- Archiving ---
+
+  test "active scope excludes archived cars" do
+    @car.archive!
+    assert_not_includes Car.active, @car
+    assert_includes Car.archived, @car
+  end
+
+  test "archive! and unarchive! toggle archived state" do
+    assert_not @car.archived?
+    @car.archive!
+    assert @car.archived?
+    @car.unarchive!
+    assert_not @car.archived?
+  end
+
   # --- Enums ---
 
   test "fuel_type enum has correct values" do

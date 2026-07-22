@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_18_120500) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_23_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -131,6 +131,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_18_120500) do
   end
 
   create_table "cars", force: :cascade do |t|
+    t.datetime "archived_at"
     t.bigint "car_make_id"
     t.bigint "car_model_id"
     t.datetime "created_at", null: false
@@ -148,6 +149,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_18_120500) do
     t.index "lower((license_plate)::text)", name: "index_cars_on_lower_license_plate", unique: true
     t.index ["car_make_id"], name: "index_cars_on_car_make_id"
     t.index ["car_model_id"], name: "index_cars_on_car_model_id"
+    t.index ["user_id", "archived_at"], name: "index_cars_on_user_id_and_archived_at"
     t.index ["user_id"], name: "index_cars_on_user_id"
     t.index ["vin"], name: "index_cars_on_vin", unique: true
   end

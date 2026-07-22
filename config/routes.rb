@@ -75,7 +75,12 @@ Rails.application.routes.draw do
   resources :car_makes, only: [:index] do
     resources :car_models, only: [:index]
   end
-  resources :cars
+  resources :cars do
+    member do
+      patch :archive
+      patch :unarchive
+    end
+  end
   resources :queue_entries, only: [:show, :create, :destroy]
   resources :service_requests, only: [:index, :show, :new, :create] do
     resource :review, only: [:new, :create]

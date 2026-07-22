@@ -1,8 +1,9 @@
 class CarsController < ApplicationController
-  before_action :set_car, only: [:show, :edit, :update, :destroy]
+  before_action :set_car, only: [:show, :edit, :update, :destroy, :archive, :unarchive]
 
   def index
-    @pagy, @cars = pagy(current_user.cars.order(created_at: :desc), limit: 10)
+    @pagy, @cars = pagy(current_user.cars.active.order(created_at: :desc), limit: 10)
+    @archived_cars = current_user.cars.archived.order(created_at: :desc)
   end
 
   def show
@@ -39,8 +40,22 @@ class CarsController < ApplicationController
   end
 
   def destroy
-    @car.destroy
+    @car.destroy!
     redirect_to cars_path, notice: t("cars.destroy.success"), status: :see_other
+  rescue ActiveRecord::DeleteRestrictionError
+    redirect_to @car, alert: t("cars.destroy.has_history"), status: :see_other
+  end
+
+  # A serviced car can't be deleted (its history is append-only), so drivers
+  # archive it instead — it leaves the active list but keeps the passport.
+  def archive
+    @car.archive!
+    redirect_to cars_path, notice: t("cars.archive.success"), status: :see_other
+  end
+
+  def unarchive
+    @car.unarchive!
+    redirect_to @car, notice: t("cars.unarchive.success"), status: :see_other
   end
 
   private

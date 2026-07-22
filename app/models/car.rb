@@ -8,6 +8,9 @@ class Car < ApplicationRecord
   has_many :service_requests, dependent: :restrict_with_exception
   has_many :service_records, through: :service_requests
 
+  scope :active, -> { where(archived_at: nil) }
+  scope :archived, -> { where.not(archived_at: nil) }
+
   enum :fuel_type, { gasoline: 0, diesel: 1, electric: 2, hybrid: 3 }
   enum :transmission, { manual: 0, automatic: 1 }
 
@@ -31,6 +34,18 @@ class Car < ApplicationRecord
 
   def display_name
     "#{year} #{make} #{model}"
+  end
+
+  def archived?
+    archived_at.present?
+  end
+
+  def archive!
+    update!(archived_at: Time.current)
+  end
+
+  def unarchive!
+    update!(archived_at: nil)
   end
 
   def vin_duplicate_for_another_user?
