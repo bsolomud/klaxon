@@ -89,6 +89,11 @@ class QueueEntryTest < ActiveSupport::TestCase
     end
   end
 
+  test "cancelled entries are excluded from active" do
+    @entry.cancelled!
+    assert_not_includes QueueEntry.active, @entry
+  end
+
   test "waiting entry waits a full slot when the only bay is busy" do
     # open_queue: 1 bay, tire_service duration 45. Put entry 1 into service;
     # entry 2 is then first-in-line but must wait for the busy bay to clear.

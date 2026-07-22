@@ -385,6 +385,7 @@ en:
       in_service: "In Service"
       completed: "Completed"
       no_show: "No Show"
+      cancelled: "Cancelled"
     create:
       success: "You have joined the queue."
       already_in_queue: "You are already in a queue. Leave it first to join another."
@@ -399,6 +400,7 @@ en:
       back: "Back to workshop"
       you_are_up: "You are up! Head to the workshop now."
       you_are_next: "You're next — head over now."
+      cancelled: "The workshop closed this queue."
       leave: "Leave queue"
       leave_confirm: "Leave this queue?"
     destroy:
@@ -1030,6 +1032,7 @@ en:
       car_transfer_cancelled: "Car transfer cancelled"
       car_transfer_expired: "Car transfer expired"
       queue_called: "Your turn in the queue"
+      queue_cancelled: "The workshop cancelled the queue"
     bell:
       label: "Notifications"
       unread_title: "%{count} unread notifications"

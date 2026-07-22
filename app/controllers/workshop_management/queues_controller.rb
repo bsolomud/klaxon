@@ -1,4 +1,6 @@
 class WorkshopManagement::QueuesController < WorkshopManagement::BaseController
+  include NotificationDispatch
+
   before_action :set_queue, only: [:show, :pause, :close]
 
   def index
@@ -53,7 +55,10 @@ class WorkshopManagement::QueuesController < WorkshopManagement::BaseController
       return
     end
 
+    cancelled = cancel_pending_entries
     @queue.closed!
+    notify_cancelled(cancelled)
+
     redirect_to workshop_management_workshop_queue_path(@workshop, @queue),
                 notice: t(".success")
   end
@@ -62,5 +67,17 @@ class WorkshopManagement::QueuesController < WorkshopManagement::BaseController
 
   def set_queue
     @queue = @workshop.service_queues.find(params[:id])
+  end
+
+  # Closing a queue must not strand the drivers waiting in it: cancel the
+  # still-open entries and notify each so they can make other plans.
+  def cancel_pending_entries
+    @queue.queue_entries.where(status: [:waiting, :called]).to_a.each(&:cancelled!)
+  end
+
+  def notify_cancelled(entries)
+    entries.each do |entry|
+      dispatch_notification(recipients: entry.user_id, notifiable: entry, event: :queue_cancelled)
+    end
   end
 end

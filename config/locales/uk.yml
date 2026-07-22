@@ -385,6 +385,7 @@ uk:
       in_service: "Обслуговується"
       completed: "Завершено"
       no_show: "Не з'явився"
+      cancelled: "Скасовано"
     create:
       success: "Ви стали в чергу."
       already_in_queue: "Ви вже стоїте в черзі. Спершу покиньте її, щоб стати в іншу."
@@ -399,6 +400,7 @@ uk:
       back: "Назад до майстерні"
       you_are_up: "Ваша черга! Прямуйте до майстерні."
       you_are_next: "Ви наступні — вирушайте!"
+      cancelled: "Майстерня закрила цю чергу."
       leave: "Покинути чергу"
       leave_confirm: "Покинути чергу?"
     destroy:
@@ -1038,6 +1040,7 @@ uk:
       car_transfer_cancelled: "Передачу авто скасовано"
       car_transfer_expired: "Термін передачі минув"
       queue_called: "Ваша черга"
+      queue_cancelled: "Чергу скасовано майстернею"
     bell:
       label: "Сповіщення"
       unread_title: "%{count} непрочитаних сповіщень"

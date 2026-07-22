@@ -114,6 +114,16 @@ class WorkshopManagement::QueuesControllerTest < ActionDispatch::IntegrationTest
     assert @queue.reload.closed?
   end
 
+  test "close cancels waiting entries and notifies their drivers" do
+    # open_queue has waiting_entry (user one) + waiting_entry_two (user two)
+    assert_difference "Notification.count", 2 do
+      patch close_workshop_management_workshop_queue_path(@workshop, @queue)
+    end
+    assert queue_entries(:waiting_entry).reload.cancelled?
+    assert queue_entries(:waiting_entry_two).reload.cancelled?
+    assert_equal "queue_cancelled", Notification.recent.first.event
+  end
+
   test "close rejects already closed queue" do
     @queue.update!(status: :closed)
     patch close_workshop_management_workshop_queue_path(@workshop, @queue)

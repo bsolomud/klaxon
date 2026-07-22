@@ -5,6 +5,12 @@
     </div>
   <% end %>
 
+  <% if entry.cancelled? %>
+    <div class="mb-6 rounded-2xl bg-red-50 border border-red-200 p-6 text-center">
+      <p class="text-lg font-bold text-red-800"><%= t("queue_entries.show.cancelled") %></p>
+    </div>
+  <% end %>
+
   <div class="bg-white border border-gray-100 rounded-2xl p-8 shadow-sm text-center">
     <h1 class="text-2xl font-bold tracking-tight text-gray-900 mb-2"><%= t("queue_entries.show.title") %></h1>
     <p class="text-sm text-gray-500 mb-8"><%= entry.service_queue.workshop.name %></p>

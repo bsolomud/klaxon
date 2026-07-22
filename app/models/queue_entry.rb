@@ -3,11 +3,11 @@ class QueueEntry < ApplicationRecord
   belongs_to :user
   belongs_to :car, optional: true
 
-  enum :status, { waiting: 0, called: 1, in_service: 2, completed: 3, no_show: 4 }
+  enum :status, { waiting: 0, called: 1, in_service: 2, completed: 3, no_show: 4, cancelled: 5 }
 
   STATUS_COLORS = {
     "waiting" => "yellow", "called" => "blue", "in_service" => "indigo",
-    "completed" => "green", "no_show" => "red"
+    "completed" => "green", "no_show" => "red", "cancelled" => "gray"
   }.freeze
 
   validates :position, presence: true,
