@@ -407,12 +407,19 @@ en:
       success: "You have left the queue."
   service_requests:
     price_on_request: "Price on request"
+    cancel:
+      success: "Request cancelled."
+      not_allowed: "This request can't be cancelled."
+    reschedule:
+      success: "Requested time updated."
+      not_allowed: "This request can't be rescheduled."
     statuses:
       pending: "Pending"
       accepted: "Accepted"
       rejected: "Rejected"
       in_progress: "In Progress"
       completed: "Completed"
+      cancelled: "Cancelled"
     index:
       title: "My Service Requests"
       subtitle: "Your service requests to workshops"
@@ -436,6 +443,10 @@ en:
       status: "Status"
       created_at: "Created"
       leave_review: "Leave a Review"
+      cancel: "Cancel request"
+      cancel_confirm: "Cancel this request?"
+      reschedule: "Reschedule"
+      reschedule_submit: "Update time"
       back: "Back to requests"
     new:
       title: "Request Service"
@@ -657,6 +668,8 @@ en:
         view_public: "View public workshop page"
     service_requests:
       invalid_transition: "This action is not available for the current request status."
+      cancel:
+        success: "Request cancelled."
       index:
         title: "Service Requests"
         subtitle: "Incoming service requests for your workshop"
@@ -682,6 +695,8 @@ en:
         reject_confirm: "Are you sure you want to reject this request?"
         start: "Start Work"
         complete: "Complete Work"
+        cancel: "Cancel request"
+        cancel_confirm: "Cancel this request?"
         back: "Back to requests"
       accept:
         success: "Request accepted."
@@ -1026,6 +1041,8 @@ en:
       service_request_rejected: "Service request declined"
       service_request_started: "Service started"
       service_request_completed: "Service completed"
+      service_request_cancelled: "Service request cancelled"
+      service_request_rescheduled: "Request time changed"
       car_transfer_requested: "Car transfer requested"
       car_transfer_approved: "Car transfer approved"
       car_transfer_rejected: "Car transfer rejected"

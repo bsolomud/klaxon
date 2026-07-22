@@ -43,7 +43,7 @@ class ServiceRequestTest < ActiveSupport::TestCase
   end
 
   test "enum status values" do
-    expected = { "pending" => 0, "accepted" => 1, "rejected" => 2, "in_progress" => 3, "completed" => 4 }
+    expected = { "pending" => 0, "accepted" => 1, "rejected" => 2, "in_progress" => 3, "completed" => 4, "cancelled" => 5 }
     assert_equal expected, ServiceRequest.statuses
   end
 

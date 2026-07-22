@@ -9,11 +9,11 @@ class ServiceRequest < ApplicationRecord
   has_one :service_record, dependent: :destroy
   has_one :review, dependent: :destroy
 
-  enum :status, { pending: 0, accepted: 1, rejected: 2, in_progress: 3, completed: 4 }
+  enum :status, { pending: 0, accepted: 1, rejected: 2, in_progress: 3, completed: 4, cancelled: 5 }
 
   STATUS_COLORS = {
     "pending" => "yellow", "accepted" => "blue", "rejected" => "red",
-    "in_progress" => "indigo", "completed" => "green"
+    "in_progress" => "indigo", "completed" => "green", "cancelled" => "gray"
   }.freeze
 
   validates :description, presence: true
@@ -21,10 +21,11 @@ class ServiceRequest < ApplicationRecord
 
   before_create :snapshot_price
   after_update_commit :broadcast_status_change, if: :saved_change_to_status?
+  after_update_commit :release_appointment_slot, if: :saved_change_to_status?
 
   validate :service_offered_by_workshop
   validate :preferred_time_within_working_hours
-  validate :preferred_time_not_in_past, on: :create
+  validate :preferred_time_not_in_past
 
   scope :recent, -> { order(created_at: :desc) }
 
@@ -38,7 +39,23 @@ class ServiceRequest < ApplicationRecord
     )
   end
 
+  def cancellable_by_driver?
+    pending? || accepted?
+  end
+
+  def cancellable_by_operator?
+    accepted? || in_progress?
+  end
+
   private
+
+  # Frees the reserved slot when a booking falls through, so its capacity is
+  # not leaked. Terminal statuses fire once, so the slot is released only once.
+  def release_appointment_slot
+    return unless (rejected? || cancelled?) && appointment_slot
+
+    appointment_slot.release!
+  end
 
   def snapshot_price
     return unless workshop_service_category
@@ -85,6 +102,7 @@ class ServiceRequest < ApplicationRecord
 
   def preferred_time_not_in_past
     return if preferred_time.blank?
+    return unless preferred_time_changed?
 
     errors.add(:preferred_time, :in_the_past) if preferred_time < Time.current
   end

@@ -54,6 +54,20 @@
               new_service_request_review_path(service_request),
               class: "block btn-primary text-center" %>
       <% end %>
+
+      <% if service_request.cancellable_by_driver? %>
+        <details class="rounded-lg border border-gray-200 bg-white">
+          <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-gray-700"><%= t("service_requests.show.reschedule") %></summary>
+          <%= form_with scope: :service_request, url: reschedule_service_request_path(service_request), method: :patch, class: "px-4 pb-3 space-y-2" do |f| %>
+            <%= f.datetime_field :preferred_time, value: service_request.preferred_time.strftime("%Y-%m-%dT%H:%M"), class: "w-full rounded-lg border-gray-300 text-sm focus:border-black focus:ring-black" %>
+            <%= f.submit t("service_requests.show.reschedule_submit"), class: "btn-primary !w-auto cursor-pointer" %>
+          <% end %>
+        </details>
+        <%= button_to t("service_requests.show.cancel"), cancel_service_request_path(service_request),
+              method: :patch, data: { turbo_confirm: t("service_requests.show.cancel_confirm") },
+              class: "block w-full text-left rounded-lg border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 transition-colors cursor-pointer" %>
+      <% end %>
+
       <%= link_to t("service_requests.show.back"), service_requests_path,
             class: "block text-sm font-medium text-gray-500 hover:text-black transition-colors" %>
     </div>

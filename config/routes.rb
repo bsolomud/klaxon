@@ -33,6 +33,7 @@ Rails.application.routes.draw do
           patch :accept
           patch :reject
           patch :start
+          patch :cancel
         end
         resource :service_record, only: [:new, :create]
       end
@@ -83,6 +84,10 @@ Rails.application.routes.draw do
   end
   resources :queue_entries, only: [:show, :create, :destroy]
   resources :service_requests, only: [:index, :show, :new, :create] do
+    member do
+      patch :cancel
+      patch :reschedule
+    end
     resource :review, only: [:new, :create]
   end
   resources :car_transfers, only: [:new, :create, :show], param: :token do

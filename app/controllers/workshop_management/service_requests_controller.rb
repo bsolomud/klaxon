@@ -2,7 +2,7 @@ class WorkshopManagement::ServiceRequestsController < WorkshopManagement::BaseCo
   include StateTransitionable
   include NotificationDispatch
 
-  before_action :set_service_request, only: [:show, :accept, :reject, :start]
+  before_action :set_service_request, only: [:show, :accept, :reject, :start, :cancel]
 
   def index
     scope = @workshop.service_requests
@@ -25,6 +25,23 @@ class WorkshopManagement::ServiceRequestsController < WorkshopManagement::BaseCo
 
   def start
     transition_service_request(:accepted, :in_progress!, notify: :started)
+  end
+
+  def cancel
+    unless @service_request.cancellable_by_operator?
+      redirect_to workshop_management_workshop_service_request_path(@workshop, @service_request),
+                  alert: t("workshop_management.service_requests.invalid_transition")
+      return
+    end
+
+    @service_request.cancelled!
+    dispatch_notification(
+      recipients: @service_request.car.user,
+      notifiable: @service_request,
+      event: :service_request_cancelled
+    )
+    redirect_to workshop_management_workshop_service_request_path(@workshop, @service_request),
+                notice: t("workshop_management.service_requests.cancel.success")
   end
 
   private

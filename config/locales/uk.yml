@@ -407,12 +407,19 @@ uk:
       success: "Ви покинули чергу."
   service_requests:
     price_on_request: "Ціна за запитом"
+    cancel:
+      success: "Запит скасовано."
+      not_allowed: "Цей запит не можна скасувати."
+    reschedule:
+      success: "Час запиту оновлено."
+      not_allowed: "Цей запит не можна перенести."
     statuses:
       pending: "Очікує"
       accepted: "Прийнято"
       rejected: "Відхилено"
       in_progress: "В роботі"
       completed: "Завершено"
+      cancelled: "Скасовано"
     index:
       title: "Мої запити на обслуговування"
       subtitle: "Ваші запити до майстерень"
@@ -436,6 +443,10 @@ uk:
       status: "Статус"
       created_at: "Створено"
       leave_review: "Залишити відгук"
+      cancel: "Скасувати запит"
+      cancel_confirm: "Скасувати цей запит?"
+      reschedule: "Змінити час"
+      reschedule_submit: "Оновити час"
       back: "Назад до запитів"
     new:
       title: "Замовити послугу"
@@ -663,6 +674,8 @@ uk:
         view_public: "Переглянути публічну сторінку"
     service_requests:
       invalid_transition: "Ця дія недоступна для поточного статусу запиту."
+      cancel:
+        success: "Запит скасовано."
       index:
         title: "Запити на обслуговування"
         subtitle: "Вхідні запити для вашої майстерні"
@@ -688,6 +701,8 @@ uk:
         reject_confirm: "Ви впевнені, що хочете відхилити цей запит?"
         start: "Почати роботу"
         complete: "Завершити роботу"
+        cancel: "Скасувати запит"
+        cancel_confirm: "Скасувати цей запит?"
         back: "Назад до запитів"
       accept:
         success: "Запит прийнято."
@@ -1034,6 +1049,8 @@ uk:
       service_request_rejected: "Запит на обслуговування відхилено"
       service_request_started: "Обслуговування розпочато"
       service_request_completed: "Обслуговування завершено"
+      service_request_cancelled: "Запит на обслуговування скасовано"
+      service_request_rescheduled: "Час запиту змінено"
       car_transfer_requested: "Запит на передачу авто"
       car_transfer_approved: "Передачу авто схвалено"
       car_transfer_rejected: "Передачу авто відхилено"

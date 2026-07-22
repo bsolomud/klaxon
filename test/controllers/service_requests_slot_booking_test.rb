@@ -33,6 +33,28 @@ class ServiceRequestsSlotBookingTest < ActionDispatch::IntegrationTest
     assert_redirected_to service_request_path(sr)
   end
 
+  test "operator rejecting a booked request releases its slot" do
+    @slot.book!
+    request = ServiceRequest.create!(
+      car: @car, workshop: @workshop, workshop_service_category: @wsc,
+      appointment_slot: @slot, preferred_time: @slot.starts_at,
+      description: "Заміна шин", status: :pending
+    )
+    request.rejected!
+    assert_equal 0, @slot.reload.booked_count
+  end
+
+  test "driver cancelling a booked request releases its slot" do
+    @slot.book!
+    request = ServiceRequest.create!(
+      car: @car, workshop: @workshop, workshop_service_category: @wsc,
+      appointment_slot: @slot, preferred_time: @slot.starts_at,
+      description: "Заміна шин", status: :accepted
+    )
+    request.cancelled!
+    assert_equal 0, @slot.reload.booked_count
+  end
+
   test "cannot book a slot that is already full" do
     @slot.update!(booked_count: 1) # capacity 1, now full
     assert_no_difference "ServiceRequest.count" do

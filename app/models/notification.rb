@@ -16,7 +16,9 @@ class Notification < ApplicationRecord
     car_transfer_cancelled: 10,
     car_transfer_expired: 11,
     queue_called: 12,
-    queue_cancelled: 13
+    queue_cancelled: 13,
+    service_request_cancelled: 14,
+    service_request_rescheduled: 15
   }
 
   validates :event, presence: true

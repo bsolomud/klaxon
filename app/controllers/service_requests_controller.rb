@@ -1,6 +1,6 @@
 class ServiceRequestsController < ApplicationController
   include NotificationDispatch
-  before_action :set_service_request, only: [:show]
+  before_action :set_service_request, only: [:show, :cancel, :reschedule]
 
   def index
     scope = ServiceRequest.where(car: current_user.cars).recent
@@ -9,6 +9,41 @@ class ServiceRequestsController < ApplicationController
   end
 
   def show
+  end
+
+  def cancel
+    unless @service_request.cancellable_by_driver?
+      redirect_to @service_request, alert: t("service_requests.cancel.not_allowed")
+      return
+    end
+
+    @service_request.cancelled!
+    dispatch_notification(
+      recipients: @service_request.workshop.workshop_operators.pluck(:user_id),
+      notifiable: @service_request,
+      event: :service_request_cancelled
+    )
+    redirect_to @service_request, notice: t("service_requests.cancel.success")
+  end
+
+  def reschedule
+    unless @service_request.cancellable_by_driver?
+      redirect_to @service_request, alert: t("service_requests.reschedule.not_allowed")
+      return
+    end
+
+    slot = @service_request.appointment_slot
+    if @service_request.update(preferred_time: reschedule_params[:preferred_time], appointment_slot: nil)
+      slot&.release!
+      dispatch_notification(
+        recipients: @service_request.workshop.workshop_operators.pluck(:user_id),
+        notifiable: @service_request,
+        event: :service_request_rescheduled
+      )
+      redirect_to @service_request, notice: t("service_requests.reschedule.success")
+    else
+      redirect_to @service_request, alert: @service_request.errors.full_messages.to_sentence
+    end
   end
 
   def new
@@ -64,6 +99,10 @@ class ServiceRequestsController < ApplicationController
       :car_id, :workshop_id, :workshop_service_category_id,
       :description, :preferred_time
     )
+  end
+
+  def reschedule_params
+    params.require(:service_request).permit(:preferred_time)
   end
 
   # Booking a slot fixes the service and time; the slot booking and the request
