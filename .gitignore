@@ -38,7 +38,5 @@
 !/app/assets/builds/.keep
 .idea/
 
-# Playwright page-capture tooling (generated dependencies — re-hydrate with `npm install`).
-/page-captures/node_modules/
-/page-captures/test-results/
-/page-captures/playwright-report/
+# Playwright page-capture tooling & screenshots — local only, never pushed to remote.
+/page-captures/
