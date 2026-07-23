@@ -1072,6 +1072,9 @@ uk:
       car_transfer_expired: "Термін передачі минув"
       queue_called: "Ваша черга"
       queue_cancelled: "Чергу скасовано майстернею"
+      review_received: "Новий відгук про вашу майстерню"
+      review_replied: "Майстерня відповіла на ваш відгук"
+      service_due_reminder: "Час на планове обслуговування авто"
     bell:
       label: "Сповіщення"
       unread_title: "%{count} непрочитаних сповіщень"

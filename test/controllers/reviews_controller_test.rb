@@ -67,6 +67,17 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_equal @completed_request.workshop_id, review.workshop_id
   end
 
+  test "create notifies the workshop operators" do
+    reviews(:published_review).destroy!
+    operator_count = @completed_request.workshop.workshop_operators.count
+    assert_difference "Notification.count", operator_count do
+      post service_request_review_path(@completed_request), params: {
+        review: { rating: 5, body: "Great!" }
+      }
+    end
+    assert_equal "review_received", Notification.recent.first.event
+  end
+
   test "create re-renders form on invalid params" do
     reviews(:published_review).destroy!
     assert_no_difference "Review.count" do

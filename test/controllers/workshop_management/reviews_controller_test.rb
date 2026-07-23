@@ -23,14 +23,19 @@ class WorkshopManagement::ReviewsControllerTest < ActionDispatch::IntegrationTes
     assert_response :not_found
   end
 
-  test "owner can respond to a review" do
+  test "owner can respond to a review and the reviewer is notified" do
     sign_in @owner
-    patch respond_workshop_management_workshop_review_path(@workshop, @review),
-      params: { review: { response: "Дякуємо за ваш відгук!" } }
+    assert_difference "Notification.count", 1 do
+      patch respond_workshop_management_workshop_review_path(@workshop, @review),
+        params: { review: { response: "Дякуємо за ваш відгук!" } }
+    end
     assert_redirected_to workshop_management_workshop_reviews_path(@workshop)
     @review.reload
     assert_equal "Дякуємо за ваш відгук!", @review.response
     assert @review.responded_at.present?
+    notification = Notification.recent.first
+    assert_equal "review_replied", notification.event
+    assert_equal @review.user, notification.user
   end
 
   test "non-manager cannot respond to a review" do

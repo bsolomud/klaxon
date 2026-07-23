@@ -1,4 +1,6 @@
 class WorkshopManagement::ReviewsController < WorkshopManagement::BaseController
+  include NotificationDispatch
+
   before_action :set_review, only: [:respond]
 
   def index
@@ -7,6 +9,7 @@ class WorkshopManagement::ReviewsController < WorkshopManagement::BaseController
 
   def respond
     if @review.update(response_params.merge(responded_at: Time.current))
+      dispatch_notification(recipients: @review.user, notifiable: @review, event: :review_replied)
       redirect_to workshop_management_workshop_reviews_path(@workshop),
         notice: t("workshop_management.reviews.respond.success")
     else

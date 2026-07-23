@@ -16,3 +16,6 @@ production:
   expire_car_transfers:
     class: ExpireCarTransfersJob
     schedule: every hour at minute 5
+  service_reminders:
+    class: ServiceReminderJob
+    schedule: every day at 8am

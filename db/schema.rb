@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_23_120200) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_23_120300) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -249,6 +249,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_23_120200) do
     t.jsonb "parts_used"
     t.string "performed_by"
     t.text "recommendations"
+    t.datetime "reminder_sent_at"
     t.bigint "service_request_id", null: false
     t.text "summary", null: false
     t.datetime "updated_at", null: false

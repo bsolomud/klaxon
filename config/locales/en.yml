@@ -1064,6 +1064,9 @@ en:
       car_transfer_expired: "Car transfer expired"
       queue_called: "Your turn in the queue"
       queue_cancelled: "The workshop cancelled the queue"
+      review_received: "New review of your workshop"
+      review_replied: "The workshop replied to your review"
+      service_due_reminder: "Your car is due for service"
     bell:
       label: "Notifications"
       unread_title: "%{count} unread notifications"

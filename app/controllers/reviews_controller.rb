@@ -1,4 +1,6 @@
 class ReviewsController < ApplicationController
+  include NotificationDispatch
+
   before_action :set_service_request
 
   def new
@@ -11,6 +13,11 @@ class ReviewsController < ApplicationController
     @review.workshop = @service_request.workshop
 
     if @review.save
+      dispatch_notification(
+        recipients: @service_request.workshop.workshop_operators.pluck(:user_id),
+        notifiable: @review,
+        event: :review_received
+      )
       redirect_to workshop_path(@service_request.workshop), notice: t("reviews.create.success")
     else
       render :new, status: :unprocessable_entity

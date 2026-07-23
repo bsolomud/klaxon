@@ -18,7 +18,10 @@ class Notification < ApplicationRecord
     queue_called: 12,
     queue_cancelled: 13,
     service_request_cancelled: 14,
-    service_request_rescheduled: 15
+    service_request_rescheduled: 15,
+    review_received: 16,
+    review_replied: 17,
+    service_due_reminder: 18
   }
 
   validates :event, presence: true
@@ -44,6 +47,10 @@ class Notification < ApplicationRecord
       Rails.application.routes.url_helpers.my_workshops_path
     when "QueueEntry"
       Rails.application.routes.url_helpers.queue_entry_path(notifiable_id)
+    when "Review"
+      Rails.application.routes.url_helpers.workshop_path(notifiable.workshop_id)
+    when "ServiceRecord"
+      Rails.application.routes.url_helpers.car_path(notifiable.car)
     end
   end
 end
