@@ -97,6 +97,7 @@ Rails.application.routes.draw do
       patch :cancel
     end
   end
+  resources :car_history_accesses, only: [:create, :destroy]
   resources :service_categories, only: [:index, :show]
   resources :workshops
   resources :my_workshops, only: [:index]

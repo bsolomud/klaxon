@@ -39,6 +39,28 @@
         </div>
       </dl>
     </div>
+
+    <%# Car history — visible only when the driver granted this workshop access %>
+    <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+      <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-500 mb-4"><%= t(".car_history") %></h2>
+      <% if @car_history.nil? %>
+        <p class="text-sm text-gray-400"><%= t(".history_not_shared") %></p>
+      <% elsif @car_history.any? %>
+        <div class="divide-y divide-gray-100">
+          <% @car_history.each do |record| %>
+            <div class="py-3 first:pt-0 last:pb-0">
+              <div class="flex items-start justify-between gap-2">
+                <p class="text-sm font-medium text-gray-900"><%= record.workshop.name %> &mdash; <%= record.workshop_service_category.service_category.name %></p>
+                <time class="text-xs text-gray-500 whitespace-nowrap"><%= l(record.completed_at.to_date) %></time>
+              </div>
+              <p class="mt-1 text-sm text-gray-700"><%= record.summary %></p>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-sm text-gray-400"><%= t(".no_history") %></p>
+      <% end %>
+    </div>
   </div>
 
   <div class="space-y-3">

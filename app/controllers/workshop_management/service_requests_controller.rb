@@ -13,6 +13,11 @@ class WorkshopManagement::ServiceRequestsController < WorkshopManagement::BaseCo
   end
 
   def show
+    return unless @service_request.car.history_visible_to?(@workshop)
+
+    @car_history = @service_request.car.service_records
+      .includes(service_request: [:workshop, { workshop_service_category: :service_category }])
+      .order(completed_at: :desc)
   end
 
   def accept

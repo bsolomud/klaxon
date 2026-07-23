@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_23_120100) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_23_120200) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -66,6 +66,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_23_120100) do
     t.index ["workshop_id"], name: "index_appointment_slots_on_workshop_id"
     t.index ["workshop_service_category_id", "starts_at"], name: "index_slots_on_wsc_and_start", unique: true
     t.index ["workshop_service_category_id"], name: "index_appointment_slots_on_workshop_service_category_id"
+  end
+
+  create_table "car_history_accesses", force: :cascade do |t|
+    t.bigint "car_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "workshop_id", null: false
+    t.index ["car_id", "workshop_id"], name: "index_car_history_accesses_on_car_id_and_workshop_id", unique: true
+    t.index ["car_id"], name: "index_car_history_accesses_on_car_id"
+    t.index ["workshop_id"], name: "index_car_history_accesses_on_workshop_id"
   end
 
   create_table "car_makes", force: :cascade do |t|
@@ -369,6 +379,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_23_120100) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "appointment_slots", "workshop_service_categories"
   add_foreign_key "appointment_slots", "workshops"
+  add_foreign_key "car_history_accesses", "cars"
+  add_foreign_key "car_history_accesses", "workshops"
   add_foreign_key "car_makes", "users", column: "submitted_by_id"
   add_foreign_key "car_models", "car_makes"
   add_foreign_key "car_models", "users", column: "submitted_by_id"

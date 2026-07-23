@@ -95,6 +95,31 @@
         <p class="text-sm text-gray-500"><%= t(".no_service_history") %></p>
       <% end %>
     </div>
+
+    <%# History access — the driver grants/revokes workshop visibility %>
+    <% shared_workshops = Workshop.active.where(id: @car.service_requests.select(:workshop_id)).distinct.order(:name) %>
+    <% if shared_workshops.any? %>
+      <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+        <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-500 mb-1"><%= t(".history_access") %></h2>
+        <p class="text-xs text-gray-500 mb-4"><%= t(".history_access_hint") %></p>
+        <% granted = @car.history_accesses.index_by(&:workshop_id) %>
+        <div class="divide-y divide-gray-100">
+          <% shared_workshops.each do |w| %>
+            <div class="flex items-center justify-between py-2.5">
+              <span class="text-sm text-gray-900"><%= w.name %></span>
+              <% if (access = granted[w.id]) %>
+                <%= button_to t(".revoke_access"), car_history_access_path(access), method: :delete,
+                      class: "text-xs font-medium text-red-600 hover:text-red-700 cursor-pointer" %>
+              <% else %>
+                <%= button_to t(".grant_access"), car_history_accesses_path,
+                      params: { car_id: @car.id, workshop_id: w.id }, method: :post,
+                      class: "text-xs font-medium text-gray-700 hover:text-black cursor-pointer" %>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
   </div>
 
   <div class="space-y-3">

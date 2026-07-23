@@ -7,6 +7,12 @@ class Car < ApplicationRecord
   has_many :car_transfers, dependent: :restrict_with_exception
   has_many :service_requests, dependent: :restrict_with_exception
   has_many :service_records, through: :service_requests
+  has_many :history_accesses, class_name: "CarHistoryAccess", dependent: :destroy
+  has_many :history_shared_workshops, through: :history_accesses, source: :workshop
+
+  def history_visible_to?(workshop)
+    history_accesses.exists?(workshop: workshop)
+  end
 
   scope :active, -> { where(archived_at: nil) }
   scope :archived, -> { where.not(archived_at: nil) }

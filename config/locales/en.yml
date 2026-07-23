@@ -305,6 +305,10 @@ en:
       recommendations: "Recommendations"
       performed_by: "Performed by"
       total_cost: "Total cost"
+      history_access: "History access"
+      history_access_hint: "Let workshops view this car's service history."
+      grant_access: "Grant access"
+      revoke_access: "Revoke access"
       back: "Back to cars"
     new:
       title: "Add Car"
@@ -335,6 +339,11 @@ en:
       success: "Car moved to archive."
     unarchive:
       success: "Car restored."
+  car_history_accesses:
+    create:
+      success: "History access granted to %{workshop}."
+    destroy:
+      success: "History access revoked."
   car_transfers:
     statuses:
       requested: "Requested"
@@ -699,6 +708,9 @@ en:
         complete: "Complete Work"
         cancel: "Cancel request"
         cancel_confirm: "Cancel this request?"
+        car_history: "Car history"
+        history_not_shared: "The driver hasn't shared this car's history."
+        no_history: "No service records yet."
         back: "Back to requests"
       accept:
         success: "Request accepted."

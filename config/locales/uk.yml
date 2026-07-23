@@ -305,6 +305,10 @@ uk:
       recommendations: "Рекомендації"
       performed_by: "Виконавець"
       total_cost: "Вартість"
+      history_access: "Доступ до історії"
+      history_access_hint: "Дозвольте майстерням переглядати історію обслуговування цього авто."
+      grant_access: "Надати доступ"
+      revoke_access: "Скасувати доступ"
       back: "Назад до автомобілів"
     new:
       title: "Додати автомобіль"
@@ -335,6 +339,11 @@ uk:
       success: "Автомобіль переміщено в архів."
     unarchive:
       success: "Автомобіль відновлено."
+  car_history_accesses:
+    create:
+      success: "Доступ до історії надано майстерні %{workshop}."
+    destroy:
+      success: "Доступ до історії скасовано."
   car_transfers:
     statuses:
       requested: "Запитано"
@@ -705,6 +714,9 @@ uk:
         complete: "Завершити роботу"
         cancel: "Скасувати запит"
         cancel_confirm: "Скасувати цей запит?"
+        car_history: "Історія авто"
+        history_not_shared: "Водій не надав доступ до історії цього авто."
+        no_history: "Записів обслуговування ще немає."
         back: "Назад до запитів"
       accept:
         success: "Запит прийнято."
