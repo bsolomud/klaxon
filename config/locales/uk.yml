@@ -454,6 +454,9 @@ uk:
       status: "Статус"
       created_at: "Створено"
       leave_review: "Залишити відгук"
+      edit_review: "Редагувати відгук"
+      delete_review: "Видалити відгук"
+      delete_review_confirm: "Видалити ваш відгук?"
       cancel: "Скасувати запит"
       cancel_confirm: "Скасувати цей запит?"
       reschedule: "Змінити час"
@@ -1037,9 +1040,17 @@ uk:
       images: "Фото (необов'язково)"
       submit: "Надіслати відгук"
       cancel: "Скасувати"
+    edit:
+      title: "Редагувати відгук"
+      submit: "Оновити відгук"
     create:
       success: "Дякуємо за ваш відгук!"
       already_reviewed: "Ви вже залишили відгук на цю послугу."
+    update:
+      success: "Відгук оновлено."
+    destroy:
+      success: "Відгук видалено."
+    not_found: "Відгук не знайдено."
     response:
       label: "Відповідь власника"
   notifications:

@@ -95,4 +95,32 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to service_request_path(@completed_request)
     assert_equal I18n.t("reviews.create.already_reviewed"), flash[:alert]
   end
+
+  # --- Edit / Update / Destroy ---
+
+  test "edit renders the form for the reviewer" do
+    get edit_service_request_review_path(@completed_request)
+    assert_response :success
+    assert_select "form"
+  end
+
+  test "update changes the review and recomputes rating" do
+    patch service_request_review_path(@completed_request), params: { review: { rating: 3, body: "Updated" } }
+    review = reviews(:published_review).reload
+    assert_equal 3, review.rating
+    assert_equal "Updated", review.body
+    assert_redirected_to workshop_path(review.workshop)
+  end
+
+  test "destroy removes the review" do
+    assert_difference "Review.count", -1 do
+      delete service_request_review_path(@completed_request)
+    end
+    assert_redirected_to service_request_path(@completed_request)
+  end
+
+  test "cannot edit another user's review" do
+    get edit_service_request_review_path(service_requests(:other_user_completed))
+    assert_response :not_found
+  end
 end

@@ -88,7 +88,7 @@ Rails.application.routes.draw do
       patch :cancel
       patch :reschedule
     end
-    resource :review, only: [:new, :create]
+    resource :review, only: [:new, :create, :edit, :update, :destroy]
   end
   resources :car_transfers, only: [:new, :create, :show], param: :token do
     member do

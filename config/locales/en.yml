@@ -454,6 +454,9 @@ en:
       status: "Status"
       created_at: "Created"
       leave_review: "Leave a Review"
+      edit_review: "Edit review"
+      delete_review: "Delete review"
+      delete_review_confirm: "Delete your review?"
       cancel: "Cancel request"
       cancel_confirm: "Cancel this request?"
       reschedule: "Reschedule"
@@ -1029,9 +1032,17 @@ en:
       images: "Photos (optional)"
       submit: "Submit Review"
       cancel: "Cancel"
+    edit:
+      title: "Edit Review"
+      submit: "Update Review"
     create:
       success: "Thank you for your review!"
       already_reviewed: "You have already reviewed this service."
+    update:
+      success: "Review updated."
+    destroy:
+      success: "Review removed."
+    not_found: "Review not found."
     response:
       label: "Owner's response"
   notifications:

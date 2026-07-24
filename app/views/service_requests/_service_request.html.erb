@@ -49,10 +49,20 @@
     </div>
 
     <div class="space-y-3">
-      <% if service_request.completed? && service_request.review.blank? %>
-        <%= link_to t("service_requests.show.leave_review"),
-              new_service_request_review_path(service_request),
-              class: "block btn-primary text-center" %>
+      <% if service_request.completed? %>
+        <% if service_request.review.blank? %>
+          <%= link_to t("service_requests.show.leave_review"),
+                new_service_request_review_path(service_request),
+                class: "block btn-primary text-center" %>
+        <% else %>
+          <%= link_to t("service_requests.show.edit_review"),
+                edit_service_request_review_path(service_request),
+                class: "block text-sm font-medium text-gray-700 hover:text-black transition-colors" %>
+          <%= button_to t("service_requests.show.delete_review"),
+                service_request_review_path(service_request), method: :delete,
+                data: { turbo_confirm: t("service_requests.show.delete_review_confirm") },
+                class: "block w-full text-left text-sm font-medium text-red-600 hover:text-red-700 transition-colors cursor-pointer" %>
+        <% end %>
       <% end %>
 
       <% if service_request.cancellable_by_driver? %>
