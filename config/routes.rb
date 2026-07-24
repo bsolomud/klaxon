@@ -64,6 +64,7 @@ Rails.application.routes.draw do
           post :generate
         end
       end
+      resources :operators, only: [:index, :create, :update, :destroy]
     end
   end
 

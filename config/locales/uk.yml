@@ -140,6 +140,7 @@ uk:
         settings: "Налаштування"
         reviews: "Відгуки"
         slots: "Час запису"
+        team: "Команда"
   admin:
     dashboard:
       index:
@@ -649,6 +650,25 @@ uk:
       success: "Майстерню успішно видалено."
       has_requests: "Неможливо видалити майстерню, яка має запити на обслуговування."
   workshop_management:
+    operators:
+      owner_only: "Лише власник може керувати командою."
+      added: "%{email} додано до команди."
+      no_user: "Користувача з такою поштою не знайдено."
+      already_member: "Цей користувач вже в команді."
+      role_updated: "Роль оновлено."
+      removed: "Оператора видалено."
+      cannot_remove_last_owner: "Неможливо видалити останнього власника."
+      roles:
+        owner: "Власник"
+        staff: "Співробітник"
+      index:
+        title: "Команда"
+        subtitle: "Керуйте власниками та співробітниками майстерні"
+        add_title: "Додати учасника"
+        email: "Електронна пошта"
+        add_button: "Додати"
+        remove: "Видалити"
+        remove_confirm: "Видалити цього оператора?"
     reviews:
       index:
         title: "Відгуки"

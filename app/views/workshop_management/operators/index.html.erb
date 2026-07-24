@@ -1,0 +1,40 @@
+<div class="mb-8">
+  <h1 class="text-2xl font-bold tracking-tight text-gray-900"><%= t(".title") %></h1>
+  <p class="mt-1 text-sm text-gray-500"><%= t(".subtitle") %></p>
+</div>
+
+<div class="mb-8 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+  <h2 class="mb-3 text-sm font-medium uppercase tracking-wider text-gray-900"><%= t(".add_title") %></h2>
+  <%= form_with url: workshop_management_workshop_operators_path(@workshop), method: :post,
+        class: "flex flex-wrap items-end gap-3" do %>
+    <div>
+      <label class="label-input" for="email"><%= t(".email") %></label>
+      <%= email_field_tag :email, nil, placeholder: "name@example.com",
+            class: "mt-1 block rounded-lg border-gray-300 text-sm focus:border-black focus:ring-black" %>
+    </div>
+    <%= submit_tag t(".add_button"), class: "btn-primary !w-auto cursor-pointer" %>
+  <% end %>
+</div>
+
+<div class="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm divide-y divide-gray-50">
+  <% @operators.each do |op| %>
+    <div class="flex items-center justify-between px-5 py-3">
+      <p class="text-sm font-medium text-gray-900"><%= op.user.email %></p>
+      <div class="flex items-center gap-3">
+        <%= form_with url: workshop_management_workshop_operator_path(@workshop, op), method: :patch, class: "inline" do %>
+          <%= select_tag "workshop_operator[role]",
+                options_for_select(
+                  [[t("workshop_management.operators.roles.owner"), "owner"],
+                   [t("workshop_management.operators.roles.staff"), "staff"]],
+                  op.role
+                ),
+                onchange: "this.form.requestSubmit()",
+                class: "rounded-lg border-gray-300 text-xs focus:border-black focus:ring-black" %>
+        <% end %>
+        <%= button_to t(".remove"), workshop_management_workshop_operator_path(@workshop, op), method: :delete,
+              data: { turbo_confirm: t(".remove_confirm") },
+              class: "text-xs font-medium text-red-600 hover:text-red-700 cursor-pointer" %>
+      </div>
+    </div>
+  <% end %>
+</div>

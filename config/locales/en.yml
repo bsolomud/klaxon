@@ -140,6 +140,7 @@ en:
         settings: "Settings"
         reviews: "Reviews"
         slots: "Time slots"
+        team: "Team"
   admin:
     dashboard:
       index:
@@ -643,6 +644,25 @@ en:
       success: "Workshop was successfully deleted."
       has_requests: "Cannot delete workshop that has service requests."
   workshop_management:
+    operators:
+      owner_only: "Only an owner can manage the team."
+      added: "%{email} added to the team."
+      no_user: "No user found with that email."
+      already_member: "That user is already on the team."
+      role_updated: "Role updated."
+      removed: "Operator removed."
+      cannot_remove_last_owner: "You can't remove the last owner."
+      roles:
+        owner: "Owner"
+        staff: "Staff"
+      index:
+        title: "Team"
+        subtitle: "Manage your workshop's owners and staff"
+        add_title: "Add a member"
+        email: "Email"
+        add_button: "Add"
+        remove: "Remove"
+        remove_confirm: "Remove this operator?"
     reviews:
       index:
         title: "Reviews"

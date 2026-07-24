@@ -64,6 +64,9 @@
           <%= link_to t("layouts.workshop.nav.slots"),
                 workshop_management_workshop_appointment_slots_path(@workshop),
                 class: controller_name == "appointment_slots" ? nav_active : nav_inactive %>
+          <%= link_to t("layouts.workshop.nav.team"),
+                workshop_management_workshop_operators_path(@workshop),
+                class: controller_name == "operators" ? nav_active : nav_inactive %>
           <%= link_to t("layouts.workshop.nav.settings"),
                 workshop_management_workshop_path(@workshop),
                 class: (controller_name == "workshops" && action_name == "show") ? nav_active : nav_inactive %>
