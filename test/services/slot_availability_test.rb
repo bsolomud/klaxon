@@ -22,6 +22,11 @@ class SlotAvailabilityTest < ActiveSupport::TestCase
     end
   end
 
+  test "returns nothing on a workshop closure date" do
+    @workshop.working_hour_exceptions.create!(date: @date, closed: true)
+    assert_empty SlotAvailability.new(@workshop, @wsc, @date).generate!
+  end
+
   test "returns nothing on a closed day" do
     closed_date = @date.next_day
     @workshop.working_hours.create!(day_of_week: closed_date.wday, closed: true)

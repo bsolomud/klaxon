@@ -12,6 +12,7 @@ class SlotAvailability
   def generate!
     hours = @workshop.working_hours.find_by(day_of_week: @date.wday)
     return AppointmentSlot.none if hours.nil? || hours.closed?
+    return AppointmentSlot.none if @workshop.closed_on?(@date)
 
     duration = (@wsc.estimated_duration_minutes || DEFAULT_DURATION_MINUTES).minutes
     slot_start = combine(hours.opens_at)

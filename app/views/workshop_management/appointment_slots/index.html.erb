@@ -28,6 +28,27 @@
   </div>
 <% end %>
 
+<div class="mb-8 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+  <h2 class="mb-1 text-sm font-medium uppercase tracking-wider text-gray-900"><%= t(".closures_title") %></h2>
+  <p class="mb-3 text-xs text-gray-500"><%= t(".closures_hint") %></p>
+  <%= form_with url: workshop_management_workshop_working_hour_exceptions_path(@workshop), method: :post,
+        class: "flex flex-wrap items-end gap-3" do %>
+    <%= date_field_tag :date, @date.iso8601, class: "rounded-lg border-gray-300 text-sm focus:border-black focus:ring-black" %>
+    <%= submit_tag t(".add_closure"), class: "btn-primary !w-auto cursor-pointer" %>
+  <% end %>
+  <% if @closures.any? %>
+    <div class="mt-4 flex flex-wrap gap-2">
+      <% @closures.each do |closure| %>
+        <span class="inline-flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-700">
+          <%= l(closure.date) %>
+          <%= button_to "×", workshop_management_workshop_working_hour_exception_path(@workshop, closure), method: :delete,
+                class: "leading-none text-gray-400 hover:text-red-600 cursor-pointer" %>
+        </span>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
 <% if @slots.any? %>
   <div class="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
     <table class="w-full text-sm">

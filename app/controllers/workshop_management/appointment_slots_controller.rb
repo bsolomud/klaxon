@@ -3,6 +3,7 @@ class WorkshopManagement::AppointmentSlotsController < WorkshopManagement::BaseC
     @date = parse_date
     @categories = @workshop.workshop_service_categories.includes(:service_category)
     @slots = @workshop.appointment_slots.for_day(@date).chronological.includes(workshop_service_category: :service_category)
+    @closures = @workshop.working_hour_exceptions.upcoming
   end
 
   def generate

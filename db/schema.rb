@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_23_120300) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_23_120400) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -313,6 +313,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_23_120300) do
     t.index ["unlock_token"], name: "index_users_on_unlock_token", unique: true
   end
 
+  create_table "working_hour_exceptions", force: :cascade do |t|
+    t.boolean "closed", default: true, null: false
+    t.datetime "created_at", null: false
+    t.date "date", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "workshop_id", null: false
+    t.index ["workshop_id", "date"], name: "index_working_hour_exceptions_on_workshop_id_and_date", unique: true
+    t.index ["workshop_id"], name: "index_working_hour_exceptions_on_workshop_id"
+  end
+
   create_table "working_hours", force: :cascade do |t|
     t.boolean "closed", default: false, null: false
     t.time "closes_at"
@@ -411,6 +421,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_23_120300) do
   add_foreign_key "service_requests", "cars"
   add_foreign_key "service_requests", "workshop_service_categories"
   add_foreign_key "service_requests", "workshops"
+  add_foreign_key "working_hour_exceptions", "workshops"
   add_foreign_key "working_hours", "workshops"
   add_foreign_key "workshop_operators", "users"
   add_foreign_key "workshop_operators", "workshops"

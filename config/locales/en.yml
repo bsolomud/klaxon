@@ -679,6 +679,10 @@ en:
       success: "Workshop was successfully deleted."
       has_requests: "Cannot delete workshop that has service requests."
   workshop_management:
+    closures:
+      added: "Closed date added."
+      removed: "Closed date removed."
+      invalid_date: "Invalid date."
     operators:
       owner_only: "Only an owner can manage the team."
       added: "%{email} added to the team."
@@ -720,6 +724,9 @@ en:
         time: "Time"
         booked: "Booked"
         empty: "No slots for this day."
+        closures_title: "Closed dates"
+        closures_hint: "Mark dates when the workshop is closed (holidays, days off)."
+        add_closure: "Add closed date"
       generate:
         done: "%{count} slots available."
         no_service: "Please choose a service."

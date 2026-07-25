@@ -20,6 +20,7 @@ class Workshop < ApplicationRecord
   has_many :reviews, dependent: :destroy
 
   has_many :working_hours, dependent: :destroy
+  has_many :working_hour_exceptions, dependent: :destroy
   accepts_nested_attributes_for :working_hours, allow_destroy: true
 
   has_one_attached :logo
@@ -105,6 +106,8 @@ class Workshop < ApplicationRecord
   }
 
   def open_now?
+    return false if closed_on?(Date.current)
+
     now = Time.current
     time = now.strftime(TIME_FORMAT)
 
@@ -167,6 +170,10 @@ class Workshop < ApplicationRecord
 
   def verified?
     active?
+  end
+
+  def closed_on?(date)
+    working_hour_exceptions.exists?(date: date, closed: true)
   end
 
   def full_address

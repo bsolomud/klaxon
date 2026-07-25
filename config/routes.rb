@@ -75,6 +75,7 @@ Rails.application.routes.draw do
         end
       end
       resources :operators, only: [:index, :create, :update, :destroy]
+      resources :working_hour_exceptions, only: [:create, :destroy]
     end
   end
 
