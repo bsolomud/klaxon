@@ -5,6 +5,8 @@ class CarModel < ApplicationRecord
 
   enum :status, { pending: 0, approved: 1, rejected: 2 }
 
+  STATUS_COLORS = { "pending" => "yellow", "approved" => "green", "rejected" => "red" }.freeze
+
   validates :name, presence: true, uniqueness: { scope: :car_make_id, case_sensitive: false }
 
   normalizes :name, with: ->(v) { v&.strip }

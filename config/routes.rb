@@ -14,9 +14,19 @@ Rails.application.routes.draw do
         patch :transition
       end
     end
-    resources :users, only: %i[index show]
+    resources :users, only: %i[index show] do
+      member do
+        patch :lock
+        patch :unlock
+      end
+    end
     resources :reviews, only: %i[index update]
     resources :car_makes, only: [:index] do
+      member do
+        patch :transition
+      end
+    end
+    resources :car_models, only: [:index] do
       member do
         patch :transition
       end

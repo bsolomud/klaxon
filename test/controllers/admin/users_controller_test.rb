@@ -50,4 +50,20 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "p", text: I18n.t("admin.users.show.no_workshops")
   end
+
+  # --- Lock / Unlock ---
+
+  test "lock locks a user's access" do
+    user = users(:two)
+    patch lock_admin_user_path(user)
+    assert user.reload.access_locked?
+    assert_redirected_to admin_user_path(user)
+  end
+
+  test "unlock restores a user's access" do
+    user = users(:two)
+    user.lock_access!
+    patch unlock_admin_user_path(user)
+    assert_not user.reload.access_locked?
+  end
 end

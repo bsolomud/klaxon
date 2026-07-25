@@ -126,7 +126,8 @@ uk:
         workshops: "Майстерні"
         users: "Користувачі"
         reviews: "Відгуки"
-        car_makes: "Марки/Моделі"
+        car_makes: "Марки"
+        car_models: "Моделі"
     workshop:
       sign_out: "Вихід"
       status_active: "Активна"
@@ -242,6 +243,14 @@ uk:
         last_sign_in: "Останній вхід"
         sign_in_count: "Кількість входів"
         back: "Назад до користувачів"
+        locked_badge: "Заблоковано"
+        lock: "Заблокувати"
+        unlock: "Розблокувати"
+        lock_confirm: "Заблокувати цього користувача?"
+      lock:
+        success: "Користувача заблоковано."
+      unlock:
+        success: "Користувача розблоковано."
     car_makes:
       statuses:
         pending: "Очікує"
@@ -266,6 +275,28 @@ uk:
         success: "Статус марки оновлено."
         invalid_status: "Неможливо виконати цю дію з поточним статусом."
         stale: "Цю марку вже оновлено іншою дією."
+    car_models:
+      statuses:
+        pending: "Очікує"
+        approved: "Схвалена"
+        rejected: "Відхилена"
+      index:
+        title: "Моделі авто"
+        subtitle: "Схваліть або відхиліть моделі, додані користувачами"
+        filter_all: "Усі"
+        filter_pending: "Очікують"
+        filter_approved: "Схвалені"
+        filter_rejected: "Відхилені"
+        col_make: "Марка"
+        col_name: "Модель"
+        col_status: "Статус"
+        col_submitted_by: "Додав"
+        approve: "Схвалити"
+        reject: "Відхилити"
+        empty: "Моделей не знайдено."
+      transition:
+        success: "Статус моделі оновлено."
+        invalid_status: "Неможливо виконати цю дію з поточним статусом."
   cars:
     fuel_types:
       gasoline: "Бензин"
