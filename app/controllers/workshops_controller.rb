@@ -7,6 +7,7 @@ class WorkshopsController < ApplicationController
   before_action :build_missing_records, only: [:edit]
 
   def index
+    @service_categories = ServiceCategory.order(:name)
     @workshops = Workshop.active.includes(:service_categories, :working_hours).with_attached_photos
     @workshops = @workshops.text_search(params[:q]) if params[:q].present?
     @workshops = @workshops.by_city(params[:city]) if params[:city].present?
@@ -17,6 +18,8 @@ class WorkshopsController < ApplicationController
 
     if (coords = Workshop.parse_near_coords(params[:near]))
       @workshops = @workshops.sorted_by_distance(*coords)
+    elsif params[:sort] == "rating"
+      @workshops = @workshops.order(avg_rating: :desc)
     else
       @workshops = @workshops.order(:name)
     end

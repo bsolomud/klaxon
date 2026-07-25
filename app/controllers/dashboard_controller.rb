@@ -21,6 +21,13 @@ class DashboardController < ApplicationController
         .where(car_id: @cars.select(:id))
         .order(created_at: :desc)
         .limit(5)
+
+      @upcoming_requests = ServiceRequest
+        .includes(:workshop, :car)
+        .where(car_id: @cars.select(:id), status: [:pending, :accepted])
+        .where(preferred_time: Time.current..)
+        .order(:preferred_time)
+        .limit(5)
     end
   end
 end

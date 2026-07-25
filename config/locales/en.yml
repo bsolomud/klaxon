@@ -89,6 +89,7 @@ en:
       add_car: "Add car"
       no_cars: "You haven't added any cars yet."
       view: "View"
+      upcoming: "Upcoming appointments"
       recent_requests: "Recent Requests"
       view_all_requests: "View all"
       col_workshop: "Workshop"
@@ -574,6 +575,9 @@ en:
       search_placeholder: "Search..."
       search_button: "Search"
       near_me: "Near me"
+      all_categories: "All categories"
+      sort_name: "By name"
+      sort_rating: "By rating"
       empty: "No workshops found."
     show:
       open_now: "Open now"

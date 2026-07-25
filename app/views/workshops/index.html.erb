@@ -9,15 +9,25 @@
   <% end %>
 </div>
 
-<%# Search %>
+<%# Search + filters %>
 <div class="mb-6">
-  <%= form_with url: workshops_path, method: :get, class: "flex gap-2" do %>
-    <% request.query_parameters.except("q", "page").each do |key, value| %>
+  <%= form_with url: workshops_path, method: :get, class: "flex flex-wrap gap-2 items-center" do %>
+    <% request.query_parameters.slice("near", "city", "country").each do |key, value| %>
       <%= hidden_field_tag key, value %>
     <% end %>
     <%= text_field_tag :q, params[:q],
           placeholder: t(".search_placeholder"),
-          class: "flex-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-black focus:ring-1 focus:ring-black" %>
+          class: "flex-1 min-w-[180px] rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-black focus:ring-1 focus:ring-black" %>
+    <%= select_tag :category,
+          options_for_select([[t(".all_categories"), ""]] + @service_categories.map { |c| [c.name, c.slug] }, params[:category]),
+          class: "rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 focus:border-black focus:ring-1 focus:ring-black" %>
+    <%= select_tag :sort,
+          options_for_select([[t(".sort_name"), "name"], [t(".sort_rating"), "rating"]], params[:sort]),
+          class: "rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 focus:border-black focus:ring-1 focus:ring-black" %>
+    <label class="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-600 cursor-pointer">
+      <%= check_box_tag :open_now, "1", params[:open_now].present?, class: "rounded border-gray-300" %>
+      <%= t(".open_now_filter") %>
+    </label>
     <%= submit_tag t(".search_button"), class: "btn-primary !w-auto" %>
   <% end %>
 </div>
