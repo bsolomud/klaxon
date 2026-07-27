@@ -8,6 +8,7 @@ class ServiceRequest < ApplicationRecord
 
   has_one :service_record, dependent: :destroy
   has_one :review, dependent: :destroy
+  has_many :payments, as: :payable, dependent: :destroy
 
   enum :status, { pending: 0, accepted: 1, rejected: 2, in_progress: 3, completed: 4, cancelled: 5 }
 
@@ -37,6 +38,20 @@ class ServiceRequest < ApplicationRecord
       price_snapshot["max"],
       price_snapshot["currency"]
     )
+  end
+
+  # The final bill for completed work (labor + parts), 0 until a record exists.
+  def outstanding_amount
+    service_record&.total_cost || 0
+  end
+
+  def paid?
+    payments.successful.exists?
+  end
+
+  # A completed job with a real bill that has not been settled yet.
+  def payable?
+    completed? && !paid? && outstanding_amount.positive?
   end
 
   def cancellable_by_driver?

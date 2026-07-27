@@ -486,6 +486,8 @@ uk:
       price: "Ціна"
       status: "Статус"
       created_at: "Створено"
+      pay: "Сплатити %{amount}"
+      paid: "Сплачено %{amount}"
       leave_review: "Залишити відгук"
       edit_review: "Редагувати відгук"
       delete_review: "Видалити відгук"
@@ -784,6 +786,9 @@ uk:
         history_not_shared: "Водій не надав доступ до історії цього авто."
         no_history: "Записів обслуговування ще немає."
         back: "Назад до запитів"
+        payment: "Оплата"
+        payment_paid: "Сплачено"
+        payment_pending: "Очікує оплати"
       accept:
         success: "Запит прийнято."
         stale: "Цей запит вже оновлено іншою дією."
@@ -1160,3 +1165,22 @@ uk:
     enable_device: "Увімкнути push на цьому пристрої"
     update:
       success: "Налаштування сповіщень оновлено."
+  payments:
+    show:
+      title: "Оплата"
+      test_gateway: "Тестовий платіжний шлюз"
+      pay: "Сплатити"
+      cancel: "Скасувати"
+      back: "Назад"
+    status:
+      pending: "Очікує"
+      processing: "Обробляється"
+      paid: "Сплачено"
+      failed: "Помилка оплати"
+      refunded: "Повернено"
+      cancelled: "Скасовано"
+    create:
+      unavailable: "Цей запит зараз не можна оплатити."
+    callback:
+      paid: "Оплату отримано. Дякуємо!"
+      cancelled: "Оплату скасовано."

@@ -19,6 +19,11 @@ module ApplicationHelper
     })
   end
 
+  # A single money amount, matching the app's price style ("1000 UAH").
+  def format_money(amount, currency)
+    "#{amount.to_i} #{currency}"
+  end
+
   def status_badge(status, color_map, i18n_key, default_color: "yellow")
     color = color_map[status.to_s] || default_color
     colors = BADGE_COLORS[color]

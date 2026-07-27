@@ -1,0 +1,24 @@
+<% content_for :title, t("payments.show.title") %>
+
+<div class="max-w-md mx-auto mt-10">
+  <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm text-center">
+    <p class="text-xs uppercase tracking-wide text-gray-400"><%= t("payments.show.test_gateway") %></p>
+    <h1 class="mt-2 text-3xl font-bold text-gray-900"><%= format_money(@payment.amount, @payment.currency) %></h1>
+    <p class="mt-1 text-sm text-gray-500"><%= @payment.payable.workshop.name %></p>
+
+    <% if @payment.processing? %>
+      <div class="mt-6 space-y-3">
+        <%= button_to t("payments.show.pay"), payments_callback_path,
+              params: { reference: @payment.provider_reference, decision: "pay" },
+              class: "block w-full btn-primary text-center" %>
+        <%= button_to t("payments.show.cancel"), payments_callback_path,
+              params: { reference: @payment.provider_reference, decision: "cancel" },
+              class: "block w-full text-sm font-medium text-gray-500 hover:text-black transition-colors cursor-pointer" %>
+      </div>
+    <% else %>
+      <p class="mt-6 text-sm font-medium text-gray-900"><%= t("payments.status.#{@payment.status}") %></p>
+      <%= link_to t("payments.show.back"), @payment.payable,
+            class: "mt-4 inline-block text-sm font-medium text-gray-500 hover:text-black transition-colors" %>
+    <% end %>
+  </div>
+</div>

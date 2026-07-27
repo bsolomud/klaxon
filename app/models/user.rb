@@ -17,6 +17,7 @@ class User < ApplicationRecord
   has_many :notifications, dependent: :destroy
   has_many :reviews, dependent: :destroy
   has_many :push_subscriptions, dependent: :destroy
+  has_many :payments, dependent: :destroy
 
   def manages_workshop?(workshop)
     workshop_operators.exists?(workshop: workshop)

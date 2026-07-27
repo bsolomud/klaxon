@@ -87,6 +87,9 @@ Rails.application.routes.draw do
   resources :push_subscriptions, only: [:create]
   resource :notification_preferences, only: [:update], controller: "notification_preferences"
 
+  resources :payments, only: [:create, :show]
+  post "payments/callback", to: "payments#callback", as: :payments_callback
+
   resources :car_makes, only: [:index] do
     resources :car_models, only: [:index]
   end

@@ -486,6 +486,8 @@ en:
       price: "Price"
       status: "Status"
       created_at: "Created"
+      pay: "Pay %{amount}"
+      paid: "Paid %{amount}"
       leave_review: "Leave a Review"
       edit_review: "Edit review"
       delete_review: "Delete review"
@@ -778,6 +780,9 @@ en:
         history_not_shared: "The driver hasn't shared this car's history."
         no_history: "No service records yet."
         back: "Back to requests"
+        payment: "Payment"
+        payment_paid: "Paid"
+        payment_pending: "Awaiting payment"
       accept:
         success: "Request accepted."
         stale: "This request was already updated by another action."
@@ -1152,3 +1157,22 @@ en:
     enable_device: "Enable push on this device"
     update:
       success: "Notification preferences updated."
+  payments:
+    show:
+      title: "Payment"
+      test_gateway: "Test payment gateway"
+      pay: "Pay"
+      cancel: "Cancel"
+      back: "Back"
+    status:
+      pending: "Pending"
+      processing: "Processing"
+      paid: "Paid"
+      failed: "Payment failed"
+      refunded: "Refunded"
+      cancelled: "Cancelled"
+    create:
+      unavailable: "This request can't be paid right now."
+    callback:
+      paid: "Payment received. Thank you!"
+      cancelled: "Payment cancelled."

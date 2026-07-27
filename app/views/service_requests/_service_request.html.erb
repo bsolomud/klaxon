@@ -49,6 +49,18 @@
     </div>
 
     <div class="space-y-3">
+      <% if service_request.completed? && service_request.outstanding_amount.positive? %>
+        <% if service_request.paid? %>
+          <div class="rounded-lg border border-green-200 bg-green-50 px-4 py-2 text-sm font-medium text-green-800 text-center">
+            <%= t("service_requests.show.paid", amount: format_money(service_request.outstanding_amount, service_request.service_record.currency)) %>
+          </div>
+        <% else %>
+          <%= button_to t("service_requests.show.pay", amount: format_money(service_request.outstanding_amount, service_request.service_record.currency)),
+                payments_path(service_request_id: service_request.id),
+                class: "block w-full btn-primary text-center" %>
+        <% end %>
+      <% end %>
+
       <% if service_request.completed? %>
         <% if service_request.review.blank? %>
           <%= link_to t("service_requests.show.leave_review"),

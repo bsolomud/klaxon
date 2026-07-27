@@ -33,6 +33,18 @@
           <dt class="text-gray-500"><%= t(".created_at") %></dt>
           <dd class="mt-0.5 font-medium text-gray-900"><%= l(@service_request.created_at, format: :short) %></dd>
         </div>
+        <% if @service_request.completed? && @service_request.outstanding_amount.positive? %>
+          <div>
+            <dt class="text-gray-500"><%= t(".payment") %></dt>
+            <dd class="mt-0.5 font-medium">
+              <% if @service_request.paid? %>
+                <span class="text-green-700"><%= t(".payment_paid") %></span>
+              <% else %>
+                <span class="text-gray-500"><%= t(".payment_pending") %></span>
+              <% end %>
+            </dd>
+          </div>
+        <% end %>
         <div class="col-span-2">
           <dt class="text-gray-500"><%= t(".description") %></dt>
           <dd class="mt-0.5 text-gray-900"><%= simple_format(@service_request.description) %></dd>

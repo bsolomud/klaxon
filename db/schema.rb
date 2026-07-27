@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_23_120600) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_27_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -175,6 +175,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_23_120600) do
     t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable"
     t.index ["user_id", "read_at"], name: "index_notifications_on_user_id_and_read_at"
     t.index ["user_id"], name: "index_notifications_on_user_id"
+  end
+
+  create_table "payments", force: :cascade do |t|
+    t.decimal "amount", precision: 10, scale: 2, null: false
+    t.datetime "created_at", null: false
+    t.string "currency", default: "UAH", null: false
+    t.integer "kind", default: 0, null: false
+    t.datetime "paid_at"
+    t.bigint "payable_id", null: false
+    t.string "payable_type", null: false
+    t.string "provider"
+    t.string "provider_reference"
+    t.integer "status", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["payable_type", "payable_id"], name: "index_payments_on_payable"
+    t.index ["provider_reference"], name: "index_payments_on_provider_reference", unique: true
+    t.index ["user_id"], name: "index_payments_on_user_id"
   end
 
   create_table "push_subscriptions", force: :cascade do |t|
@@ -419,6 +437,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_23_120600) do
   add_foreign_key "cars", "car_models"
   add_foreign_key "cars", "users"
   add_foreign_key "notifications", "users"
+  add_foreign_key "payments", "users"
   add_foreign_key "push_subscriptions", "users"
   add_foreign_key "queue_entries", "cars"
   add_foreign_key "queue_entries", "queues"
