@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_23_120400) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_23_120600) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -177,6 +177,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_23_120400) do
     t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
+  create_table "push_subscriptions", force: :cascade do |t|
+    t.string "auth_key", null: false
+    t.datetime "created_at", null: false
+    t.string "endpoint", null: false
+    t.string "p256dh_key", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["endpoint"], name: "index_push_subscriptions_on_endpoint", unique: true
+    t.index ["user_id"], name: "index_push_subscriptions_on_user_id"
+  end
+
   create_table "queue_entries", force: :cascade do |t|
     t.datetime "called_at"
     t.bigint "car_id"
@@ -293,6 +304,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_23_120400) do
     t.string "locale"
     t.datetime "locked_at"
     t.string "middle_name"
+    t.jsonb "notification_preferences", default: {}, null: false
     t.jsonb "onboarding_flags", default: {}, null: false
     t.string "phone_number"
     t.string "provider"
@@ -407,6 +419,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_23_120400) do
   add_foreign_key "cars", "car_models"
   add_foreign_key "cars", "users"
   add_foreign_key "notifications", "users"
+  add_foreign_key "push_subscriptions", "users"
   add_foreign_key "queue_entries", "cars"
   add_foreign_key "queue_entries", "queues"
   add_foreign_key "queue_entries", "service_requests"

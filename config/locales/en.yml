@@ -691,6 +691,7 @@ en:
       role_updated: "Role updated."
       removed: "Operator removed."
       cannot_remove_last_owner: "You can't remove the last owner."
+      invalid_role: "Unknown role."
       roles:
         owner: "Owner"
         staff: "Staff"
@@ -1143,3 +1144,11 @@ en:
     bell:
       label: "Notifications"
       unread_title: "%{count} unread notifications"
+  notification_preferences:
+    title: "Notification settings"
+    email: "Receive email notifications"
+    push: "Browser push notifications"
+    save: "Save"
+    enable_device: "Enable push on this device"
+    update:
+      success: "Notification preferences updated."

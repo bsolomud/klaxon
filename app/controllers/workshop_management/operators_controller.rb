@@ -18,7 +18,9 @@ class WorkshopManagement::OperatorsController < WorkshopManagement::BaseControll
   end
 
   def update
-    new_role = operator_params[:role]
+    new_role = params.dig(:workshop_operator, :role).to_s
+    return redirect_with(alert: t("workshop_management.operators.invalid_role")) unless WorkshopOperator.roles.key?(new_role)
+
     if demoting_last_owner?(@operator, new_role)
       return redirect_with(alert: t("workshop_management.operators.cannot_remove_last_owner"))
     end
@@ -59,9 +61,5 @@ class WorkshopManagement::OperatorsController < WorkshopManagement::BaseControll
 
   def redirect_with(**flash)
     redirect_to workshop_management_workshop_operators_path(@workshop), **flash
-  end
-
-  def operator_params
-    params.require(:workshop_operator).permit(:role)
   end
 end

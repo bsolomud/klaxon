@@ -16,6 +16,7 @@ class User < ApplicationRecord
   has_many :workshops, through: :workshop_operators
   has_many :notifications, dependent: :destroy
   has_many :reviews, dependent: :destroy
+  has_many :push_subscriptions, dependent: :destroy
 
   def manages_workshop?(workshop)
     workshop_operators.exists?(workshop: workshop)
@@ -27,6 +28,14 @@ class User < ApplicationRecord
 
   def full_name
     [first_name, last_name].compact_blank.join(" ").presence
+  end
+
+  def email_notifications?
+    notification_preferences.fetch("email", true)
+  end
+
+  def push_notifications?
+    notification_preferences.fetch("push", true)
   end
 
   def show_welcome_banner?

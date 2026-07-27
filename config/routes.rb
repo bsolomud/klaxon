@@ -84,6 +84,8 @@ Rails.application.routes.draw do
       patch :update_all
     end
   end
+  resources :push_subscriptions, only: [:create]
+  resource :notification_preferences, only: [:update], controller: "notification_preferences"
 
   resources :car_makes, only: [:index] do
     resources :car_models, only: [:index]

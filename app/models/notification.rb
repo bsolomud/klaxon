@@ -26,6 +26,8 @@ class Notification < ApplicationRecord
 
   validates :event, presence: true
 
+  after_create_commit :enqueue_delivery
+
   scope :unread, -> { where(read_at: nil) }
   scope :recent, -> { order(created_at: :desc) }
 
@@ -52,5 +54,11 @@ class Notification < ApplicationRecord
     when "ServiceRecord"
       Rails.application.routes.url_helpers.car_path(notifiable.car)
     end
+  end
+
+  private
+
+  def enqueue_delivery
+    DeliverNotificationJob.perform_later(self)
   end
 end

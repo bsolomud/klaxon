@@ -697,6 +697,7 @@ uk:
       role_updated: "Роль оновлено."
       removed: "Оператора видалено."
       cannot_remove_last_owner: "Неможливо видалити останнього власника."
+      invalid_role: "Невідома роль."
       roles:
         owner: "Власник"
         staff: "Співробітник"
@@ -1151,3 +1152,11 @@ uk:
     bell:
       label: "Сповіщення"
       unread_title: "%{count} непрочитаних сповіщень"
+  notification_preferences:
+    title: "Налаштування сповіщень"
+    email: "Отримувати сповіщення на email"
+    push: "Push-сповіщення у браузері"
+    save: "Зберегти"
+    enable_device: "Увімкнути push на цьому пристрої"
+    update:
+      success: "Налаштування сповіщень оновлено."

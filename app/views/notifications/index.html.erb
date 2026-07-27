@@ -14,6 +14,29 @@
   <% end %>
 </div>
 
+<div class="bg-white border border-gray-200 rounded-lg p-4 mb-6">
+  <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500 mb-3"><%= t("notification_preferences.title") %></h2>
+  <%= form_with url: notification_preferences_path, method: :patch, class: "space-y-3" do |f| %>
+    <label class="flex items-center gap-2 text-sm">
+      <%= check_box_tag "email", "1", current_user.email_notifications? %>
+      <%= t("notification_preferences.email") %>
+    </label>
+    <label class="flex items-center gap-2 text-sm">
+      <%= check_box_tag "push", "1", current_user.push_notifications? %>
+      <%= t("notification_preferences.push") %>
+    </label>
+    <%= f.submit t("notification_preferences.save"), class: "btn-primary" %>
+  <% end %>
+
+  <% if WebPushDeliverer.configured? %>
+    <div class="mt-4" data-controller="push" data-push-public-key-value="<%= Rails.application.config.x.vapid[:public_key] %>">
+      <button type="button" data-action="push#subscribe" class="text-sm text-gray-600 hover:text-black underline">
+        <%= t("notification_preferences.enable_device") %>
+      </button>
+    </div>
+  <% end %>
+</div>
+
 <% if @notifications.empty? %>
   <div class="bg-white border border-gray-200 rounded-lg p-10 text-center text-gray-500">
     <%= t("notifications.index.empty") %>
