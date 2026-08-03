@@ -159,6 +159,18 @@ class WorkshopsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "index shows distance on cards when geolocated" do
+    sign_out @user
+    get workshops_path, params: { near: "50.4630,30.5180" }
+    assert_match(/(км від вас|km away)/, response.body)
+  end
+
+  test "index does not show distance without a near param" do
+    sign_out @user
+    get workshops_path
+    assert_no_match(/(км від вас|km away)/, response.body)
+  end
+
   # --- Create (Task 30) ---
 
   test "create sets workshop status to pending" do

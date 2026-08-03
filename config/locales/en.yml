@@ -577,6 +577,7 @@ en:
       search_placeholder: "Search..."
       search_button: "Search"
       near_me: "Near me"
+      distance_km: "%{km} km away"
       all_categories: "All categories"
       sort_name: "By name"
       sort_rating: "By rating"

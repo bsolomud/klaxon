@@ -41,6 +41,16 @@
 
     <p class="mt-1 text-sm text-gray-500"><%= workshop.city %>, <%= workshop.country %></p>
 
+    <% if workshop.has_attribute?("distance") && workshop.distance.to_f < 999_999 %>
+      <p class="mt-1 inline-flex items-center gap-1 text-xs font-medium text-gray-600">
+        <svg class="h-3.5 w-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+        </svg>
+        <%= t("workshops.index.distance_km", km: number_with_precision(workshop.distance.to_f, precision: 1)) %>
+      </p>
+    <% end %>
+
     <div class="mt-2 flex items-center gap-1.5">
       <% if workshop.review_count > 0 %>
         <div class="flex"><%= star_icons(workshop.avg_rating, size: "h-3.5 w-3.5") %></div>

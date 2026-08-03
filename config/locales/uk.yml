@@ -579,6 +579,7 @@ uk:
       search_placeholder: "Пошук..."
       search_button: "Знайти"
       near_me: "Поруч зі мною"
+      distance_km: "%{km} км від вас"
       all_categories: "Усі категорії"
       sort_name: "За назвою"
       sort_rating: "За рейтингом"
