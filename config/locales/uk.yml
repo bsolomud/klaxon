@@ -580,6 +580,8 @@ uk:
       search_button: "Знайти"
       near_me: "Поруч зі мною"
       distance_km: "%{km} км від вас"
+      location_placeholder: "Місто, адреса або район"
+      location_not_found: "Не вдалося знайти «%{query}»"
       all_categories: "Усі категорії"
       sort_name: "За назвою"
       sort_rating: "За рейтингом"

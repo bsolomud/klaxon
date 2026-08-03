@@ -578,6 +578,8 @@ en:
       search_button: "Search"
       near_me: "Near me"
       distance_km: "%{km} km away"
+      location_placeholder: "City, address or area"
+      location_not_found: "Couldn't find “%{query}”"
       all_categories: "All categories"
       sort_name: "By name"
       sort_rating: "By rating"

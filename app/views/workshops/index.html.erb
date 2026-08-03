@@ -18,6 +18,9 @@
     <%= text_field_tag :q, params[:q],
           placeholder: t(".search_placeholder"),
           class: "flex-1 min-w-[180px] rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-black focus:ring-1 focus:ring-black" %>
+    <%= search_field_tag :location, params[:location],
+          placeholder: t(".location_placeholder"),
+          class: "flex-1 min-w-[180px] rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-black focus:ring-1 focus:ring-black" %>
     <%= select_tag :category,
           options_for_select([[t(".all_categories"), ""]] + @service_categories.map { |c| [c.name, c.slug] }, params[:category]),
           class: "rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 focus:border-black focus:ring-1 focus:ring-black" %>
@@ -56,9 +59,21 @@
   </div>
 <% end %>
 
+<% if @location_not_found %>
+  <div class="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">
+    <%= t(".location_not_found", query: params[:location]) %>
+  </div>
+<% end %>
+
 <%# Map + near-me %>
 <% map_points = @workshops.select { |w| w.latitude && w.longitude }.map { |w| { lat: w.latitude.to_f, lng: w.longitude.to_f, name: w.name, url: workshop_path(w) } } %>
-<div class="mb-6" data-controller="map" data-map-points-value="<%= map_points.to_json %>">
+<div class="mb-6" data-controller="map"
+     data-map-points-value="<%= map_points.to_json %>"
+     <% if @search_center %>
+       data-map-lat-value="<%= @search_center.first %>"
+       data-map-lng-value="<%= @search_center.last %>"
+       data-map-zoom-value="13"
+     <% end %>>
   <div data-map-target="canvas" class="h-72 sm:h-80 rounded-2xl overflow-hidden border border-gray-100"></div>
   <div class="mt-2 flex justify-end">
     <button type="button" data-action="map#geolocate"

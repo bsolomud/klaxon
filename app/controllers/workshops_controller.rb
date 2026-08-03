@@ -14,9 +14,20 @@ class WorkshopsController < ApplicationController
     @workshops = @workshops.by_country(params[:country]) if params[:country].present?
     @workshops = @workshops.by_category_slug(params[:category]) if params[:category].present?
     @workshops = @workshops.open_now if params[:open_now].present?
-    @workshops = @workshops.near_param(params[:near])
 
-    if (coords = Workshop.parse_near_coords(params[:near]))
+    # A typed address/place (geocoded) takes precedence over GPS "near me"; both
+    # resolve to a point we sort distance from and center the map on.
+    coords = nil
+    if params[:location].present?
+      coords = geocode_location(params[:location])
+      @location_not_found = coords.nil?
+    elsif (near = Workshop.parse_near_coords(params[:near]))
+      coords = near
+      @workshops = @workshops.near_param(params[:near])
+    end
+    @search_center = coords
+
+    if coords
       @workshops = @workshops.sorted_by_distance(*coords)
     elsif params[:sort] == "rating"
       @workshops = @workshops.order(avg_rating: :desc)
@@ -78,6 +89,18 @@ class WorkshopsController < ApplicationController
   end
 
   private
+
+  # Forward-geocode a typed address/place to [lat, lng]; nil when nothing matches
+  # or the geocoding service errors (it is an external call).
+  def geocode_location(query)
+    result = Geocoder.search(query).first
+    return unless result&.latitude && result&.longitude
+
+    [result.latitude, result.longitude]
+  rescue StandardError => e
+    Rails.logger.warn("Location geocode failed for #{query.inspect}: #{e.message}")
+    nil
+  end
 
   def set_workshop
     @workshop = Workshop.includes(workshop_service_categories: :service_category).find(params[:id])

@@ -171,6 +171,24 @@ class WorkshopsControllerTest < ActionDispatch::IntegrationTest
     assert_no_match(/(км від вас|km away)/, response.body)
   end
 
+  test "index with location param geocodes the address and sorts by distance" do
+    sign_out @user
+    Geocoder::Lookup::Test.set_default_stub([{ "latitude" => 50.4501, "longitude" => 30.5234 }])
+    get workshops_path, params: { location: "Майдан, Київ" }
+    assert_response :success
+    assert_match(/(км від вас|km away)/, response.body)
+  end
+
+  test "index shows a not-found note when the address can't be geocoded" do
+    sign_out @user
+    Geocoder::Lookup::Test.set_default_stub([])
+    get workshops_path, params: { location: "nowhere-xyz" }
+    assert_response :success
+    assert_match(/(Не вдалося знайти|Couldn't find)/, response.body)
+  ensure
+    Geocoder::Lookup::Test.set_default_stub([{ "latitude" => 50.4501, "longitude" => 30.5234 }])
+  end
+
   # --- Create (Task 30) ---
 
   test "create sets workshop status to pending" do
