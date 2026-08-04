@@ -582,6 +582,8 @@ uk:
       distance_km: "%{km} км від вас"
       location_placeholder: "Місто, адреса або район"
       location_not_found: "Не вдалося знайти «%{query}»"
+      you_are_here: "Ви тут"
+      geo_error: "Не вдалося визначити місцезнаходження. Перевірте дозвіл геолокації."
       all_categories: "Усі категорії"
       sort_name: "За назвою"
       sort_rating: "За рейтингом"

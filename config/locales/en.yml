@@ -580,6 +580,8 @@ en:
       distance_km: "%{km} km away"
       location_placeholder: "City, address or area"
       location_not_found: "Couldn't find “%{query}”"
+      you_are_here: "You are here"
+      geo_error: "Couldn't get your location. Check location permissions."
       all_categories: "All categories"
       sort_name: "By name"
       sort_rating: "By rating"

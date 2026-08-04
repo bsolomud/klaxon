@@ -5,9 +5,11 @@ import * as L from "leaflet"
 // vendor/ (no runtime CDN dependency). Used on the workshops index (many pins)
 // and workshop show (single pin).
 export default class extends Controller {
-  static targets = ["canvas"]
+  static targets = ["canvas", "error"]
   static values = {
     points: { type: Array, default: [] },
+    center: { type: Array, default: [] }, // [lat, lng] search origin ("you are here")
+    hereLabel: { type: String, default: "" },
     lat: { type: Number, default: 50.4501 },
     lng: { type: Number, default: 30.5234 },
     zoom: { type: Number, default: 12 }
@@ -38,7 +40,7 @@ export default class extends Controller {
       popupAnchor: [0, -28]
     })
 
-    const markers = this.pointsValue
+    const framed = this.pointsValue
       .filter((point) => point.lat && point.lng)
       .map((point) => {
         const marker = L.marker([point.lat, point.lng], { icon }).addTo(this.map)
@@ -48,8 +50,18 @@ export default class extends Controller {
         return marker
       })
 
-    if (markers.length > 1) {
-      this.map.fitBounds(L.featureGroup(markers).getBounds().pad(0.2))
+    // "You are here": the GPS / geocoded search origin, as a distinct blue dot.
+    if (this.centerValue.length === 2) {
+      const here = L.circleMarker(this.centerValue, {
+        radius: 8, color: "#ffffff", weight: 3, fillColor: "#2563eb", fillOpacity: 1
+      }).addTo(this.map)
+      if (this.hereLabelValue) here.bindPopup(this.hereLabelValue)
+      this.map.setView(this.centerValue, 13)
+      framed.push(here)
+    }
+
+    if (framed.length > 1) {
+      this.map.fitBounds(L.featureGroup(framed).getBounds().pad(0.2))
     }
 
     // Turbo/flex layouts can leave the container sized 0 at connect; recompute
@@ -61,13 +73,26 @@ export default class extends Controller {
   // using the existing `near=lat,lng` query the controller already supports.
   geolocate(event) {
     event.preventDefault()
-    if (!navigator.geolocation) return
+    this.hideError()
+    if (!navigator.geolocation) return this.showError()
 
-    navigator.geolocation.getCurrentPosition((position) => {
-      const url = new URL(window.location.href)
-      url.searchParams.set("near", `${position.coords.latitude},${position.coords.longitude}`)
-      window.location.assign(url.toString())
-    })
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const url = new URL(window.location.href)
+        url.searchParams.set("near", `${position.coords.latitude},${position.coords.longitude}`)
+        url.searchParams.delete("location") // a fresh GPS fix supersedes a typed address
+        window.location.assign(url.toString())
+      },
+      () => this.showError() // denied or unavailable
+    )
+  }
+
+  showError() {
+    if (this.hasErrorTarget) this.errorTarget.classList.remove("hidden")
+  }
+
+  hideError() {
+    if (this.hasErrorTarget) this.errorTarget.classList.add("hidden")
   }
 
   disconnect() {

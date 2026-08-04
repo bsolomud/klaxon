@@ -69,7 +69,9 @@
 <% map_points = @workshops.select { |w| w.latitude && w.longitude }.map { |w| { lat: w.latitude.to_f, lng: w.longitude.to_f, name: w.name, url: workshop_path(w) } } %>
 <div class="mb-6" data-controller="map"
      data-map-points-value="<%= map_points.to_json %>"
+     data-map-here-label-value="<%= t(".you_are_here") %>"
      <% if @search_center %>
+       data-map-center-value="<%= @search_center.to_json %>"
        data-map-lat-value="<%= @search_center.first %>"
        data-map-lng-value="<%= @search_center.last %>"
        data-map-zoom-value="13"
@@ -85,6 +87,7 @@
       <%= t(".near_me") %>
     </button>
   </div>
+  <p data-map-target="error" class="hidden mt-2 text-right text-xs text-amber-700"><%= t(".geo_error") %></p>
 </div>
 
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
