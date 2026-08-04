@@ -162,6 +162,13 @@ class WorkshopTest < ActiveSupport::TestCase
     assert_equal BigDecimal("25.0"), @workshop.longitude
   end
 
+  test "does not re-geocode when the point was set on the map" do
+    @workshop.located_on_map = "1"
+    @workshop.update!(address: "вул. Нова, 5", latitude: 49.5, longitude: 24.5)
+    assert_equal BigDecimal("49.5"), @workshop.latitude
+    assert_equal BigDecimal("24.5"), @workshop.longitude
+  end
+
   # Task 29 — near_location scope
 
   test "near_location returns workshops within bounding box" do

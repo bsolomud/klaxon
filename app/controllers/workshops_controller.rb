@@ -45,6 +45,16 @@ class WorkshopsController < ApplicationController
     @reviews = @workshop.reviews.published.recent.includes(:user).limit(10)
   end
 
+  # JSON geocode for the map picker: turns the typed address into coordinates.
+  def geocode
+    coords = geocode_location([params[:address], params[:city], params[:country]].compact_blank.join(", "))
+    if coords
+      render json: { lat: coords.first, lng: coords.last }
+    else
+      render json: { error: "not_found" }, status: :not_found
+    end
+  end
+
   def new
     @workshop = Workshop.new
     @workshop.applying = true # so verification fields render as required
@@ -129,7 +139,7 @@ class WorkshopsController < ApplicationController
     params.require(:workshop).permit(
       :name, :description, :phone, :email,
       :address, :city, :country,
-      :latitude, :longitude,
+      :latitude, :longitude, :located_on_map,
       :registration_number, :contact_name, :verification_document,
       :logo, photos: [],
       working_hours_attributes: [:id, :day_of_week, :opens_at, :closes_at, :closed, :_destroy],

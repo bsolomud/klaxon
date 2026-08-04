@@ -28,6 +28,38 @@ class WorkshopsControllerTest < ActionDispatch::IntegrationTest
     assert_select "label[for=workshop_description] span.text-red-500", count: 0             # optional
   end
 
+  test "new form uses the map picker instead of raw coordinate fields" do
+    get new_workshop_path
+    assert_response :success
+    assert_select "[data-controller='location-picker']"
+    assert_select "input[type=number][name='workshop[latitude]']", count: 0
+    assert_select "input[type=hidden][name='workshop[latitude]']"
+  end
+
+  # --- Geocode endpoint (map picker) ---
+
+  test "geocode returns coordinates for an address" do
+    get geocode_workshops_path, params: { address: "вул. Хрещатик 1", city: "Київ", country: "UA" }
+    assert_response :success
+    body = JSON.parse(response.body)
+    assert_in_delta 50.4501, body["lat"], 0.01
+    assert_in_delta 30.5234, body["lng"], 0.01
+  end
+
+  test "geocode returns not_found when the address can't be resolved" do
+    Geocoder::Lookup::Test.set_default_stub([])
+    get geocode_workshops_path, params: { address: "nowhere-xyz" }
+    assert_response :not_found
+  ensure
+    Geocoder::Lookup::Test.set_default_stub([{ "latitude" => 50.4501, "longitude" => 30.5234 }])
+  end
+
+  test "geocode requires authentication" do
+    sign_out @user
+    get geocode_workshops_path, params: { address: "вул. Хрещатик 1" }
+    assert_redirected_to new_user_session_path
+  end
+
   test "edit form checks selected categories and shows pricing fields" do
     get edit_workshop_path(@workshop)
     assert_response :success

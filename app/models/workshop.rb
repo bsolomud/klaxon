@@ -56,6 +56,10 @@ class Workshop < ApplicationRecord
   validates :registration_number, presence: true, if: :applying
   validates :contact_name, presence: true, if: :applying
 
+  # Set by the map picker so coordinates chosen on the map aren't overwritten by
+  # address-based geocoding.
+  attr_accessor :located_on_map
+
   scope :text_search, ->(q) { q.blank? ? all : where("name ILIKE :q OR address ILIKE :q", q: "%#{sanitize_sql_like(q)}%") }
   scope :by_city, ->(city) { where(city: city) }
   scope :by_country, ->(country) { where(country: country) }
@@ -207,6 +211,7 @@ class Workshop < ApplicationRecord
   private
 
   def needs_geocoding?
+    return false if ActiveModel::Type::Boolean.new.cast(located_on_map)
     return address.present? if new_record?
 
     address_changed? || city_changed? || country_changed?

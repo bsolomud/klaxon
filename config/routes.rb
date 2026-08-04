@@ -117,7 +117,11 @@ Rails.application.routes.draw do
   end
   resources :car_history_accesses, only: [:create, :destroy]
   resources :service_categories, only: [:index, :show]
-  resources :workshops
+  resources :workshops do
+    collection do
+      get :geocode
+    end
+  end
   resources :my_workshops, only: [:index]
   resource :onboarding, only: [:update], controller: "onboarding"
 
