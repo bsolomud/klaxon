@@ -35,12 +35,15 @@ class Workshop < ApplicationRecord
   }.freeze
 
   ALLOWED_IMAGE_TYPES = %w[image/png image/jpeg image/webp].freeze
+  ALLOWED_DOCUMENT_TYPES = (ALLOWED_IMAGE_TYPES + %w[application/pdf]).freeze
   MAX_PHOTO_SIZE = 10.megabytes
   MAX_LOGO_SIZE = 5.megabytes
+  MAX_DOCUMENT_SIZE = 10.megabytes
 
   validates :name, presence: true
   validate :acceptable_logo
   validate :acceptable_photos
+  validate :acceptable_verification_document
   validates :phone, presence: true
   validates :address, presence: true
   validates :city, presence: true
@@ -214,6 +217,14 @@ class Workshop < ApplicationRecord
 
     errors.add(:logo, :content_type) unless logo.content_type.in?(ALLOWED_IMAGE_TYPES)
     errors.add(:logo, :file_size) if logo.byte_size > MAX_LOGO_SIZE
+  end
+
+  # Restrict to images/PDF so the admin can view it inline without XSS risk.
+  def acceptable_verification_document
+    return unless verification_document.attached?
+
+    errors.add(:verification_document, :content_type) unless verification_document.content_type.in?(ALLOWED_DOCUMENT_TYPES)
+    errors.add(:verification_document, :file_size) if verification_document.byte_size > MAX_DOCUMENT_SIZE
   end
 
   def acceptable_photos

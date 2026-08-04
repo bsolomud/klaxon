@@ -227,4 +227,31 @@ class Admin::WorkshopsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "button[type=submit]", text: I18n.t("admin.workshops.show.suspend"), count: 0
   end
+
+  # --- Verification document (admin-only access) ---
+
+  test "document streams the verification file to an admin inline" do
+    workshop = workshops(:one)
+    workshop.verification_document.attach(
+      io: File.open(Rails.root.join("test/fixtures/files/test_photo.png")),
+      filename: "registration.png", content_type: "image/png"
+    )
+
+    get document_admin_workshop_path(workshop)
+
+    assert_response :success
+    assert_equal "image/png", response.media_type
+    assert_equal "nosniff", response.headers["X-Content-Type-Options"]
+  end
+
+  test "document redirects when no document is attached" do
+    get document_admin_workshop_path(workshops(:two))
+    assert_redirected_to admin_workshop_path(workshops(:two))
+  end
+
+  test "document requires an authenticated admin" do
+    reset!
+    get document_admin_workshop_path(workshops(:one))
+    assert_redirected_to new_admin_session_path
+  end
 end

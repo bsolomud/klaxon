@@ -104,7 +104,7 @@
           <dt class="text-xs text-gray-400 uppercase tracking-wider"><%= t(".verification_document") %></dt>
           <dd class="mt-0.5 text-sm">
             <% if @workshop.verification_document.attached? %>
-              <%= link_to t(".view_document"), rails_blob_path(@workshop.verification_document, disposition: "inline"),
+              <%= link_to t(".view_document"), document_admin_workshop_path(@workshop),
                     target: "_blank", rel: "noopener", class: "text-blue-600 hover:underline" %>
             <% else %>
               <span class="text-gray-400"><%= t(".not_provided") %></span>

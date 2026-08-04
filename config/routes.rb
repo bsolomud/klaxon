@@ -12,6 +12,7 @@ Rails.application.routes.draw do
     resources :workshops, only: %i[index show] do
       member do
         patch :transition
+        get :document
       end
     end
     resources :users, only: %i[index show] do

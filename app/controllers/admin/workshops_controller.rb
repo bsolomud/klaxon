@@ -2,7 +2,7 @@ class Admin::WorkshopsController < Admin::BaseController
   include NotificationDispatch
   include StateTransitionable
 
-  before_action :set_workshop, only: %i[show transition]
+  before_action :set_workshop, only: %i[show transition document]
 
   TRANSITIONS = {
     "approve"  => { from: :pending,  to: :active },
@@ -18,6 +18,18 @@ class Admin::WorkshopsController < Admin::BaseController
 
   def show
     @owner = @workshop.workshop_operators.find_by(role: :owner)&.user
+  end
+
+  # Streams the verification document through this admin-only action, so the
+  # file is never exposed via a public (signed) ActiveStorage URL.
+  def document
+    unless @workshop.verification_document.attached?
+      return redirect_to admin_workshop_path(@workshop), alert: t("admin.workshops.document.missing")
+    end
+
+    doc = @workshop.verification_document
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    send_data doc.download, filename: doc.filename.to_s, type: doc.content_type, disposition: "inline"
   end
 
   def transition

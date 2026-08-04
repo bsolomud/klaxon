@@ -197,6 +197,8 @@ en:
         success: "Workshop status updated successfully."
         invalid_status: "Cannot perform this transition from current status."
         stale: "This workshop was already updated by another action."
+      document:
+        missing: "No document has been uploaded."
     reviews:
       statuses:
         published: "Published"
