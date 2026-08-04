@@ -24,6 +24,20 @@ module ApplicationHelper
     "#{amount.to_i} #{currency}"
   end
 
+  # The red "*" required marker. Used by AuFormBuilder and by hand-written
+  # labels on the few forms that don't go through the builder.
+  def required_mark
+    tag.span("*", class: "text-red-500 ml-0.5", aria: { hidden: true })
+  end
+
+  # Small "* — required field" legend for forms that mark required fields.
+  def required_legend
+    tag.p(
+      safe_join([tag.span("*", class: "text-red-500"), " #{t('forms.required_legend')}"]),
+      class: "text-xs text-gray-400"
+    )
+  end
+
   def status_badge(status, color_map, i18n_key, default_color: "yellow")
     color = color_map[status.to_s] || default_color
     colors = BADGE_COLORS[color]

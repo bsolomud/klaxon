@@ -1,5 +1,6 @@
 <%= form_with(builder: AuFormBuilder, model: workshop, class: "space-y-8") do |f| %>
   <%= render "devise/shared/error_messages", resource: workshop %>
+  <%= required_legend %>
 
   <%# Basic Info %>
   <fieldset>

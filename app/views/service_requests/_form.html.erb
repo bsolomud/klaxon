@@ -1,5 +1,6 @@
 <%= form_with(builder: AuFormBuilder, model: service_request, class: "space-y-6") do |f| %>
   <%= render "devise/shared/error_messages", resource: service_request %>
+  <%= required_legend %>
 
   <%= f.hidden_field :workshop_id, value: workshop.id %>
 

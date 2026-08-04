@@ -1196,3 +1196,5 @@ en:
     callback:
       paid: "Payment received. Thank you!"
       cancelled: "Payment cancelled."
+  forms:
+    required_legend: "— required field"

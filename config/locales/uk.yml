@@ -1204,3 +1204,5 @@ uk:
     callback:
       paid: "Оплату отримано. Дякуємо!"
       cancelled: "Оплату скасовано."
+  forms:
+    required_legend: "— обов'язкове поле"

@@ -20,6 +20,14 @@ class WorkshopsControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[type=checkbox][data-pricing-fields-target='checkbox']", count: ServiceCategory.count
   end
 
+  test "new form marks required fields with an asterisk and leaves optional ones plain" do
+    get new_workshop_path
+    assert_response :success
+    assert_select "label[for=workshop_name] span.text-red-500", text: "*"                  # required
+    assert_select "label[for=workshop_registration_number] span.text-red-500", text: "*"    # required on application
+    assert_select "label[for=workshop_description] span.text-red-500", count: 0             # optional
+  end
+
   test "edit form checks selected categories and shows pricing fields" do
     get edit_workshop_path(@workshop)
     assert_response :success

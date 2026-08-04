@@ -10,7 +10,7 @@
   <% end %>
 
   <div>
-    <label class="label-input"><%= t("reviews.new.rating") %></label>
+    <label class="label-input"><%= t("reviews.new.rating") %><%= required_mark %></label>
     <div class="flex gap-1 mt-1" data-controller="star-rating">
       <% (1..5).each do |star| %>
         <label class="cursor-pointer">

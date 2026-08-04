@@ -23,6 +23,26 @@ class AuFormBuilder < ActionView::Helpers::FormBuilder
     end
   end
 
+  # Appends a red "*" to a field's label when the model requires it (detected
+  # from presence validators, evaluated against this record so conditional
+  # rules resolve correctly). Keeps required-marking DRY and always in sync.
+  def label(method, text = nil, options = {}, &block)
+    if text.is_a?(Hash) # called as label(method, options)
+      options = text
+      text = nil
+    end
+    return super(method, text, options, &block) unless required_field?(method)
+
+    marker = @template.required_mark
+
+    if block
+      super(method, options) { @template.capture(&block) + marker }
+    else
+      body = (text || method.to_s.humanize).to_s
+      super(method, @template.safe_join([body, marker]), options)
+    end
+  end
+
   def check_box(name, options = {}, checked_value = "1", unchecked_value = "0")
     # Витягуємо текст лейбла, щоб він не потрапив у атрибути самого інпуту
     label_text = options.delete(:label_text)
@@ -40,6 +60,34 @@ class AuFormBuilder < ActionView::Helpers::FormBuilder
   end
 
   private
+
+  # True when the model has an active presence validation for this attribute.
+  # Conditional validators (if:/unless:) are evaluated against the record, so a
+  # field is marked required only in the context where it actually is.
+  def required_field?(method)
+    return false unless object.class.respond_to?(:validators_on)
+
+    object.class.validators_on(method).any? do |validator|
+      validator.is_a?(ActiveModel::Validations::PresenceValidator) && validator_active?(validator)
+    end
+  rescue StandardError
+    false
+  end
+
+  def validator_active?(validator)
+    if_cond = validator.options[:if]
+    unless_cond = validator.options[:unless]
+    (if_cond.nil? || evaluate_condition(if_cond)) &&
+      (unless_cond.nil? || !evaluate_condition(unless_cond))
+  end
+
+  def evaluate_condition(condition)
+    case condition
+    when Symbol then object.send(condition)
+    when Proc then object.instance_exec(&condition)
+    else true
+    end
+  end
 
   def error_message_for(name)
     return unless object.errors[name].any?

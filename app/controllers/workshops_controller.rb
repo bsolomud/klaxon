@@ -47,6 +47,7 @@ class WorkshopsController < ApplicationController
 
   def new
     @workshop = Workshop.new
+    @workshop.applying = true # so verification fields render as required
     build_missing_records
   end
 

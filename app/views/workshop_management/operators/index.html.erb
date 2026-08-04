@@ -8,7 +8,7 @@
   <%= form_with url: workshop_management_workshop_operators_path(@workshop), method: :post,
         class: "flex flex-wrap items-end gap-3" do %>
     <div>
-      <label class="label-input" for="email"><%= t(".email") %></label>
+      <label class="label-input" for="email"><%= t(".email") %><%= required_mark %></label>
       <%= email_field_tag :email, nil, placeholder: "name@example.com",
             class: "mt-1 block rounded-lg border-gray-300 text-sm focus:border-black focus:ring-black" %>
     </div>
