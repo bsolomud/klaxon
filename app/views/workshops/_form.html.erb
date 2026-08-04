@@ -77,6 +77,32 @@
     </div>
   </fieldset>
 
+  <%# Business verification %>
+  <fieldset>
+    <legend class="text-sm font-medium text-gray-900 uppercase tracking-wider mb-1"><%= t("workshops.form.verification") %></legend>
+    <p class="text-sm text-gray-500 mb-4"><%= t("workshops.form.verification_hint") %></p>
+
+    <div class="space-y-4">
+      <div>
+        <%= f.label :registration_number, t("workshops.form.registration_number"), class: "label-input" %>
+        <%= f.text_field :registration_number %>
+      </div>
+
+      <div>
+        <%= f.label :contact_name, t("workshops.form.contact_name"), class: "label-input" %>
+        <%= f.text_field :contact_name %>
+      </div>
+
+      <div>
+        <%= f.label :verification_document, t("workshops.form.verification_document"), class: "label-input" %>
+        <% if workshop.verification_document.attached? %>
+          <p class="mb-1 text-xs text-gray-500"><%= t("workshops.form.document_attached") %></p>
+        <% end %>
+        <%= f.file_field :verification_document, accept: "image/*,application/pdf" %>
+      </div>
+    </div>
+  </fieldset>
+
   <%# Location %>
   <fieldset>
     <legend class="text-sm font-medium text-gray-900 uppercase tracking-wider mb-4"><%= t("workshops.form.location_info") %></legend>

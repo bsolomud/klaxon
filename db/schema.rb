@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_27_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_04_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -396,6 +396,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_27_120000) do
     t.string "address", null: false
     t.decimal "avg_rating", precision: 3, scale: 2
     t.string "city", null: false
+    t.string "contact_name"
     t.string "country", null: false
     t.datetime "created_at", null: false
     t.text "decline_reason"
@@ -406,6 +407,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_27_120000) do
     t.decimal "longitude", precision: 10, scale: 7
     t.string "name", null: false
     t.string "phone", null: false
+    t.string "registration_number"
     t.integer "review_count", default: 0, null: false
     t.integer "status", default: 0, null: false
     t.datetime "updated_at", null: false

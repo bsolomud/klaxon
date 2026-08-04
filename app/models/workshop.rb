@@ -25,6 +25,7 @@ class Workshop < ApplicationRecord
 
   has_one_attached :logo
   has_many_attached :photos
+  has_one_attached :verification_document
 
   enum :status, { pending: 0, active: 1, declined: 2, suspended: 3 }
 
@@ -44,6 +45,13 @@ class Workshop < ApplicationRecord
   validates :address, presence: true
   validates :city, presence: true
   validates :country, presence: true
+
+  # Business-verification fields are required only when a user submits an
+  # application through the site (the controller sets `applying`); seeds,
+  # fixtures, and admin-side creation stay exempt.
+  attr_accessor :applying
+  validates :registration_number, presence: true, if: :applying
+  validates :contact_name, presence: true, if: :applying
 
   scope :text_search, ->(q) { q.blank? ? all : where("name ILIKE :q OR address ILIKE :q", q: "%#{sanitize_sql_like(q)}%") }
   scope :by_city, ->(city) { where(city: city) }

@@ -5,6 +5,19 @@ class WorkshopTest < ActiveSupport::TestCase
     @workshop = workshops(:one)
   end
 
+  test "requires registration_number and contact_name when applying" do
+    workshop = Workshop.new(name: "X", phone: "+380500000000", address: "вул. А, 1", city: "Київ", country: "UA")
+    workshop.applying = true
+    assert_not workshop.valid?
+    assert_includes workshop.errors.attribute_names, :registration_number
+    assert_includes workshop.errors.attribute_names, :contact_name
+  end
+
+  test "does not require verification fields when not applying" do
+    workshop = Workshop.new(name: "X", phone: "+380500000000", address: "вул. А, 1", city: "Київ", country: "UA")
+    assert workshop.valid?
+  end
+
   test "has operators through workshop_operators" do
     assert_includes @workshop.operators, users(:one)
     assert_includes @workshop.operators, users(:two)

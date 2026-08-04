@@ -88,6 +88,32 @@
       </dl>
     </div>
 
+    <%# Business verification %>
+    <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+      <h2 class="text-sm font-medium text-gray-900 uppercase tracking-wider mb-4"><%= t(".verification") %></h2>
+      <dl class="space-y-3">
+        <div>
+          <dt class="text-xs text-gray-400 uppercase tracking-wider"><%= t(".registration_number") %></dt>
+          <dd class="mt-0.5 text-sm text-gray-900"><%= @workshop.registration_number.presence || t(".not_provided") %></dd>
+        </div>
+        <div>
+          <dt class="text-xs text-gray-400 uppercase tracking-wider"><%= t(".contact_name") %></dt>
+          <dd class="mt-0.5 text-sm text-gray-900"><%= @workshop.contact_name.presence || t(".not_provided") %></dd>
+        </div>
+        <div>
+          <dt class="text-xs text-gray-400 uppercase tracking-wider"><%= t(".verification_document") %></dt>
+          <dd class="mt-0.5 text-sm">
+            <% if @workshop.verification_document.attached? %>
+              <%= link_to t(".view_document"), rails_blob_path(@workshop.verification_document, disposition: "inline"),
+                    target: "_blank", rel: "noopener", class: "text-blue-600 hover:underline" %>
+            <% else %>
+              <span class="text-gray-400"><%= t(".not_provided") %></span>
+            <% end %>
+          </dd>
+        </div>
+      </dl>
+    </div>
+
     <%# Service categories %>
     <% if @workshop.service_categories.any? %>
       <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">

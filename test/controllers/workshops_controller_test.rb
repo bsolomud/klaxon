@@ -196,6 +196,8 @@ class WorkshopsControllerTest < ActionDispatch::IntegrationTest
       workshop: {
         name: "Нова майстерня",
         phone: "+380501111111",
+        registration_number: "12345678",
+        contact_name: "Іван Власник",
         address: "вул. Тестова, 1",
         city: "Київ",
         country: "UA"
@@ -212,6 +214,8 @@ class WorkshopsControllerTest < ActionDispatch::IntegrationTest
         workshop: {
           name: "Нова майстерня",
           phone: "+380501111111",
+          registration_number: "12345678",
+          contact_name: "Іван Власник",
           address: "вул. Тестова, 1",
           city: "Київ",
           country: "UA"
@@ -230,6 +234,8 @@ class WorkshopsControllerTest < ActionDispatch::IntegrationTest
       workshop: {
         name: "Нова майстерня",
         phone: "+380501111111",
+        registration_number: "12345678",
+        contact_name: "Іван Власник",
         address: "вул. Тестова, 1",
         city: "Київ",
         country: "UA"
@@ -251,12 +257,29 @@ class WorkshopsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
+  test "create without business verification info is rejected" do
+    assert_no_difference "Workshop.count" do
+      post workshops_path, params: {
+        workshop: {
+          name: "Без верифікації",
+          phone: "+380501111111",
+          address: "вул. Тестова, 1",
+          city: "Київ",
+          country: "UA"
+        }
+      }
+    end
+    assert_response :unprocessable_entity
+  end
+
   test "create with pricing data saves workshop_service_categories" do
     assert_difference "WorkshopServiceCategory.count", 1 do
       post workshops_path, params: {
         workshop: {
           name: "Тестова майстерня",
           phone: "+380501111111",
+          registration_number: "12345678",
+          contact_name: "Іван Власник",
           address: "вул. Тестова, 1",
           city: "Київ",
           country: "UA",
@@ -297,6 +320,8 @@ class WorkshopsControllerTest < ActionDispatch::IntegrationTest
         workshop: {
           name: "Порожня майстерня",
           phone: "+380501111111",
+          registration_number: "12345678",
+          contact_name: "Іван Власник",
           address: "вул. Тестова, 2",
           city: "Київ",
           country: "UA",
@@ -322,6 +347,8 @@ class WorkshopsControllerTest < ActionDispatch::IntegrationTest
       workshop: {
         name: "Майстерня з фото",
         phone: "+380501111111",
+        registration_number: "12345678",
+        contact_name: "Іван Власник",
         address: "вул. Тестова, 1",
         city: "Київ",
         country: "UA",

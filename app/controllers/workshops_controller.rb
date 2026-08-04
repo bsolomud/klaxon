@@ -52,6 +52,7 @@ class WorkshopsController < ApplicationController
 
   def create
     @workshop = Workshop.new(workshop_params)
+    @workshop.applying = true # enforce business-verification fields on submission
 
     unless @workshop.valid?
       build_missing_records
@@ -128,6 +129,7 @@ class WorkshopsController < ApplicationController
       :name, :description, :phone, :email,
       :address, :city, :country,
       :latitude, :longitude,
+      :registration_number, :contact_name, :verification_document,
       :logo, photos: [],
       working_hours_attributes: [:id, :day_of_week, :opens_at, :closes_at, :closed, :_destroy],
       workshop_service_categories_attributes: [
