@@ -5,12 +5,29 @@ class ServiceReminderJob < ApplicationJob
   queue_as :default
 
   def perform
-    ServiceRecord
+    scope = ServiceRecord
       .where(reminder_sent_at: nil)
       .where(next_service_at_date: ..Date.current)
-      .find_each do |record|
-        Notification.create!(user: record.car.user, notifiable: record, event: :service_due_reminder)
-        record.update_column(:reminder_sent_at, Time.current) # rubocop:disable Rails/SkipsModelValidations
+
+    # Eager-load :car (was an N+1 on record.car.user), then bulk-insert the
+    # notifications and bulk-update reminder_sent_at per batch. insert_all skips
+    # the delivery callback, so fan it out explicitly.
+    scope.includes(:car).find_in_batches do |records|
+      now = Time.current
+      rows = records.map do |record|
+        {
+          user_id: record.car.user_id,
+          notifiable_type: "ServiceRecord",
+          notifiable_id: record.id,
+          event: Notification.events.fetch("service_due_reminder"),
+          created_at: now,
+          updated_at: now
+        }
       end
+
+      ids = Notification.insert_all(rows, returning: %w[id]).rows.flatten
+      ServiceRecord.where(id: records.map(&:id)).update_all(reminder_sent_at: now) # rubocop:disable Rails/SkipsModelValidations
+      ActiveJob.perform_all_later(Notification.where(id: ids).map { |n| DeliverNotificationJob.new(n) })
+    end
   end
 end

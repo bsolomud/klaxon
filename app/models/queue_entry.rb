@@ -41,10 +41,22 @@ class QueueEntry < ApplicationRecord
     bays = [queue.concurrency, 1].max
     free = [bays - queue.serving_count, 0].max
 
-    queue.queue_entries.waiting.order(:position).each_with_index do |entry, i|
-      wait = i < free ? 0 : (((i - free) / bays) + 1) * duration
-      entry.update_column(:estimated_wait_minutes, wait) # rubocop:disable Rails/SkipsModelValidations
+    ids = queue.queue_entries.waiting.order(:position).pluck(:id)
+    return if ids.empty?
+
+    # One UPDATE with a parameterized CASE instead of N per-row update_columns.
+    pairs = ids.each_with_index.map do |id, i|
+      [id, i < free ? 0 : (((i - free) / bays) + 1) * duration]
     end
+    queue.queue_entries.where(id: ids)
+         .update_all(self.class.wait_estimate_case(pairs)) # rubocop:disable Rails/SkipsModelValidations
+  end
+
+  # SET fragment for the bulk wait-estimate UPDATE. Values are bound through
+  # sanitize_sql_array, so the raw SQL carries no interpolated data.
+  def self.wait_estimate_case(pairs)
+    clauses = Array.new(pairs.size, "WHEN ? THEN ?").join(" ")
+    Arel.sql(sanitize_sql_array(["estimated_wait_minutes = CASE id #{clauses} END", *pairs.flatten]))
   end
 
   private

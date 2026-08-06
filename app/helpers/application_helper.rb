@@ -19,9 +19,12 @@ module ApplicationHelper
     })
   end
 
-  # A single money amount, matching the app's price style ("1000 UAH").
+  # A single money amount, matching the app's price style ("1000 UAH"). Whole
+  # amounts show without decimals; kopiykas are kept when present.
   def format_money(amount, currency)
-    "#{amount.to_i} #{currency}"
+    value = amount.to_d
+    formatted = value == value.to_i ? value.to_i.to_s : format("%.2f", value)
+    "#{formatted} #{currency}"
   end
 
   # The red "*" required marker. Used by AuFormBuilder and by hand-written
