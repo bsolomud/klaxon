@@ -1,0 +1,9 @@
+<h1><%= t("mailers.service_request_mailer.completed.heading") %></h1>
+
+<p><%= t("mailers.service_request_mailer.completed.body", workshop: @workshop.name) %></p>
+
+<p>
+  <%= link_to t("mailers.service_request_mailer.completed.cta"),
+              car_url(@service_request.car),
+              class: "btn" %>
+</p>

@@ -1,0 +1,50 @@
+one:
+  name: "Шиномонтаж Експрес"
+  phone: "+380501234567"
+  address: "вул. Хрещатик, 1"
+  city: "Київ"
+  country: "UA"
+  status: active
+  latitude: 50.450100
+  longitude: 30.523400
+
+two:
+  name: "Автомийка Блиск"
+  phone: "+380507654321"
+  address: "вул. Сагайдачного, 10"
+  city: "Київ"
+  country: "UA"
+  status: active
+  latitude: 50.462800
+  longitude: 30.517900
+
+pending_workshop:
+  name: "СТО Новий"
+  phone: "+380509999999"
+  address: "вул. Грушевського, 5"
+  city: "Київ"
+  country: "UA"
+  status: pending
+  latitude: 50.445500
+  longitude: 30.528600
+
+declined_workshop:
+  name: "СТО Відхилений"
+  phone: "+380501111111"
+  address: "вул. Лесі Українки, 3"
+  city: "Київ"
+  country: "UA"
+  status: declined
+  decline_reason: "Неповний пакет документів"
+  latitude: 50.434200
+  longitude: 30.539100
+
+suspended_workshop:
+  name: "СТО Призупинений"
+  phone: "+380502222222"
+  address: "вул. Богдана Хмельницького, 7"
+  city: "Київ"
+  country: "UA"
+  status: suspended
+  latitude: 50.448300
+  longitude: 30.521700

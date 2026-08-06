@@ -1,0 +1,13 @@
+<h1><%= t("mailers.car_transfer_mailer.expired.heading") %></h1>
+
+<p><%= t("mailers.car_transfer_mailer.expired.body") %></p>
+
+<p>
+  <strong><%= t("mailers.car_transfer_mailer.expired.car") %>:</strong> <%= "#{@car.make} #{@car.model} (#{@car.year})" %>
+</p>
+
+<p>
+  <%= link_to t("mailers.car_transfer_mailer.expired.cta"),
+              car_transfer_url(@transfer.token),
+              class: "btn" %>
+</p>

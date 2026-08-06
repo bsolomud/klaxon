@@ -1,0 +1,44 @@
+<dialog data-dialog-target="dialog"
+        class="w-full max-w-md rounded-2xl p-0 shadow-xl backdrop:bg-black/40">
+  <div class="p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-bold text-gray-900"><%= t("workshops.show.queue_select_title") %></h2>
+      <button type="button" data-action="dialog#close"
+              class="text-gray-400 hover:text-black cursor-pointer"
+              aria-label="<%= t("workshops.show.queue_close") %>">✕</button>
+    </div>
+
+    <%= form_with url: queue_entries_path, method: :post do |f| %>
+      <div class="space-y-2 mb-4">
+        <% open_queues.each_with_index do |queue, idx| %>
+          <label class="flex items-center justify-between gap-3 rounded-xl border border-gray-200 p-3 cursor-pointer hover:border-gray-400">
+            <span class="flex items-center gap-3">
+              <%= f.radio_button :queue_id, queue.id, checked: idx.zero?, class: "h-4 w-4" %>
+              <span class="text-sm font-medium text-gray-900">
+                <%= queue.service_category&.name || t("workshop_management.queues.index.general_queue") %>
+              </span>
+            </span>
+            <span class="text-right text-xs text-gray-500">
+              <% if queue.waiting_count.zero? %>
+                <%= t("workshops.show.queue_none_waiting") %> · <%= t("workshops.show.queue_now") %>
+              <% else %>
+                <%= t("workshops.show.queue_waiting", count: queue.waiting_count) %> ·
+                <%= t("workshops.show.queue_wait", minutes: queue.prospective_wait_minutes) %>
+              <% end %>
+            </span>
+          </label>
+        <% end %>
+      </div>
+
+      <% if cars.any? %>
+        <label class="label-input block mb-1"><%= t("workshops.show.car_label") %></label>
+        <%= f.select :car_id,
+              options_for_select(cars.map { |c| [c.display_name, c.id] }),
+              {},
+              class: "w-full rounded-xl border border-gray-200 px-3 py-2 text-sm mb-4" %>
+      <% end %>
+
+      <%= f.submit t("workshops.show.join_queue"), class: "btn-primary w-full cursor-pointer" %>
+    <% end %>
+  </div>
+</dialog>

@@ -1,0 +1,3 @@
+<%= turbo_stream_from "user_#{current_user.id}_requests" %>
+
+<%= render partial: "service_requests/service_request", locals: { service_request: @service_request } %>

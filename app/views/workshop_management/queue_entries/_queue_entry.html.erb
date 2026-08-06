@@ -1,0 +1,43 @@
+<tr id="<%= dom_id(entry, :operator) %>">
+  <td class="px-6 py-3 text-sm font-semibold text-gray-900"><%= entry.position %></td>
+  <td class="px-6 py-3 text-sm text-gray-700"><%= entry.user.full_name || entry.user.email %></td>
+  <td class="px-6 py-3 text-sm text-gray-600"><%= entry.car&.display_name || "—" %></td>
+  <td class="px-6 py-3"><%= queue_entry_status_badge(entry.status) %></td>
+  <td class="px-6 py-3 text-sm text-gray-600">
+    <% if entry.waiting? && entry.estimated_wait_minutes.present? %>
+      ~<%= entry.estimated_wait_minutes %> <%= t("workshop_management.queues.show.minutes") %>
+    <% else %>
+      —
+    <% end %>
+  </td>
+  <td class="px-6 py-3 text-right">
+    <div class="flex items-center justify-end gap-2">
+      <% if entry.waiting? %>
+        <%= button_to t("workshop_management.queues.show.call"),
+              call_workshop_management_workshop_queue_queue_entry_path(entry.service_queue.workshop, entry.service_queue, entry),
+              method: :patch,
+              params: { lock_version: entry.lock_version },
+              class: "text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors cursor-pointer" %>
+      <% end %>
+      <% if entry.called? %>
+        <%= button_to t("workshop_management.queues.show.serve"),
+              serve_workshop_management_workshop_queue_queue_entry_path(entry.service_queue.workshop, entry.service_queue, entry),
+              method: :patch,
+              params: { lock_version: entry.lock_version },
+              class: "text-sm font-medium text-green-600 hover:text-green-800 transition-colors cursor-pointer" %>
+        <%= button_to t("workshop_management.queues.show.no_show"),
+              no_show_workshop_management_workshop_queue_queue_entry_path(entry.service_queue.workshop, entry.service_queue, entry),
+              method: :patch,
+              params: { lock_version: entry.lock_version },
+              class: "text-sm font-medium text-red-600 hover:text-red-800 transition-colors cursor-pointer" %>
+      <% end %>
+      <% if entry.in_service? %>
+        <%= button_to t("workshop_management.queues.show.complete"),
+              complete_workshop_management_workshop_queue_queue_entry_path(entry.service_queue.workshop, entry.service_queue, entry),
+              method: :patch,
+              params: { lock_version: entry.lock_version },
+              class: "text-sm font-medium text-green-600 hover:text-green-800 transition-colors cursor-pointer" %>
+      <% end %>
+    </div>
+  </td>
+</tr>

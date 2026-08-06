@@ -1,0 +1,75 @@
+class WorkshopManagement::ServiceRequestsController < WorkshopManagement::BaseController
+  include StateTransitionable
+  include NotificationDispatch
+
+  before_action :set_service_request, only: [:show, :accept, :reject, :start, :cancel]
+
+  def index
+    scope = @workshop.service_requests
+                     .includes(:car, workshop_service_category: :service_category)
+                     .recent
+    scope = scope.where(status: params[:status]) if params[:status].present?
+    @pagy, @service_requests = pagy(scope, limit: 20)
+  end
+
+  def show
+    return unless @service_request.car.history_visible_to?(@workshop)
+
+    @car_history = @service_request.car.service_records
+      .includes(service_request: [:workshop, { workshop_service_category: :service_category }])
+      .order(completed_at: :desc)
+  end
+
+  def accept
+    transition_service_request(:pending, :accepted!, notify: :accepted)
+  end
+
+  def reject
+    transition_service_request(:pending, :rejected!, notify: :rejected)
+  end
+
+  def start
+    transition_service_request(:accepted, :in_progress!, notify: :started)
+  end
+
+  def cancel
+    unless @service_request.cancellable_by_operator?
+      redirect_to workshop_management_workshop_service_request_path(@workshop, @service_request),
+                  alert: t("workshop_management.service_requests.invalid_transition")
+      return
+    end
+
+    @service_request.cancelled!
+    dispatch_notification(
+      recipients: @service_request.car.user,
+      notifiable: @service_request,
+      event: :service_request_cancelled
+    )
+    redirect_to workshop_management_workshop_service_request_path(@workshop, @service_request),
+                notice: t("workshop_management.service_requests.cancel.success")
+  end
+
+  private
+
+  def set_service_request
+    @service_request = @workshop.service_requests.find(params[:id])
+  end
+
+  def transition_service_request(required_status, transition, notify:)
+    transition_status(
+      @service_request,
+      required_status: required_status,
+      transition: transition,
+      redirect_path: workshop_management_workshop_service_request_path(@workshop, @service_request),
+      invalid_message: t("workshop_management.service_requests.invalid_transition"),
+      after_success: ->(record) {
+        dispatch_notification(
+          recipients: record.car.user,
+          notifiable: record,
+          event: "service_request_#{notify}",
+          mailer: ServiceRequestMailer.with(service_request: record).public_send(notify)
+        )
+      }
+    )
+  end
+end

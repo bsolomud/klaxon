@@ -1,0 +1,5 @@
+pending_transfer_requested:
+  car_transfer: pending_transfer
+  actor: one
+  event_type: 0
+  created_at: "<%= Time.current %>"

@@ -10,9 +10,300 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_16_212702) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_04_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+  enable_extension "pg_trgm"
+
+  create_table "active_storage_attachments", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.bigint "record_id", null: false
+    t.string "record_type", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", force: :cascade do |t|
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.string "content_type"
+    t.datetime "created_at", null: false
+    t.string "filename", null: false
+    t.string "key", null: false
+    t.text "metadata"
+    t.string "service_name", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "admins", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email", default: "", null: false
+    t.string "encrypted_password", default: "", null: false
+    t.datetime "remember_created_at"
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_admins_on_email", unique: true
+  end
+
+  create_table "appointment_slots", force: :cascade do |t|
+    t.integer "booked_count", default: 0, null: false
+    t.integer "capacity", default: 1, null: false
+    t.datetime "created_at", null: false
+    t.datetime "ends_at", null: false
+    t.integer "lock_version", default: 0, null: false
+    t.datetime "starts_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "workshop_id", null: false
+    t.bigint "workshop_service_category_id", null: false
+    t.index ["workshop_id", "starts_at"], name: "index_appointment_slots_on_workshop_id_and_starts_at"
+    t.index ["workshop_id"], name: "index_appointment_slots_on_workshop_id"
+    t.index ["workshop_service_category_id", "starts_at"], name: "index_slots_on_wsc_and_start", unique: true
+    t.index ["workshop_service_category_id"], name: "index_appointment_slots_on_workshop_service_category_id"
+  end
+
+  create_table "car_history_accesses", force: :cascade do |t|
+    t.bigint "car_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "workshop_id", null: false
+    t.index ["car_id", "workshop_id"], name: "index_car_history_accesses_on_car_id_and_workshop_id", unique: true
+    t.index ["car_id"], name: "index_car_history_accesses_on_car_id"
+    t.index ["workshop_id"], name: "index_car_history_accesses_on_workshop_id"
+  end
+
+  create_table "car_makes", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "lock_version", default: 0, null: false
+    t.string "name", null: false
+    t.integer "status", default: 0, null: false
+    t.bigint "submitted_by_id"
+    t.datetime "updated_at", null: false
+    t.index "lower((name)::text)", name: "index_car_makes_on_lower_name", unique: true
+    t.index ["submitted_by_id"], name: "index_car_makes_on_submitted_by_id"
+  end
+
+  create_table "car_models", force: :cascade do |t|
+    t.bigint "car_make_id", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.integer "status", default: 0, null: false
+    t.bigint "submitted_by_id"
+    t.datetime "updated_at", null: false
+    t.index "car_make_id, lower((name)::text)", name: "index_car_models_on_make_and_lower_name", unique: true
+    t.index ["car_make_id"], name: "index_car_models_on_car_make_id"
+    t.index ["submitted_by_id"], name: "index_car_models_on_submitted_by_id"
+  end
+
+  create_table "car_ownership_records", force: :cascade do |t|
+    t.bigint "car_id", null: false
+    t.bigint "car_transfer_id"
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.datetime "ended_at"
+    t.datetime "started_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["car_id"], name: "index_car_ownership_records_active_owner", unique: true, where: "(ended_at IS NULL)"
+    t.index ["car_id"], name: "index_car_ownership_records_on_car_id"
+    t.index ["car_transfer_id"], name: "index_car_ownership_records_on_car_transfer_id"
+    t.index ["user_id"], name: "index_car_ownership_records_on_user_id"
+  end
+
+  create_table "car_transfer_events", force: :cascade do |t|
+    t.bigint "actor_id"
+    t.bigint "car_transfer_id", null: false
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.integer "event_type", null: false
+    t.jsonb "metadata"
+    t.index ["actor_id"], name: "index_car_transfer_events_on_actor_id"
+    t.index ["car_transfer_id"], name: "index_car_transfer_events_on_car_transfer_id"
+  end
+
+  create_table "car_transfers", force: :cascade do |t|
+    t.bigint "car_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "expires_at", null: false
+    t.bigint "from_user_id", null: false
+    t.integer "status", default: 0, null: false
+    t.bigint "to_user_id", null: false
+    t.string "token", null: false
+    t.datetime "updated_at", null: false
+    t.index ["car_id"], name: "index_car_transfers_on_car_id"
+    t.index ["car_id"], name: "index_car_transfers_one_active_per_car", unique: true, where: "(status = 0)"
+    t.index ["from_user_id"], name: "index_car_transfers_on_from_user_id"
+    t.index ["to_user_id"], name: "index_car_transfers_on_to_user_id"
+    t.index ["token"], name: "index_car_transfers_on_token", unique: true
+  end
+
+  create_table "cars", force: :cascade do |t|
+    t.datetime "archived_at"
+    t.bigint "car_make_id"
+    t.bigint "car_model_id"
+    t.datetime "created_at", null: false
+    t.decimal "engine_volume", precision: 3, scale: 1
+    t.integer "fuel_type", default: 0, null: false
+    t.string "license_plate", null: false
+    t.string "make", null: false
+    t.string "model", null: false
+    t.integer "odometer"
+    t.integer "transmission"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.string "vin"
+    t.integer "year", null: false
+    t.index "lower((license_plate)::text)", name: "index_cars_on_lower_license_plate", unique: true
+    t.index ["car_make_id"], name: "index_cars_on_car_make_id"
+    t.index ["car_model_id"], name: "index_cars_on_car_model_id"
+    t.index ["user_id", "archived_at"], name: "index_cars_on_user_id_and_archived_at"
+    t.index ["user_id"], name: "index_cars_on_user_id"
+    t.index ["vin"], name: "index_cars_on_vin", unique: true
+  end
+
+  create_table "notifications", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "event", null: false
+    t.bigint "notifiable_id", null: false
+    t.string "notifiable_type", null: false
+    t.datetime "read_at"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable"
+    t.index ["user_id", "read_at"], name: "index_notifications_on_user_id_and_read_at"
+    t.index ["user_id"], name: "index_notifications_on_user_id"
+  end
+
+  create_table "payments", force: :cascade do |t|
+    t.decimal "amount", precision: 10, scale: 2, null: false
+    t.datetime "created_at", null: false
+    t.string "currency", default: "UAH", null: false
+    t.integer "kind", default: 0, null: false
+    t.datetime "paid_at"
+    t.bigint "payable_id", null: false
+    t.string "payable_type", null: false
+    t.string "provider"
+    t.string "provider_reference"
+    t.integer "status", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["payable_type", "payable_id"], name: "index_payments_on_payable"
+    t.index ["provider_reference"], name: "index_payments_on_provider_reference", unique: true
+    t.index ["user_id"], name: "index_payments_on_user_id"
+  end
+
+  create_table "push_subscriptions", force: :cascade do |t|
+    t.string "auth_key", null: false
+    t.datetime "created_at", null: false
+    t.string "endpoint", null: false
+    t.string "p256dh_key", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["endpoint"], name: "index_push_subscriptions_on_endpoint", unique: true
+    t.index ["user_id"], name: "index_push_subscriptions_on_user_id"
+  end
+
+  create_table "queue_entries", force: :cascade do |t|
+    t.datetime "called_at"
+    t.bigint "car_id"
+    t.datetime "created_at", null: false
+    t.integer "estimated_wait_minutes"
+    t.datetime "joined_at", null: false
+    t.integer "lock_version", default: 0, null: false
+    t.integer "position", null: false
+    t.bigint "queue_id", null: false
+    t.bigint "service_request_id"
+    t.integer "status", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["car_id"], name: "index_queue_entries_on_car_id"
+    t.index ["queue_id", "position"], name: "index_queue_entries_on_queue_id_and_position", unique: true
+    t.index ["queue_id"], name: "index_queue_entries_on_queue_id"
+    t.index ["service_request_id"], name: "index_queue_entries_on_service_request_id"
+    t.index ["user_id"], name: "index_queue_entries_active_user", unique: true, where: "(status = ANY (ARRAY[0, 1, 2]))"
+    t.index ["user_id"], name: "index_queue_entries_on_user_id"
+  end
+
+  create_table "queues", force: :cascade do |t|
+    t.integer "concurrency", default: 1, null: false
+    t.datetime "created_at", null: false
+    t.date "date", null: false
+    t.bigint "service_category_id"
+    t.integer "status", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "workshop_id", null: false
+    t.index ["service_category_id"], name: "index_queues_on_service_category_id"
+    t.index ["workshop_id", "date"], name: "index_queues_on_workshop_date_when_category_null", unique: true, where: "(service_category_id IS NULL)"
+    t.index ["workshop_id", "service_category_id", "date"], name: "index_queues_on_workshop_category_date", unique: true
+    t.index ["workshop_id"], name: "index_queues_on_workshop_id"
+  end
+
+  create_table "reviews", force: :cascade do |t|
+    t.text "body"
+    t.datetime "created_at", null: false
+    t.integer "lock_version", default: 0, null: false
+    t.integer "rating", null: false
+    t.datetime "responded_at"
+    t.text "response"
+    t.bigint "service_request_id", null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.bigint "workshop_id", null: false
+    t.index ["service_request_id"], name: "index_reviews_on_service_request_id", unique: true
+    t.index ["user_id"], name: "index_reviews_on_user_id"
+    t.index ["workshop_id", "status"], name: "index_reviews_on_workshop_id_and_status"
+  end
+
+  create_table "service_categories", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_service_categories_on_slug", unique: true
+  end
+
+  create_table "service_records", force: :cascade do |t|
+    t.datetime "completed_at", null: false
+    t.datetime "created_at", null: false
+    t.string "currency", default: "UAH", null: false
+    t.decimal "labor_cost", precision: 10, scale: 2
+    t.date "next_service_at_date"
+    t.integer "next_service_at_km"
+    t.integer "odometer_at_service"
+    t.decimal "parts_cost", precision: 10, scale: 2
+    t.jsonb "parts_used"
+    t.string "performed_by"
+    t.text "recommendations"
+    t.datetime "reminder_sent_at"
+    t.bigint "service_request_id", null: false
+    t.text "summary", null: false
+    t.datetime "updated_at", null: false
+    t.index ["service_request_id"], name: "index_service_records_on_service_request_id", unique: true
+  end
+
+  create_table "service_requests", force: :cascade do |t|
+    t.bigint "appointment_slot_id"
+    t.bigint "car_id", null: false
+    t.datetime "created_at", null: false
+    t.text "description", null: false
+    t.integer "lock_version", default: 0, null: false
+    t.datetime "preferred_time", null: false
+    t.jsonb "price_snapshot"
+    t.integer "status", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "workshop_id", null: false
+    t.bigint "workshop_service_category_id", null: false
+    t.index ["appointment_slot_id"], name: "index_service_requests_on_appointment_slot_id"
+    t.index ["car_id", "status"], name: "index_service_requests_on_car_id_and_status"
+    t.index ["car_id"], name: "index_service_requests_on_car_id"
+    t.index ["workshop_id", "status"], name: "index_service_requests_on_workshop_id_and_status"
+    t.index ["workshop_id"], name: "index_service_requests_on_workshop_id"
+    t.index ["workshop_service_category_id"], name: "index_service_requests_on_workshop_service_category_id"
+  end
 
   create_table "users", force: :cascade do |t|
     t.datetime "confirmation_sent_at"
@@ -28,20 +319,146 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_16_212702) do
     t.string "last_name"
     t.datetime "last_sign_in_at"
     t.string "last_sign_in_ip"
+    t.string "locale"
     t.datetime "locked_at"
     t.string "middle_name"
+    t.jsonb "notification_preferences", default: {}, null: false
+    t.jsonb "onboarding_flags", default: {}, null: false
     t.string "phone_number"
+    t.string "provider"
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
+    t.integer "role", default: 0, null: false
     t.integer "sign_in_count", default: 0, null: false
+    t.string "uid"
     t.string "unconfirmed_email"
     t.string "unlock_token"
     t.datetime "updated_at", null: false
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["phone_number"], name: "index_users_on_phone_number", unique: true
+    t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["unlock_token"], name: "index_users_on_unlock_token", unique: true
   end
+
+  create_table "working_hour_exceptions", force: :cascade do |t|
+    t.boolean "closed", default: true, null: false
+    t.datetime "created_at", null: false
+    t.date "date", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "workshop_id", null: false
+    t.index ["workshop_id", "date"], name: "index_working_hour_exceptions_on_workshop_id_and_date", unique: true
+    t.index ["workshop_id"], name: "index_working_hour_exceptions_on_workshop_id"
+  end
+
+  create_table "working_hours", force: :cascade do |t|
+    t.boolean "closed", default: false, null: false
+    t.time "closes_at"
+    t.datetime "created_at", null: false
+    t.integer "day_of_week", null: false
+    t.time "opens_at"
+    t.datetime "updated_at", null: false
+    t.bigint "workshop_id", null: false
+    t.index ["day_of_week", "closed", "opens_at", "closes_at"], name: "index_working_hours_on_schedule"
+    t.index ["workshop_id", "day_of_week"], name: "index_working_hours_on_workshop_id_and_day_of_week", unique: true
+    t.index ["workshop_id"], name: "index_working_hours_on_workshop_id"
+  end
+
+  create_table "workshop_operators", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "role", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.bigint "workshop_id", null: false
+    t.index ["user_id", "workshop_id"], name: "index_workshop_operators_on_user_id_and_workshop_id", unique: true
+    t.index ["user_id"], name: "index_workshop_operators_on_user_id"
+    t.index ["workshop_id"], name: "index_workshop_operators_on_workshop_id"
+  end
+
+  create_table "workshop_service_categories", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "currency", default: "UAH"
+    t.integer "estimated_duration_minutes"
+    t.decimal "price_max", precision: 10, scale: 2
+    t.decimal "price_min", precision: 10, scale: 2
+    t.string "price_unit"
+    t.bigint "service_category_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "workshop_id", null: false
+    t.index ["service_category_id"], name: "index_workshop_service_categories_on_service_category_id"
+    t.index ["workshop_id", "service_category_id"], name: "index_wsc_on_workshop_id_and_service_category_id", unique: true
+    t.index ["workshop_id"], name: "index_workshop_service_categories_on_workshop_id"
+  end
+
+  create_table "workshops", force: :cascade do |t|
+    t.string "address", null: false
+    t.decimal "avg_rating", precision: 3, scale: 2
+    t.string "city", null: false
+    t.string "contact_name"
+    t.string "country", null: false
+    t.datetime "created_at", null: false
+    t.text "decline_reason"
+    t.text "description"
+    t.string "email"
+    t.decimal "latitude", precision: 10, scale: 7
+    t.integer "lock_version", default: 0, null: false
+    t.decimal "longitude", precision: 10, scale: 7
+    t.string "name", null: false
+    t.string "phone", null: false
+    t.string "registration_number"
+    t.integer "review_count", default: 0, null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["address"], name: "index_workshops_on_address_trgm", opclass: :gin_trgm_ops, using: :gin
+    t.index ["city"], name: "index_workshops_on_city"
+    t.index ["country"], name: "index_workshops_on_country"
+    t.index ["name"], name: "index_workshops_on_name_trgm", opclass: :gin_trgm_ops, using: :gin
+    t.index ["status"], name: "index_workshops_on_status"
+  end
+
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "appointment_slots", "workshop_service_categories"
+  add_foreign_key "appointment_slots", "workshops"
+  add_foreign_key "car_history_accesses", "cars"
+  add_foreign_key "car_history_accesses", "workshops"
+  add_foreign_key "car_makes", "users", column: "submitted_by_id"
+  add_foreign_key "car_models", "car_makes"
+  add_foreign_key "car_models", "users", column: "submitted_by_id"
+  add_foreign_key "car_ownership_records", "car_transfers"
+  add_foreign_key "car_ownership_records", "cars"
+  add_foreign_key "car_ownership_records", "users"
+  add_foreign_key "car_transfer_events", "car_transfers"
+  add_foreign_key "car_transfer_events", "users", column: "actor_id"
+  add_foreign_key "car_transfers", "cars"
+  add_foreign_key "car_transfers", "users", column: "from_user_id"
+  add_foreign_key "car_transfers", "users", column: "to_user_id"
+  add_foreign_key "cars", "car_makes"
+  add_foreign_key "cars", "car_models"
+  add_foreign_key "cars", "users"
+  add_foreign_key "notifications", "users"
+  add_foreign_key "payments", "users"
+  add_foreign_key "push_subscriptions", "users"
+  add_foreign_key "queue_entries", "cars"
+  add_foreign_key "queue_entries", "queues"
+  add_foreign_key "queue_entries", "service_requests"
+  add_foreign_key "queue_entries", "users"
+  add_foreign_key "queues", "service_categories"
+  add_foreign_key "queues", "workshops"
+  add_foreign_key "reviews", "service_requests"
+  add_foreign_key "reviews", "users"
+  add_foreign_key "reviews", "workshops"
+  add_foreign_key "service_records", "service_requests"
+  add_foreign_key "service_requests", "appointment_slots"
+  add_foreign_key "service_requests", "cars"
+  add_foreign_key "service_requests", "workshop_service_categories"
+  add_foreign_key "service_requests", "workshops"
+  add_foreign_key "working_hour_exceptions", "workshops"
+  add_foreign_key "working_hours", "workshops"
+  add_foreign_key "workshop_operators", "users"
+  add_foreign_key "workshop_operators", "workshops"
+  add_foreign_key "workshop_service_categories", "service_categories"
+  add_foreign_key "workshop_service_categories", "workshops"
 end

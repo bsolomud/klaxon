@@ -1,0 +1,17 @@
+one:
+  user: one
+  notifiable: one (Workshop)
+  event: 0
+  read_at: <%= 1.hour.ago %>
+
+two:
+  user: one
+  notifiable: one (Workshop)
+  event: 0
+  read_at: null
+
+three:
+  user: three
+  notifiable: pending_workshop (Workshop)
+  event: 1
+  read_at: null

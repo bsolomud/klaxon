@@ -1,0 +1,7 @@
+<%= t("mailers.car_transfer_mailer.approved.heading") %>
+
+<%= t("mailers.car_transfer_mailer.approved.body") %>
+
+<%= t("mailers.car_transfer_mailer.approved.car") %>: <%= "#{@car.make} #{@car.model} (#{@car.year})" %>
+
+<%= t("mailers.car_transfer_mailer.approved.cta") %>: <%= cars_url %>

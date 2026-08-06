@@ -1,0 +1,21 @@
+# Ukrainian date/time formats and names. Rails ships these only for :en, so
+# once :uk became the default locale they must be provided explicitly.
+# Month names use the genitive case, which is how Ukrainian dates read
+# (e.g. "18 липня 2026").
+uk:
+  date:
+    formats:
+      default: "%d.%m.%Y"
+      short: "%d %b"
+      long: "%d %B %Y"
+    day_names: [неділя, понеділок, вівторок, середа, четвер, "п'ятниця", субота]
+    abbr_day_names: [Нд, Пн, Вт, Ср, Чт, Пт, Сб]
+    month_names: [~, січня, лютого, березня, квітня, травня, червня, липня, серпня, вересня, жовтня, листопада, грудня]
+    abbr_month_names: [~, січ, лют, бер, кві, тра, чер, лип, сер, вер, жов, лис, гру]
+  time:
+    formats:
+      default: "%a, %d %b %Y, %H:%M:%S %z"
+      short: "%d %b, %H:%M"
+      long: "%d %B %Y, %H:%M"
+    am: "дп"
+    pm: "пп"

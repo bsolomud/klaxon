@@ -1,0 +1,16 @@
+<h1><%= t("mailers.queue_mailer.called.heading") %></h1>
+
+<p><%= t("mailers.queue_mailer.called.body", workshop: @workshop.name) %></p>
+
+<ul>
+  <li><strong><%= t("mailers.queue_mailer.called.position") %>:</strong> <%= @entry.position %></li>
+  <% if @workshop.address.present? %>
+    <li><strong><%= t("mailers.queue_mailer.called.address") %>:</strong> <%= @workshop.address %></li>
+  <% end %>
+</ul>
+
+<p>
+  <%= link_to t("mailers.queue_mailer.called.cta"),
+              workshop_url(@workshop),
+              class: "btn" %>
+</p>

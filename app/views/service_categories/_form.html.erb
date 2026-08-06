@@ -1,0 +1,17 @@
+<%= form_with(builder: AuFormBuilder, model: service_category, class: "space-y-6") do |f| %>
+  <%= render "devise/shared/error_messages", resource: service_category %>
+
+  <div>
+    <%= f.label :name, t("service_categories.form.name"), class: "label-input" %>
+    <%= f.text_field :name, autofocus: true %>
+  </div>
+
+  <div>
+    <%= f.label :slug, t("service_categories.form.slug"), class: "label-input" %>
+    <%= f.text_field :slug, placeholder: "e.g. tire_service" %>
+  </div>
+
+  <div>
+    <%= f.submit class: "btn-primary" %>
+  </div>
+<% end %>

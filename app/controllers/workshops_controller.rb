@@ -1,0 +1,152 @@
+class WorkshopsController < ApplicationController
+  skip_before_action :authenticate_user!, only: [:index, :show]
+
+  before_action :set_workshop, only: [:show, :edit, :update, :destroy]
+  before_action :require_workshop_access!, only: [:edit, :update, :destroy]
+  before_action :load_service_categories, only: [:new, :create, :edit, :update]
+  before_action :build_missing_records, only: [:edit]
+
+  def index
+    @service_categories = ServiceCategory.order(:name)
+    @workshops = Workshop.active.includes(:service_categories, :working_hours).with_attached_photos
+    @workshops = @workshops.text_search(params[:q]) if params[:q].present?
+    @workshops = @workshops.by_city(params[:city]) if params[:city].present?
+    @workshops = @workshops.by_country(params[:country]) if params[:country].present?
+    @workshops = @workshops.by_category_slug(params[:category]) if params[:category].present?
+    @workshops = @workshops.open_now if params[:open_now].present?
+
+    # A typed address/place (geocoded) takes precedence over GPS "near me"; both
+    # resolve to a point we sort distance from and center the map on.
+    coords = nil
+    if params[:location].present?
+      coords = geocode_location(params[:location])
+      @location_not_found = coords.nil?
+    elsif (near = Workshop.parse_near_coords(params[:near]))
+      coords = near
+      @workshops = @workshops.near_param(params[:near])
+    end
+    @search_center = coords
+
+    if coords
+      @workshops = @workshops.sorted_by_distance(*coords)
+    elsif params[:sort] == "rating"
+      @workshops = @workshops.order(avg_rating: :desc)
+    else
+      @workshops = @workshops.order(:name)
+    end
+
+    @pagy, @workshops = pagy(@workshops, limit: 20)
+  end
+
+  def show
+    @working_hours = @workshop.working_hours.order(:day_of_week)
+    @open_queues = @workshop.service_queues.open.today.includes(:service_category)
+    @current_entry = current_user.queue_entries.active.includes(service_queue: :workshop).first if user_signed_in?
+    @reviews = @workshop.reviews.published.recent.includes(:user).limit(10)
+  end
+
+  # JSON geocode for the map picker: turns the typed address into coordinates.
+  def geocode
+    coords = geocode_location([params[:address], params[:city], params[:country]].compact_blank.join(", "))
+    if coords
+      render json: { lat: coords.first, lng: coords.last }
+    else
+      render json: { error: "not_found" }, status: :not_found
+    end
+  end
+
+  def new
+    @workshop = Workshop.new
+    @workshop.applying = true # so verification fields render as required
+    build_missing_records
+  end
+
+  def create
+    @workshop = Workshop.new(workshop_params)
+    @workshop.applying = true # enforce business-verification fields on submission
+
+    unless @workshop.valid?
+      build_missing_records
+      return render :new, status: :unprocessable_entity
+    end
+
+    ActiveRecord::Base.transaction do
+      @workshop.save!
+      @workshop.workshop_operators.create!(user: current_user, role: :owner)
+    end
+    redirect_to @workshop, notice: t("workshops.create.submitted")
+  end
+
+  def edit
+  end
+
+  def update
+    update_params = workshop_params
+    new_photos = update_params.extract!(:photos)[:photos]
+
+    if @workshop.update(update_params)
+      @workshop.photos.attach(new_photos) if new_photos.present?
+      redirect_to @workshop, notice: t("workshops.update.success")
+    else
+      build_missing_records
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
+  def destroy
+    @workshop.destroy!
+    redirect_to workshops_path, notice: t("workshops.destroy.success")
+  rescue ActiveRecord::DeleteRestrictionError
+    redirect_to @workshop, alert: t("workshops.destroy.has_requests")
+  end
+
+  private
+
+  # Forward-geocode a typed address/place to [lat, lng]; nil when nothing matches
+  # or the geocoding service errors (it is an external call).
+  def geocode_location(query)
+    result = Geocoder.search(query).first
+    return unless result&.latitude && result&.longitude
+
+    [result.latitude, result.longitude]
+  rescue StandardError => e
+    Rails.logger.warn("Location geocode failed for #{query.inspect}: #{e.message}")
+    nil
+  end
+
+  def set_workshop
+    @workshop = Workshop.includes(workshop_service_categories: :service_category).find(params[:id])
+
+    return unless action_name == "show"
+    return if @workshop.active?
+    return if user_signed_in? && current_user.manages_workshop?(@workshop)
+
+    raise ActiveRecord::RecordNotFound
+  end
+
+  def load_service_categories
+    @service_categories = ServiceCategory.order(:name)
+  end
+
+  def build_missing_records
+    @workshop.build_missing_working_hours
+    @workshop.build_missing_service_categories(@service_categories)
+    @sorted_workshop_service_categories = @workshop.workshop_service_categories
+      .sort_by { |wsc| wsc.service_category&.name.to_s }
+  end
+
+  def workshop_params
+    params.require(:workshop).permit(
+      :name, :description, :phone, :email,
+      :address, :city, :country,
+      :latitude, :longitude, :located_on_map,
+      :registration_number, :contact_name, :verification_document,
+      :logo, photos: [],
+      working_hours_attributes: [:id, :day_of_week, :opens_at, :closes_at, :closed, :_destroy],
+      workshop_service_categories_attributes: [
+        :id, :service_category_id, :price_min, :price_max,
+        :price_unit, :estimated_duration_minutes, :_destroy
+      ]
+    )
+  end
+end

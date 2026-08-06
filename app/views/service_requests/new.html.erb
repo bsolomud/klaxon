@@ -1,0 +1,21 @@
+<div class="mb-8">
+  <h1 class="text-2xl font-bold tracking-tight text-gray-900"><%= t(".title") %></h1>
+  <p class="mt-1 text-sm text-gray-500"><%= @workshop.name %></p>
+</div>
+
+<div class="max-w-2xl">
+  <% if @cars.empty? %>
+    <div class="rounded-lg border border-yellow-200 bg-yellow-50 p-4 mb-6">
+      <p class="text-sm text-yellow-800">
+        <%= t(".no_cars_html", link: link_to(t(".add_car"), new_car_path, class: "font-medium underline hover:text-yellow-900")) %>
+      </p>
+    </div>
+  <% else %>
+    <%= render "form", service_request: @service_request, workshop: @workshop, cars: @cars, categories: @categories, available_slots: @available_slots %>
+  <% end %>
+</div>
+
+<div class="mt-6">
+  <%= link_to t(".back"), workshop_path(@workshop),
+        class: "text-sm font-medium text-gray-500 hover:text-black transition-colors" %>
+</div>

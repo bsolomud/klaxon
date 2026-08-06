@@ -1,0 +1,245 @@
+<div class="mb-8">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold tracking-tight text-gray-900"><%= @workshop.name %></h1>
+      <div class="mt-1 flex flex-wrap items-center gap-3">
+        <% @workshop.service_categories.each do |category| %>
+          <%= link_to category.name,
+                      service_category_path(category),
+                      class: "inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700 hover:bg-gray-200 transition-colors" %>
+        <% end %>
+        <%= workshop_status_indicator(@workshop, open_key: "workshops.show.open_now", closed_key: "workshops.show.closed_now") %>
+        <% if @workshop.verified? %>
+          <span class="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700">
+            <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" /></svg>
+            <%= t(".verified") %>
+          </span>
+        <% end %>
+      </div>
+    </div>
+
+    <% if user_signed_in? %>
+      <div class="flex flex-wrap items-center gap-2">
+        <% if @workshop.active? %>
+          <% if @current_entry %>
+            <div class="flex flex-wrap items-center gap-3 rounded-xl bg-yellow-50 border border-yellow-200 px-4 py-2">
+              <span class="text-sm text-yellow-800">
+                <%= t(".already_in_queue", workshop: @current_entry.service_queue.workshop.name) %>
+              </span>
+              <%= link_to t(".view_my_position"), queue_entry_path(@current_entry),
+                    class: "text-sm font-semibold text-yellow-900 underline" %>
+            </div>
+          <% elsif @open_queues.any? %>
+            <div data-controller="dialog" class="inline-block">
+              <button type="button" data-action="dialog#open" class="btn-primary cursor-pointer">
+                <%= t(".join_queue") %>
+              </button>
+              <%= render "workshops/queue_modal", open_queues: @open_queues, cars: current_user.cars %>
+            </div>
+          <% end %>
+          <%= link_to t(".request_service"), new_service_request_path(workshop_id: @workshop.id),
+                class: "btn-primary" %>
+        <% end %>
+        <% if current_user.manages_workshop?(@workshop) %>
+          <%= link_to t(".edit"), edit_workshop_path(@workshop), class: "text-sm font-medium text-gray-500 hover:text-black transition-colors" %>
+          <%= button_to t(".delete"), workshop_path(@workshop), method: :delete,
+                class: "text-sm font-medium text-red-500 hover:text-red-700 transition-colors cursor-pointer",
+                data: { turbo_confirm: t(".delete_confirm") } %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+  <%# Main content %>
+  <div class="lg:col-span-2 space-y-6">
+    <%# Photo Gallery %>
+    <div class="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm" data-controller="lightbox"
+         data-lightbox-close-label-value="<%= t(".lightbox_close") %>"
+         data-lightbox-prev-label-value="<%= t(".lightbox_prev") %>"
+         data-lightbox-next-label-value="<%= t(".lightbox_next") %>">
+      <% if @workshop.photos.attached? %>
+        <% photos = @workshop.photos.to_a %>
+        <%# Hero — first photo %>
+        <div class="cursor-pointer" data-action="click->lightbox#open" data-lightbox-index-param="0">
+          <%= image_tag photos.first.variant(resize_to_limit: [800, 600]),
+                class: "w-full h-64 sm:h-80 object-cover",
+                alt: @workshop.name %>
+        </div>
+
+        <%# Grid — remaining photos %>
+        <% if photos.size > 1 %>
+          <div class="grid grid-cols-3 sm:grid-cols-4 gap-1 p-1">
+            <% photos.drop(1).each_with_index do |photo, i| %>
+              <div class="cursor-pointer" data-action="click->lightbox#open" data-lightbox-index-param="<%= i + 1 %>">
+                <%= image_tag photo.variant(resize_to_limit: [400, 300]),
+                      class: "w-full h-24 sm:h-28 object-cover rounded",
+                      alt: @workshop.name %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+
+        <%# Lightbox data %>
+        <template data-lightbox-target="template">
+          <% photos.each do |photo| %>
+            <img data-src="<%= url_for(photo) %>" alt="<%= @workshop.name %>">
+          <% end %>
+        </template>
+      <% else %>
+        <%# Empty state %>
+        <div class="flex flex-col items-center justify-center h-48 bg-gray-50 text-gray-300">
+          <svg class="h-12 w-12 mb-2" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Z" />
+          </svg>
+          <span class="text-sm"><%= t(".no_photos") %></span>
+        </div>
+      <% end %>
+
+      <% if @workshop.logo.attached? %>
+        <div class="px-6 py-4">
+          <%= image_tag @workshop.logo, class: "h-16 w-auto object-contain" %>
+        </div>
+      <% end %>
+    </div>
+
+    <%# Description %>
+    <% if @workshop.description.present? %>
+      <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+        <h2 class="text-sm font-medium text-gray-900 uppercase tracking-wider mb-3"><%= t(".description") %></h2>
+        <div class="text-sm text-gray-600 leading-relaxed"><%= simple_format(@workshop.description) %></div>
+      </div>
+    <% end %>
+
+    <%# Services & Pricing %>
+    <% if @workshop.workshop_service_categories.any? %>
+      <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+        <h2 class="text-sm font-medium text-gray-900 uppercase tracking-wider mb-4"><%= t(".services") %></h2>
+
+        <div class="overflow-x-auto">
+        <table class="w-full min-w-[400px]">
+          <thead>
+            <tr class="border-b border-gray-100">
+              <th class="pb-2 text-left text-xs text-gray-400 uppercase tracking-wider"><%= t(".service_name") %></th>
+              <th class="pb-2 text-right text-xs text-gray-400 uppercase tracking-wider"><%= t(".service_price") %></th>
+              <th class="pb-2 text-right text-xs text-gray-400 uppercase tracking-wider"><%= t(".service_duration") %></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-50">
+            <% @workshop.workshop_service_categories.each do |wsc| %>
+              <tr>
+                <td class="py-2.5 text-sm text-gray-900"><%= wsc.service_category.name %></td>
+                <td class="py-2.5 text-sm text-gray-600 text-right"><%= wsc.display_price %></td>
+                <td class="py-2.5 text-sm text-gray-400 text-right"><%= wsc.display_duration %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+        </div>
+      </div>
+    <% end %>
+
+    <%# Reviews %>
+    <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-sm font-medium text-gray-900 uppercase tracking-wider"><%= t(".reviews") %></h2>
+        <% if @workshop.review_count > 0 %>
+          <div class="flex items-center gap-1.5">
+            <div class="flex"><%= star_icons(@workshop.avg_rating) %></div>
+            <span class="text-sm font-medium text-gray-900"><%= @workshop.avg_rating %> / 5</span>
+            <span class="text-xs text-gray-400">&mdash; <%= t(".reviews_count", count: @workshop.review_count) %></span>
+          </div>
+        <% end %>
+      </div>
+
+      <% if @reviews.any? %>
+        <div class="divide-y divide-gray-50">
+          <%= render partial: "reviews/review", collection: @reviews, as: :review %>
+        </div>
+      <% else %>
+        <p class="text-sm text-gray-400"><%= t(".no_reviews") %></p>
+      <% end %>
+    </div>
+
+    <%# Working Hours %>
+    <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+      <h2 class="text-sm font-medium text-gray-900 uppercase tracking-wider mb-4"><%= t(".working_hours") %></h2>
+
+      <div class="space-y-2">
+        <% (0..6).each do |day| %>
+          <% wh = @working_hours.find { |h| h.day_of_week == day } %>
+          <div class="flex items-center justify-between py-1.5 <%= day == Time.current.wday ? 'font-semibold' : '' %>">
+            <span class="text-sm text-gray-700"><%= day_name(day) %></span>
+            <% if wh.nil? || wh.closed? %>
+              <span class="text-sm text-red-500"><%= t(".day_closed") %></span>
+            <% else %>
+              <span class="text-sm text-gray-600"><%= wh.opens_at.strftime("%H:%M") %> &ndash; <%= wh.closes_at.strftime("%H:%M") %></span>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <%# Sidebar — Contact info %>
+  <div class="space-y-6">
+    <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+      <h2 class="text-sm font-medium text-gray-900 uppercase tracking-wider mb-4"><%= t(".contact") %></h2>
+
+      <dl class="space-y-3">
+        <div>
+          <dt class="text-xs text-gray-400 uppercase tracking-wider"><%= t(".phone") %></dt>
+          <dd class="mt-0.5 text-sm text-gray-900">
+            <%= link_to @workshop.phone, "tel:#{@workshop.phone}", class: "hover:text-black" %>
+          </dd>
+        </div>
+
+        <% if @workshop.email.present? %>
+          <div>
+            <dt class="text-xs text-gray-400 uppercase tracking-wider"><%= t(".email") %></dt>
+            <dd class="mt-0.5 text-sm text-gray-900">
+              <%= mail_to @workshop.email, class: "hover:text-black" %>
+            </dd>
+          </div>
+        <% end %>
+      </dl>
+    </div>
+
+    <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+      <h2 class="text-sm font-medium text-gray-900 uppercase tracking-wider mb-4"><%= t(".location") %></h2>
+
+      <dl class="space-y-3">
+        <div>
+          <dt class="text-xs text-gray-400 uppercase tracking-wider"><%= t(".address_label") %></dt>
+          <dd class="mt-0.5 text-sm text-gray-900"><%= @workshop.address %></dd>
+        </div>
+
+        <div>
+          <dt class="text-xs text-gray-400 uppercase tracking-wider"><%= t(".city_label") %></dt>
+          <dd class="mt-0.5 text-sm text-gray-900">
+            <%= link_to @workshop.city, workshops_path(city: @workshop.city), class: "hover:text-black hover:underline" %>
+          </dd>
+        </div>
+
+        <div>
+          <dt class="text-xs text-gray-400 uppercase tracking-wider"><%= t(".country_label") %></dt>
+          <dd class="mt-0.5 text-sm text-gray-900"><%= @workshop.country %></dd>
+        </div>
+
+        <% if @workshop.latitude.present? && @workshop.longitude.present? %>
+          <div data-controller="map"
+               data-map-lat-value="<%= @workshop.latitude %>"
+               data-map-lng-value="<%= @workshop.longitude %>"
+               data-map-zoom-value="15"
+               data-map-points-value="<%= [{ lat: @workshop.latitude.to_f, lng: @workshop.longitude.to_f, name: @workshop.name }].to_json %>"
+               class="h-48 rounded-xl overflow-hidden border border-gray-100"></div>
+        <% end %>
+      </dl>
+    </div>
+  </div>
+</div>
+
+<div class="mt-8">
+  <%= link_to t(".back"), workshops_path, class: "text-sm font-medium text-gray-500 hover:text-black transition-colors" %>
+</div>

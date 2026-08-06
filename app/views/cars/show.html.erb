@@ -1,0 +1,137 @@
+<div class="mb-8">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold tracking-tight text-gray-900"><%= @car.display_name %></h1>
+      <p class="mt-1 text-sm text-gray-500"><%= @car.license_plate %></p>
+      <% if @car.archived? %>
+        <span class="mt-2 inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600"><%= t(".archived_badge") %></span>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+  <div class="lg:col-span-2 space-y-6">
+    <%# Car details %>
+    <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+      <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-500 mb-4"><%= t(".details") %></h2>
+      <dl class="grid grid-cols-2 gap-x-6 gap-y-4 text-sm">
+        <div>
+          <dt class="text-gray-500"><%= t(".make") %></dt>
+          <dd class="mt-0.5 font-medium text-gray-900"><%= @car.make %></dd>
+        </div>
+        <div>
+          <dt class="text-gray-500"><%= t(".model") %></dt>
+          <dd class="mt-0.5 font-medium text-gray-900"><%= @car.model %></dd>
+        </div>
+        <div>
+          <dt class="text-gray-500"><%= t(".year") %></dt>
+          <dd class="mt-0.5 font-medium text-gray-900"><%= @car.year %></dd>
+        </div>
+        <div>
+          <dt class="text-gray-500"><%= t(".fuel_type") %></dt>
+          <dd class="mt-0.5 font-medium text-gray-900"><%= t("cars.fuel_types.#{@car.fuel_type}") %></dd>
+        </div>
+        <% if @car.transmission.present? %>
+          <div>
+            <dt class="text-gray-500"><%= t(".transmission") %></dt>
+            <dd class="mt-0.5 font-medium text-gray-900"><%= t("cars.transmissions.#{@car.transmission}") %></dd>
+          </div>
+        <% end %>
+        <% if @car.engine_volume.present? %>
+          <div>
+            <dt class="text-gray-500"><%= t(".engine_volume") %></dt>
+            <dd class="mt-0.5 font-medium text-gray-900"><%= @car.engine_volume %> <%= t(".liters") %></dd>
+          </div>
+        <% end %>
+        <% if @car.odometer.present? %>
+          <div>
+            <dt class="text-gray-500"><%= t(".odometer") %></dt>
+            <dd class="mt-0.5 font-medium text-gray-900"><%= number_with_delimiter(@car.odometer) %> <%= t(".km") %></dd>
+          </div>
+        <% end %>
+        <% if @car.vin.present? %>
+          <div class="col-span-2">
+            <dt class="text-gray-500"><%= t(".vin") %></dt>
+            <dd class="mt-0.5 font-mono font-medium text-gray-900"><%= @car.vin %></dd>
+          </div>
+        <% end %>
+      </dl>
+    </div>
+
+    <%# Service history %>
+    <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+      <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-500 mb-4"><%= t(".service_history") %></h2>
+      <% if @service_records.any? %>
+        <div class="divide-y divide-gray-100">
+          <% @service_records.each do |record| %>
+            <div class="py-4 first:pt-0 last:pb-0">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-sm font-medium text-gray-900"><%= record.workshop.name %></p>
+                  <p class="text-xs text-gray-500"><%= record.workshop_service_category.service_category.name %></p>
+                </div>
+                <time class="text-xs text-gray-500"><%= l(record.completed_at.to_date) %></time>
+              </div>
+              <p class="mt-2 text-sm text-gray-700"><%= record.summary %></p>
+              <% if record.recommendations.present? %>
+                <p class="mt-1 text-sm text-gray-500"><%= t(".recommendations") %>: <%= record.recommendations %></p>
+              <% end %>
+              <div class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+                <% if record.performed_by.present? %>
+                  <span><%= t(".performed_by") %>: <%= record.performed_by %></span>
+                <% end %>
+                <% if record.odometer_at_service.present? %>
+                  <span><%= t(".odometer") %>: <%= number_with_delimiter(record.odometer_at_service) %> <%= t(".km") %></span>
+                <% end %>
+                <% if record.total_cost > 0 %>
+                  <span><%= t(".total_cost") %>: <%= number_with_delimiter(record.total_cost) %> <%= record.currency %></span>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-sm text-gray-500"><%= t(".no_service_history") %></p>
+      <% end %>
+    </div>
+
+    <%# History access — the driver grants/revokes workshop visibility %>
+    <% shared_workshops = Workshop.active.where(id: @car.service_requests.select(:workshop_id)).distinct.order(:name) %>
+    <% if shared_workshops.any? %>
+      <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+        <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-500 mb-1"><%= t(".history_access") %></h2>
+        <p class="text-xs text-gray-500 mb-4"><%= t(".history_access_hint") %></p>
+        <% granted = @car.history_accesses.index_by(&:workshop_id) %>
+        <div class="divide-y divide-gray-100">
+          <% shared_workshops.each do |w| %>
+            <div class="flex items-center justify-between py-2.5">
+              <span class="text-sm text-gray-900"><%= w.name %></span>
+              <% if (access = granted[w.id]) %>
+                <%= button_to t(".revoke_access"), car_history_access_path(access), method: :delete,
+                      class: "text-xs font-medium text-red-600 hover:text-red-700 cursor-pointer" %>
+              <% else %>
+                <%= button_to t(".grant_access"), car_history_accesses_path,
+                      params: { car_id: @car.id, workshop_id: w.id }, method: :post,
+                      class: "text-xs font-medium text-gray-700 hover:text-black cursor-pointer" %>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="space-y-3">
+    <% unless @car.archived? %>
+      <%= link_to t(".edit"), edit_car_path(@car), class: "block text-sm font-medium text-gray-700 hover:text-black transition-colors" %>
+    <% end %>
+    <% if @car.archived? %>
+      <%= button_to t(".unarchive"), unarchive_car_path(@car), method: :patch, class: "block w-full text-left text-sm font-medium text-gray-700 hover:text-black transition-colors cursor-pointer" %>
+    <% else %>
+      <%= button_to t(".archive"), archive_car_path(@car), method: :patch, data: { turbo_confirm: t(".archive_confirm") }, class: "block w-full text-left text-sm font-medium text-gray-700 hover:text-black transition-colors cursor-pointer" %>
+    <% end %>
+    <%= button_to t(".delete"), car_path(@car), method: :delete, data: { turbo_confirm: t(".delete_confirm") }, class: "block w-full text-left text-sm font-medium text-red-600 hover:text-red-700 transition-colors cursor-pointer" %>
+    <%= link_to t(".back"), cars_path, class: "block text-sm font-medium text-gray-500 hover:text-black transition-colors" %>
+  </div>
+</div>

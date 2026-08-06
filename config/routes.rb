@@ -1,17 +1,129 @@
 Rails.application.routes.draw do
-  devise_for :users, controllers: {
-    registrations: "users/registrations"
-  }
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  mount LetterOpenerWeb::Engine, at: "/dev/letters" if Rails.env.development?
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
+  devise_for :users, controllers: {
+    registrations: "users/registrations",
+    omniauth_callbacks: "users/omniauth_callbacks"
+  }
+  devise_for :admins, path: "admin/auth"
+
+  namespace :admin do
+    root "workshops#index"
+    resources :workshops, only: %i[index show] do
+      member do
+        patch :transition
+        get :document
+      end
+    end
+    resources :users, only: %i[index show] do
+      member do
+        patch :lock
+        patch :unlock
+      end
+    end
+    resources :reviews, only: %i[index update]
+    resources :car_makes, only: [:index] do
+      member do
+        patch :transition
+      end
+    end
+    resources :car_models, only: [:index] do
+      member do
+        patch :transition
+      end
+    end
+  end
+
   get "up" => "rails/health#show", as: :rails_health_check
 
-  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
+  namespace :workshop_management do
+    resources :workshops, only: [:show] do
+      resource :dashboard, only: [:show]
+      resources :service_requests, only: [:index, :show] do
+        member do
+          patch :accept
+          patch :reject
+          patch :start
+          patch :cancel
+        end
+        resource :service_record, only: [:new, :create]
+      end
+      resources :queues, only: [:index, :show] do
+        collection do
+          patch :open
+        end
+        member do
+          patch :pause
+          patch :close
+        end
+        resources :queue_entries, only: [] do
+          member do
+            patch :call
+            patch :serve
+            patch :complete
+            patch :no_show
+          end
+        end
+      end
+      resources :reviews, only: [:index] do
+        member do
+          patch :respond
+        end
+      end
+      resources :appointment_slots, only: [:index] do
+        collection do
+          post :generate
+        end
+      end
+      resources :operators, only: [:index, :create, :update, :destroy]
+      resources :working_hour_exceptions, only: [:create, :destroy]
+    end
+  end
 
-  # Defines the root path route ("/")
+  resources :notifications, only: [:index, :update] do
+    collection do
+      patch :update_all
+    end
+  end
+  resources :push_subscriptions, only: [:create]
+  resource :notification_preferences, only: [:update], controller: "notification_preferences"
+
+  resources :payments, only: [:create, :show]
+  post "payments/callback", to: "payments#callback", as: :payments_callback
+
+  resources :car_makes, only: [:index] do
+    resources :car_models, only: [:index]
+  end
+  resources :cars do
+    member do
+      patch :archive
+      patch :unarchive
+    end
+  end
+  resources :queue_entries, only: [:show, :create, :destroy]
+  resources :service_requests, only: [:index, :show, :new, :create] do
+    member do
+      patch :cancel
+      patch :reschedule
+    end
+    resource :review, only: [:new, :create, :edit, :update, :destroy]
+  end
+  resources :car_transfers, only: [:new, :create, :show], param: :token do
+    member do
+      patch :approve
+      patch :reject
+      patch :cancel
+    end
+  end
+  resources :car_history_accesses, only: [:create, :destroy]
+  resources :service_categories, only: [:index, :show]
+  resources :workshops do
+    collection do
+      get :geocode
+    end
+  end
+  resources :my_workshops, only: [:index]
+  resource :onboarding, only: [:update], controller: "onboarding"
+
   root "dashboard#index"
 end

@@ -3,11 +3,29 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <style>
-      /* Email styles need to be inline */
+      body { font-family: Arial, sans-serif; color: #111; line-height: 1.5; margin: 0; padding: 0; background: #f7f7f7; }
+      .container { max-width: 600px; margin: 0 auto; background: #ffffff; }
+      .header { background: #000000; color: #ffffff; padding: 20px 24px; }
+      .header a { color: #ffffff; text-decoration: none; font-weight: bold; font-size: 20px; letter-spacing: -0.5px; }
+      .content { padding: 24px; color: #111111; }
+      .footer { padding: 20px 24px; color: #6b7280; font-size: 12px; border-top: 1px solid #e5e7eb; }
+      a { color: #111111; }
+      .btn { display: inline-block; background: #000000; color: #ffffff; padding: 12px 20px; text-decoration: none; border-radius: 4px; font-weight: bold; }
     </style>
   </head>
 
   <body>
-    <%= yield %>
+    <div class="container">
+      <div class="header">
+        <%= link_to "AULABS", root_url %>
+      </div>
+      <div class="content">
+        <%= yield %>
+      </div>
+      <div class="footer">
+        <%= t("mailers.footer.tagline") %><br>
+        <%= t("mailers.footer.disclaimer") %>
+      </div>
+    </div>
   </body>
 </html>

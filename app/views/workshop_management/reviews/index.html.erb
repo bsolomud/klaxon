@@ -1,0 +1,48 @@
+<div class="mb-8">
+  <h1 class="text-2xl font-bold tracking-tight text-gray-900"><%= t(".title") %></h1>
+  <p class="mt-1 text-sm text-gray-500"><%= t(".subtitle") %></p>
+</div>
+
+<% if @reviews.any? %>
+  <div class="space-y-4">
+    <% @reviews.each do |review| %>
+      <div class="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="flex"><%= star_icons(review.rating) %></div>
+            <span class="text-sm font-medium text-gray-900"><%= review.user.first_name || review.user.email.split("@").first %></span>
+          </div>
+          <span class="text-xs text-gray-400"><%= l(review.created_at, format: :short) %></span>
+        </div>
+
+        <% if review.body.present? %>
+          <p class="mt-2 text-sm text-gray-600"><%= review.body %></p>
+        <% end %>
+
+        <% if review.images.attached? %>
+          <div class="mt-2 flex flex-wrap gap-2">
+            <% review.images.each do |image| %>
+              <%= image_tag image.variant(resize_to_fill: [80, 80]), class: "h-20 w-20 rounded-lg object-cover", alt: "" %>
+            <% end %>
+          </div>
+        <% end %>
+
+        <% if review.responded? %>
+          <div class="mt-3 rounded-lg bg-gray-50 p-3">
+            <p class="text-xs font-medium text-gray-500"><%= t("reviews.response.label") %></p>
+            <p class="mt-1 text-sm text-gray-700"><%= review.response %></p>
+          </div>
+        <% else %>
+          <%= form_with scope: :review, url: respond_workshop_management_workshop_review_path(@workshop, review), method: :patch, class: "mt-3 space-y-2" do |f| %>
+            <%= f.text_area :response, rows: 2,
+                  class: "block w-full rounded-lg border-gray-300 shadow-sm focus:border-black focus:ring-black text-sm",
+                  placeholder: t(".response_placeholder") %>
+            <%= f.submit t(".respond_button"), class: "btn-primary !w-auto cursor-pointer" %>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <p class="text-sm text-gray-400"><%= t(".empty") %></p>
+<% end %>

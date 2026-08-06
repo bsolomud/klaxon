@@ -1,0 +1,10 @@
+<%= t("mailers.car_transfer_mailer.requested.heading") %>
+
+<%= t("mailers.car_transfer_mailer.requested.body") %>
+
+<%= t("mailers.car_transfer_mailer.requested.details") %>:
+- <%= t("mailers.car_transfer_mailer.requested.car") %>: <%= "#{@car.make} #{@car.model} (#{@car.year})" %>
+- <%= t("mailers.car_transfer_mailer.requested.requested_by") %>: <%= @to_user.email %>
+- <%= t("mailers.car_transfer_mailer.requested.expires_at") %>: <%= l(@transfer.expires_at, format: :long) %>
+
+<%= t("mailers.car_transfer_mailer.requested.cta") %>: <%= car_transfer_url(@transfer.token) %>

@@ -1,11 +1,29 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+one:
+  email: "user-one@example.com"
+  encrypted_password: "<%= BCrypt::Password.create('password', cost: 4) %>"
+  confirmed_at: "<%= Time.current %>"
+  role: 0
 
-# This model initially had no columns defined. If you add columns to the
-# model remove the "{}" from the fixture names and add the columns immediately
-# below each fixture, per the syntax in the comments below
-#
-one: {}
-# column: value
-#
-two: {}
-# column: value
+two:
+  email: "user-two@example.com"
+  encrypted_password: "<%= BCrypt::Password.create('password', cost: 4) %>"
+  confirmed_at: "<%= Time.current %>"
+  role: 0
+
+three:
+  email: "user-three@example.com"
+  encrypted_password: "<%= BCrypt::Password.create('password', cost: 4) %>"
+  confirmed_at: "<%= Time.current %>"
+  role: 0
+
+driver_no_workshops:
+  email: "driver-no-workshops@example.com"
+  encrypted_password: "<%= BCrypt::Password.create('password', cost: 4) %>"
+  confirmed_at: "<%= Time.current %>"
+  role: 0
+
+brand_new_user:
+  email: "brand-new@example.com"
+  encrypted_password: "<%= BCrypt::Password.create('password', cost: 4) %>"
+  confirmed_at: "<%= Time.current %>"
+  role: 0

@@ -1,0 +1,65 @@
+<div class="mb-8">
+  <h1 class="text-2xl font-bold tracking-tight text-gray-900"><%= t(".title") %></h1>
+  <p class="mt-1 text-sm text-gray-500">
+    <%= @service_request.car.display_name %> &mdash; <%= @service_request.workshop_service_category.service_category.name %>
+  </p>
+</div>
+
+<div class="max-w-2xl">
+  <%= form_with(builder: AuFormBuilder, model: @service_record,
+        url: workshop_management_workshop_service_request_service_record_path(@workshop, @service_request),
+        class: "space-y-6") do |f| %>
+    <%= render "devise/shared/error_messages", resource: @service_record %>
+
+    <div>
+      <%= f.label :summary, t(".summary"), class: "label-input" %>
+      <%= f.text_area :summary, rows: 4 %>
+    </div>
+
+    <div>
+      <%= f.label :recommendations, t(".recommendations"), class: "label-input" %>
+      <%= f.text_area :recommendations, rows: 3 %>
+    </div>
+
+    <div>
+      <%= f.label :performed_by, t(".performed_by"), class: "label-input" %>
+      <%= f.text_field :performed_by %>
+    </div>
+
+    <div>
+      <%= f.label :odometer_at_service, t(".odometer_at_service"), class: "label-input" %>
+      <%= f.number_field :odometer_at_service, min: 0 %>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <%= f.label :labor_cost, t(".labor_cost"), class: "label-input" %>
+        <%= f.number_field :labor_cost, min: 0, step: 0.01 %>
+      </div>
+      <div>
+        <%= f.label :parts_cost, t(".parts_cost"), class: "label-input" %>
+        <%= f.number_field :parts_cost, min: 0, step: 0.01 %>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <%= f.label :next_service_at_km, t(".next_service_at_km"), class: "label-input" %>
+        <%= f.number_field :next_service_at_km, min: 0 %>
+      </div>
+      <div>
+        <%= f.label :next_service_at_date, t(".next_service_at_date"), class: "label-input" %>
+        <%= f.date_field :next_service_at_date %>
+      </div>
+    </div>
+
+    <div>
+      <%= f.submit t(".submit"), class: "btn-primary" %>
+    </div>
+  <% end %>
+</div>
+
+<div class="mt-6">
+  <%= link_to t(".back"), workshop_management_workshop_service_request_path(@workshop, @service_request),
+        class: "text-sm font-medium text-gray-500 hover:text-black transition-colors" %>
+</div>

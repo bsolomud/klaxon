@@ -1,0 +1,51 @@
+class WorkshopManagement::ServiceRecordsController < WorkshopManagement::BaseController
+  include NotificationDispatch
+  before_action :set_service_request
+
+  def new
+    @service_record = @service_request.build_service_record(
+      odometer_at_service: @service_request.car.odometer
+    )
+  end
+
+  def create
+    @service_record = @service_request.build_service_record(service_record_params)
+
+    ActiveRecord::Base.transaction do
+      @service_record.save!
+      @service_request.completed!
+    end
+
+    dispatch_notification(
+      recipients: @service_request.car.user,
+      notifiable: @service_request,
+      event: :service_request_completed,
+      mailer: ServiceRequestMailer.with(service_request: @service_request).completed
+    )
+
+    redirect_to workshop_management_workshop_service_request_path(@workshop, @service_request),
+                notice: t(".success")
+  rescue ActiveRecord::RecordInvalid
+    render :new, status: :unprocessable_entity
+  rescue ActiveRecord::RecordNotUnique
+    # Concurrent double-submit: the service_records.service_request_id unique
+    # index rejected the second save. The record already exists, so treat it as
+    # already completed rather than 500ing.
+    redirect_to workshop_management_workshop_service_request_path(@workshop, @service_request),
+                alert: t(".already_recorded")
+  end
+
+  private
+
+  def set_service_request
+    @service_request = @workshop.service_requests.in_progress.find(params[:service_request_id])
+  end
+
+  def service_record_params
+    params.require(:service_record).permit(
+      :summary, :recommendations, :performed_by,
+      :odometer_at_service, :labor_cost, :parts_cost,
+      :next_service_at_km, :next_service_at_date
+    )
+  end
+end

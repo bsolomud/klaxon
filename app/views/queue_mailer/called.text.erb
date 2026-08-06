@@ -1,0 +1,10 @@
+<%= t("mailers.queue_mailer.called.heading") %>
+
+<%= t("mailers.queue_mailer.called.body", workshop: @workshop.name) %>
+
+<%= t("mailers.queue_mailer.called.position") %>: <%= @entry.position %>
+<% if @workshop.address.present? %>
+<%= t("mailers.queue_mailer.called.address") %>: <%= @workshop.address %>
+<% end %>
+
+<%= t("mailers.queue_mailer.called.cta") %>: <%= workshop_url(@workshop) %>

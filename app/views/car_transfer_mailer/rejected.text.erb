@@ -1,0 +1,7 @@
+<%= t("mailers.car_transfer_mailer.rejected.heading") %>
+
+<%= t("mailers.car_transfer_mailer.rejected.body") %>
+
+<%= t("mailers.car_transfer_mailer.rejected.car") %>: <%= "#{@car.make} #{@car.model} (#{@car.year})" %>
+
+<%= t("mailers.car_transfer_mailer.rejected.cta") %>: <%= car_transfer_url(@transfer.token) %>

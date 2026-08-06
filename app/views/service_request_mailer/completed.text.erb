@@ -1,0 +1,5 @@
+<%= t("mailers.service_request_mailer.completed.heading") %>
+
+<%= t("mailers.service_request_mailer.completed.body", workshop: @workshop.name) %>
+
+<%= t("mailers.service_request_mailer.completed.cta") %>: <%= car_url(@service_request.car) %>

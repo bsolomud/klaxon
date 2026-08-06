@@ -1,0 +1,17 @@
+open_queue:
+  workshop_id: <%= ActiveRecord::FixtureSet.identify(:one) %>
+  service_category_id: <%= ActiveRecord::FixtureSet.identify(:tire_service) %>
+  date: "<%= Date.current %>"
+  status: 0
+
+paused_queue:
+  workshop_id: <%= ActiveRecord::FixtureSet.identify(:two) %>
+  service_category_id: <%= ActiveRecord::FixtureSet.identify(:car_wash) %>
+  date: "<%= Date.current %>"
+  status: 1
+
+closed_queue:
+  workshop_id: <%= ActiveRecord::FixtureSet.identify(:one) %>
+  service_category_id: <%= ActiveRecord::FixtureSet.identify(:diagnostics) %>
+  date: "<%= Date.current - 1.day %>"
+  status: 2

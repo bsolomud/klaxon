@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>" class="h-full bg-gray-50">
+  <head>
+    <title><%= content_for(:title) || "AULABS" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="h-full antialiased font-sans">
+    <div class="flex h-full" data-controller="toggle" data-toggle-target-value="workshop-sidebar">
+      <%# Mobile top bar %>
+      <div class="fixed inset-x-0 top-0 z-30 flex h-14 items-center justify-between border-b border-gray-200 bg-white px-4 md:hidden">
+        <div class="flex items-center gap-3">
+          <button data-action="toggle#toggle" type="button" class="text-gray-600 hover:text-black" aria-label="Menu">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+          </button>
+          <span class="font-bold tracking-tighter text-lg">AULABS</span>
+        </div>
+        <span class="text-sm font-medium text-gray-700 truncate max-w-[50%]"><%= @workshop.name %></span>
+      </div>
+
+      <%# Sidebar — hidden on mobile by default, toggle via hamburger %>
+      <aside id="workshop-sidebar" class="hidden md:flex w-64 flex-col border-r border-gray-200 bg-white fixed inset-y-0 left-0 z-40 md:static md:z-auto">
+        <%# Logo %>
+        <div class="flex h-14 items-center border-b border-gray-200 px-4">
+          <%= link_to root_path, class: "font-bold tracking-tighter text-lg" do %>
+            AULABS
+          <% end %>
+        </div>
+
+        <%# Workshop info %>
+        <div class="border-b border-gray-200 px-4 py-4">
+          <h2 class="text-sm font-semibold text-gray-900 truncate"><%= @workshop.name %></h2>
+          <div class="mt-1">
+            <%= workshop_status_badge(@workshop.status) %>
+          </div>
+        </div>
+
+        <%# Navigation %>
+        <% nav_base = "flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors" %>
+        <% nav_active = "#{nav_base} bg-gray-100 text-gray-900" %>
+        <% nav_inactive = "#{nav_base} text-gray-700 hover:bg-gray-100 hover:text-gray-900" %>
+        <nav class="flex-1 space-y-1 px-3 py-4">
+          <%= link_to t("layouts.workshop.nav.dashboard"),
+                workshop_management_workshop_dashboard_path(@workshop),
+                class: controller_name == "dashboards" ? nav_active : nav_inactive %>
+          <%= link_to t("layouts.workshop.nav.requests"),
+                workshop_management_workshop_service_requests_path(@workshop),
+                class: controller_name.in?(%w[service_requests service_records]) ? nav_active : nav_inactive %>
+          <%= link_to t("layouts.workshop.nav.queue"),
+                workshop_management_workshop_queues_path(@workshop),
+                class: controller_name.in?(%w[queues queue_entries]) ? nav_active : nav_inactive %>
+          <%= link_to t("layouts.workshop.nav.reviews"),
+                workshop_management_workshop_reviews_path(@workshop),
+                class: controller_name == "reviews" ? nav_active : nav_inactive %>
+          <%= link_to t("layouts.workshop.nav.slots"),
+                workshop_management_workshop_appointment_slots_path(@workshop),
+                class: controller_name == "appointment_slots" ? nav_active : nav_inactive %>
+          <%= link_to t("layouts.workshop.nav.team"),
+                workshop_management_workshop_operators_path(@workshop),
+                class: controller_name == "operators" ? nav_active : nav_inactive %>
+          <%= link_to t("layouts.workshop.nav.settings"),
+                workshop_management_workshop_path(@workshop),
+                class: (controller_name == "workshops" && action_name == "show") ? nav_active : nav_inactive %>
+        </nav>
+
+        <%# Workshop switcher %>
+        <% if @other_workshops.any? %>
+          <div class="border-t border-gray-200 px-4 py-4">
+            <p class="mb-2 text-[10px] font-medium uppercase tracking-wider text-gray-400"><%= t("layouts.workshop.switch_workshop") %></p>
+            <div class="space-y-1">
+              <% @other_workshops.each do |workshop| %>
+                <%= link_to workshop.name,
+                      workshop_management_workshop_path(workshop),
+                      class: "block truncate rounded-lg px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors" %>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+
+        <%# User & sign out %>
+        <div class="border-t border-gray-200 px-4 py-3">
+          <div class="flex items-center justify-between">
+            <span class="truncate text-xs text-gray-500"><%= current_user.email %></span>
+            <%= button_to t("layouts.workshop.sign_out"), destroy_user_session_path, method: :delete, class: "text-xs text-gray-400 hover:text-gray-700 transition-colors cursor-pointer" %>
+          </div>
+        </div>
+      </aside>
+
+      <%# Main content %>
+      <main class="flex-1 overflow-y-auto pt-14 md:pt-0">
+        <div class="mx-auto max-w-5xl px-4 sm:px-6 py-10">
+          <%= yield %>
+        </div>
+      </main>
+    </div>
+
+    <%= render "shared/flash_messages" %>
+  </body>
+</html>

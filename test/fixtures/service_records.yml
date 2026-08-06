@@ -1,0 +1,13 @@
+completed_record:
+  service_request: completed_request
+  summary: "Замінено передні гальмівні колодки"
+  recommendations: "Перевірити задні колодки через 10000 км"
+  performed_by: "Іван Механік"
+  odometer_at_service: 55000
+  parts_used: '["Колодки Bosch BP1234"]'
+  labor_cost: 500.00
+  parts_cost: 1200.00
+  currency: "UAH"
+  next_service_at_km: 65000
+  next_service_at_date: "2027-03-01"
+  completed_at: "<%= Time.current %>"

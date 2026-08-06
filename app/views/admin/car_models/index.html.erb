@@ -1,0 +1,48 @@
+<div class="mb-8">
+  <h1 class="text-2xl font-semibold tracking-tight"><%= t(".title") %></h1>
+  <p class="mt-1 text-sm text-gray-500"><%= t(".subtitle") %></p>
+</div>
+
+<div class="mb-6 flex items-center gap-2 flex-wrap">
+  <%= link_to t(".filter_all"), admin_car_models_path,
+        class: "rounded-full px-3 py-1 text-xs font-medium transition-colors #{params[:status].blank? ? 'bg-black text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}" %>
+  <% CarModel.statuses.each_key do |status| %>
+    <%= link_to t(".filter_#{status}"), admin_car_models_path(status: status),
+          class: "rounded-full px-3 py-1 text-xs font-medium transition-colors #{params[:status] == status ? 'bg-black text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}" %>
+  <% end %>
+</div>
+
+<% if @car_models.any? %>
+  <div class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-x-auto">
+    <table class="w-full min-w-[600px]">
+      <thead>
+        <tr class="border-b border-gray-100">
+          <th class="px-6 py-3 text-left text-xs text-gray-400 uppercase tracking-wider"><%= t(".col_make") %></th>
+          <th class="px-6 py-3 text-left text-xs text-gray-400 uppercase tracking-wider"><%= t(".col_name") %></th>
+          <th class="px-6 py-3 text-left text-xs text-gray-400 uppercase tracking-wider"><%= t(".col_status") %></th>
+          <th class="px-6 py-3 text-left text-xs text-gray-400 uppercase tracking-wider"><%= t(".col_submitted_by") %></th>
+          <th class="px-6 py-3"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-50">
+        <% @car_models.each do |model| %>
+          <tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-6 py-4 text-sm text-gray-600"><%= model.car_make.name %></td>
+            <td class="px-6 py-4 text-sm font-medium text-gray-900"><%= model.name %></td>
+            <td class="px-6 py-4"><%= status_badge(model.status, CarModel::STATUS_COLORS, "admin.car_models.statuses.#{model.status}") %></td>
+            <td class="px-6 py-4 text-sm text-gray-500"><%= model.submitted_by&.email || "—" %></td>
+            <td class="px-6 py-4 text-right space-x-2">
+              <% if model.pending? %>
+                <%= button_to t(".approve"), transition_admin_car_model_path(model, event: "approve"), method: :patch, class: "text-xs font-medium text-green-700 hover:text-green-900 cursor-pointer" %>
+                <%= button_to t(".reject"), transition_admin_car_model_path(model, event: "reject"), method: :patch, class: "text-xs font-medium text-red-600 hover:text-red-800 cursor-pointer" %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <div class="mt-6"><%= render "shared/pagy_nav", pagy: @pagy %></div>
+<% else %>
+  <p class="text-sm text-gray-400"><%= t(".empty") %></p>
+<% end %>

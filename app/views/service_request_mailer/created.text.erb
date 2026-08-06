@@ -1,0 +1,12 @@
+<%= t("mailers.service_request_mailer.created.heading") %>
+
+<%= t("mailers.service_request_mailer.created.body") %>
+
+<%= t("mailers.service_request_mailer.created.details") %>:
+- <%= t("mailers.service_request_mailer.created.car") %>: <%= "#{@service_request.car.make} #{@service_request.car.model}" %>
+- <%= t("mailers.service_request_mailer.created.service") %>: <%= @service_request.workshop_service_category.service_category.name %>
+- <%= t("mailers.service_request_mailer.created.driver") %>: <%= @service_request.car.user.email %>
+- <%= t("mailers.service_request_mailer.created.preferred_time") %>: <%= l(@service_request.preferred_time, format: :long) if @service_request.preferred_time %>
+- <%= t("mailers.service_request_mailer.created.price") %>: <%= @service_request.display_price %>
+
+<%= t("mailers.service_request_mailer.created.cta") %>: <%= workshop_management_workshop_service_request_url(@workshop, @service_request) %>

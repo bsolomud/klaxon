@@ -1,0 +1,15 @@
+published_review:
+  user: one
+  workshop: one
+  service_request: completed_request
+  rating: 5
+  body: "Чудовий сервіс, дуже задоволений!"
+  status: 0
+
+hidden_review:
+  user: two
+  workshop: two
+  service_request: other_user_completed
+  rating: 2
+  body: "Не дуже"
+  status: 1
