@@ -24,7 +24,7 @@
 
 ## Core Principles
 
-1. **Rails conventions over abstractions.** No service objects, form objects, or interactors unless a specific problem demands it. Fat models over thin controllers. Business logic lives in models.
+1. **Rails conventions over abstractions.** Fat models over thin controllers; business logic lives in models. Service objects are used only for the cases that genuinely need them — external gateways/adapters and multi-record orchestration (`app/services/*`: `Payments`, `WebPushDeliverer`, `Sms`, `QueueServiceRecorder`, `SlotAvailability`). Form objects and interactors remain out of scope.
 2. **Simplicity over flexibility.** Solve the MVP problem, not hypothetical future problems.
 3. **Explicit authorization, never implicit.** Every workshop management action must pass through `require_workshop_access!`. Every admin action must authenticate via `authenticate_admin!`.
 4. **Consistency over cleverness.** Every agent, every session, every PR follows the same patterns. Patterns live in `ai/patterns/`.

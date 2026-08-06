@@ -3,10 +3,10 @@ name: review-pr
 description: >-
   Use when asked to review a pull request, review a PR, review the current
   branch's changes, or "code review" work in this repo (klaxon / AULABS).
-  Runs a full review — security, vulnerabilities, N+1 queries, duplication,
-  code smell, and AULABS conventions — and posts it to GitHub as one PR
-  review: a brief summary plus inline change-requests with code suggestions
-  on the exact lines.
+  Runs a full FAANG-level review — design, extensibility (single→bulk),
+  performance / N+1, security & vulnerabilities, readability, duplication,
+  tests, and AULABS conventions — and delivers it either as one GitHub PR
+  review (summary + inline code suggestions) or as a saved Markdown report.
 ---
 
 # PR Review — klaxon / AULABS
@@ -24,6 +24,10 @@ that; otherwise resolve the PR from the current branch.
 
 ## Principles
 
+- **The standard — does it improve overall code health?** Approve when the change
+  definitely makes the codebase healthier, not when it is perfect ([Google
+  eng-practices](https://google.github.io/eng-practices/review/reviewer/standard.html)).
+  Critique the code, never the author; explain the *why*; keep 🟢 nits few and optional.
 - **Review the diff, understand the whole.** Read the changed files in full for
   context, but only comment on lines that are part of this PR's changes.
 - **Be specific and actionable.** Every line-specific finding is an inline
@@ -34,8 +38,11 @@ that; otherwise resolve the PR from the current branch.
 - **Signal over noise.** Only raise what a human reviewer would. Mark true
   nits as 🟢 and keep them few.
 - **Defer to the repo's own rules.** Treat anti-patterns in `ai/patterns/*` and
-  violations of `ai/architecture.md` as blockers. Do not invent new standards
-  or suggest abstractions the project forbids (no service/form/interactor objects).
+  violations of `ai/architecture.md` as blockers, and don't invent new standards.
+  Service objects are sanctioned here for external gateways/adapters and
+  multi-record orchestration (`app/services/*` — e.g. `Payments`, `WebPushDeliverer`,
+  `QueueServiceRecorder`); flag a *new* one only when a model or concern is the
+  plainer fit, not on sight. Form/interactor objects remain out of scope.
 
 ## Severity legend
 
@@ -105,41 +112,60 @@ Also check that new models/controllers have Minitest coverage in `test/`
 (do not add tests to `spec/` — that RSpec dir is legacy). You need not run the
 full suite; note anything obviously untested or failing.
 
-## Step 4 — Review checklist
+## Step 4 — Review checklist (FAANG dimensions)
 
-Go through the diff against every item. Cite `ai/patterns/*` / `ai/architecture.md`
-when a rule comes from there.
+Judge the diff on every dimension below. Cite `ai/patterns/*` / `ai/architecture.md`
+when a rule comes from there. A hard anti-pattern or a security/data bug is 🔴; a
+smell / N+1 / duplication / missing test is 🟡; polish is 🟢.
+
+**Design & architecture**
+- One responsibility, right layer: fat model / thin controller
+  (`ai/patterns/controllers.md`); reuse existing concerns (`StateTransitionable`,
+  `TimeRangeable`, `PriceFormattable`) and the sanctioned service objects
+  (`app/services/*`) instead of logic in controllers/views.
+- Not over-engineered for hypothetical futures (`ai/architecture.md` — simplicity).
+
+**Extensibility → bulk (scale)**
+- Per-record `.save`/`.update`/`.create!`/`.destroy`/`.update_column`/notify/
+  broadcast **inside a loop** that should be set-based (`insert_all`/`update_all`/
+  `upsert_all`); and is the code shaped so a single-record path can go bulk without
+  a rewrite? → `ai/patterns/performance.md`.
+
+**Correctness & error handling**
+- Edge cases, nil/boundary handling; optimistic locking on status transitions;
+  transactions around multi-record changes; specific `rescue` + log, never a bare
+  `rescue`. → `ai/patterns/data_integrity.md`.
+
+**Performance**
+- N+1 (associations in a loop/view without `includes`/`preload`); per-row counts
+  where a scope/`counter_cache` fits; missing indexes on new `where`/`order`
+  columns; unbatched scans. → `ai/patterns/performance.md`.
 
 **Security & vulnerabilities**
-- `brakeman` warnings; `bundler-audit` / `importmap audit` advisories.
-- `params.permit!` or skipped strong params; mass-assignment of sensitive attrs.
-- SQL built by string interpolation; unsafe `find_by_sql`/`where("...#{}")`.
-- Secrets/keys/tokens committed.
-- Queries not scoped to the authenticated principal (`ai/patterns/authorization.md`).
-- Workshop access checked via `user.role` instead of `WorkshopOperator`.
+- `brakeman` / `bundler-audit` / `importmap audit` findings; unscoped
+  `Model.find(params[:id])`; interpolated SQL; `raw`/`html_safe` on user input;
+  `permit!` or mass-assigned privilege attrs (`role`, `status`); unsafe
+  `send_data`/uploads; committed secrets; `Marshal`/`YAML.load`.
+  → `ai/patterns/security.md`, `ai/patterns/authorization.md`.
 
-**N+1 queries**
-- Associations touched in a loop/view without `includes`/`preload`/`eager_load`.
-- Per-row counts/queries where a scope, `counter_cache`, or eager load fits.
+**Readability & maintainability**
+- Clear names; guard clauses; shallow nesting; magic numbers extracted to
+  constants; comments explain *why*, not *what*.
 
-**Duplication**
-- Copy-pasted validations/queries/logic that should be a scope, concern, or
-  shared partial — using Rails conventions, not new abstractions.
+**DRY / duplication**
+- Copy-pasted validations/queries/logic that should be a scope, concern, or shared
+  partial — using Rails conventions, not new abstractions.
 
-**Code smell**
-- Business logic in controllers (keep them thin; fat models).
-- Service/form/interactor objects (forbidden here).
-- `default_scope`; `update_columns` on append-only records; generic `rescue`.
-- `where(...).first` where `find_by` fits; missing guard clauses.
+**Tests & i18n (blockers when missing)**
+- New models/controllers have Minitest coverage in `test/` (not the legacy `spec/`),
+  and tests are meaningful (fail if the code breaks). User-facing strings via `t()`
+  with keys in **both** `uk.yml` **and** `en.yml`; no hardcoded UI text.
 
 **AULABS conventions (blockers)**
-- One `User` model; no Operator model; `Admin` kept separate.
-- User-facing strings via `t()` with keys in **both** `en.yml` **and** `uk.yml`;
-  no hardcoded UI text.
-- Migrations: `foreign_key: true` on references, `null: false` on required
-  columns, explicit integer enum hashes, lambda scopes.
-- Optimistic locking on status transitions where required; missing
-  validations/DB indexes; plain correctness/logic bugs.
+- One `User` model; no Operator model; `Admin` kept separate. Migrations:
+  `foreign_key: true` on references, `null: false` on required columns, integer enum
+  hashes, lambda scopes, DB unique indexes backing uniqueness validations. No
+  `default_scope`; no `update_columns`/`update_all` on append-only records.
 
 ## Step 5 — Assemble findings
 
@@ -150,7 +176,15 @@ severity, a one-line explanation, and — when you can — a `suggestion`.
   content must be the full replacement for those lines (match indentation).
 - Line-specific → inline comment. Non-line-specific → "General notes" in the summary.
 
-## Step 6 — Post the review
+## Choose the output
+
+Two modes — pick from the request/context (ask if unclear):
+
+- **GitHub PR review** (Step 6) — when a PR exists and the review should live on it.
+- **Saved Markdown report** (Step 7) — when there is no PR, or the user wants a
+  written report to read/track; also the natural choice for a whole-branch audit.
+
+## Step 6 — Post the review (GitHub mode)
 
 Build and submit **one** review with `python3` (avoids shell-escaping issues with
 multi-line bodies). Fill `summary` and `comments` from Step 5:
@@ -210,9 +244,15 @@ PY
 
 After posting, report the review URL and a short recap of what you flagged.
 
-## Step 7 — Local fallback (no PR)
+## Step 7 — Saved Markdown report (report mode)
 
-If no PR exists, review `git diff origin/master...HEAD` (or the working tree) and
-print the **same structure** to the terminal: the brief summary, then per-file
-findings with `file:line`, severity, and suggested diffs. Offer to open a PR if
-the user wants it posted.
+Write the same findings to `ai/reviews/<YYYY-MM-DD>-<branch>.md` (create the
+`ai/reviews/` directory if absent). Structure it like the GitHub review:
+
+- The brief summary + a "General notes" list (findings not tied to a line) first.
+- Then per-file sections, each finding as `` `file:line` `` + severity + a one-line
+  explanation and, where possible, a suggested diff (the same content you'd put in a
+  GitHub ```suggestion``` block).
+
+Base the diff on `git diff origin/master...HEAD` (or the working tree). Print the
+report path and a short recap, and offer to also post it to a PR (Step 6) if one exists.
